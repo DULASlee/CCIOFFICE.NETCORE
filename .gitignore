@@ -1,0 +1,79 @@
+# ==============================
+# .NET 项目通用忽略规则
+# ==============================
+
+# ------------------------------
+# 编译生成的文件/目录
+# ------------------------------
+bin/                   # 二进制输出目录（调试/发布）
+obj/                   # 中间编译产物目录
+out/                   # 旧版 .NET Core 输出目录（部分项目使用）
+publish/               # 发布输出目录（dotnet publish 生成）
+artifacts/             # 常见构建产物目录（如 CI/CD 生成）
+TestResults/           # 测试结果目录（xUnit/NUnit/MSTest）
+Coverage/              # 代码覆盖率报告目录
+
+# ------------------------------
+# NuGet 包管理相关
+# ------------------------------
+packages/              # 旧版 NuGet 包存储目录（已废弃，现代项目用 PackageReference）
+**/packages/           # 递归匹配所有层级的 packages 目录（兼容旧项目）
+*.nupkg                # NuGet 包文件（项目不应提交预打包的 nupkg）
+nuget-package-cache/   # NuGet 本地缓存目录（非项目目录）
+~$*.xls                # Office 文件临时缓存（可能混入项目）
+
+# ------------------------------
+# IDE/编辑器生成的文件
+# ------------------------------
+# Visual Studio
+.vs/                   # VS 2017+ 解决方案级缓存/日志目录
+*.suo                  # VS 2010- 解决方案用户选项文件（已弃用，但可能存在）
+*.user                 # 项目用户特定配置（如调试路径、启动设置）
+*.userprefs            # Rider 用户首选项
+*.aps                  # VS 设计器生成的资源文件
+_ReSharper.*           # ReSharper 分析结果文件
+*.dotSettings          # ReSharper/Rider 全局设置（用户级配置）
+
+# JetBrains Rider
+.idea/                 # Rider/IntelliJ 项目配置目录
+.idea/**/workspace.xml # 工作区特定配置（用户级）
+.idea/**/tasks.xml     # 任务配置（用户级）
+.idea/**/usage.statistics.xml # 统计信息（用户级）
+.idea/**/dictionaries/ # 拼写检查字典（用户级）
+.idea/**/shelf/        # 代码片段暂存（用户级）
+
+# VS Code
+.vscode/               # VS Code 工作区配置（若需共享可保留，但建议排除敏感配置）
+.vscode/settings.json  # 工作区设置（可能包含路径/插件配置）
+.vscode/tasks.json     # 任务运行配置
+.vscode/launch.json    # 调试配置
+.vscode/extensions.json # 推荐插件列表（可选保留）
+
+# ------------------------------
+# 系统/临时文件
+# ------------------------------
+[Bb]uild/              # 构建脚本临时目录（如 msbuild 生成）
+[Oo]bj/                # 部分大小写不敏感系统的误写目录
+*.log                  # 日志文件（如应用日志、调试日志）
+*.tmp                  # 临时文件
+*.cache                # 缓存文件（如依赖解析缓存）
+*.pid                  # 进程 ID 文件（如 ASP.NET Core 进程）
+*.pfx                  # 证书文件（敏感信息，禁止提交）
+*.p12                  # 证书文件（同上）
+*.snk                  # 强名称密钥文件（敏感，除非是公共密钥）
+
+# ------------------------------
+# 特定框架/工具忽略
+# ------------------------------
+# ASP.NET Core
+appsettings.*.json     # 环境特定配置（如 appsettings.Development.json，保留 appsettings.json 模板）
+*.config.user          # 配置文件用户覆盖（如 web.config.user）
+wwwroot/lib/           # 前端库（如通过 libman 管理，建议用包管理工具恢复）
+
+# Docker
+docker-compose.override.yml # 本地覆盖配置（不提交）
+.dockerignore            # 通常不需要，但如果是用户级可忽略（保留项目级）
+
+# CSharpTest
+xunit.runner.json      # xUnit 运行配置（用户级）
+*.g.cs                 # 自动生成的代码（如 protobuf、EF 迁移）
