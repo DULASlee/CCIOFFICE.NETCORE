@@ -1,0 +1,2068 @@
+[
+  {
+    "ContainingType": "VOL.WebApi.Controllers.OSS.AliOSSController",
+    "Method": "GetAccessToken",
+    "RelativePath": "api/alioss/getAccessToken",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.Builder.BuilderController",
+    "Method": "CreateEntityModel",
+    "RelativePath": "api/Builder/CreateModel",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tableInfo",
+        "Type": "VOL.Entity.DomainModels.Sys_TableInfo",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.Builder.BuilderController",
+    "Method": "CreateServices",
+    "RelativePath": "api/Builder/CreateServices",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tableName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "nameSpace",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "foldername",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "partial",
+        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "api",
+        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.Builder.BuilderController",
+    "Method": "CreateVuePage",
+    "RelativePath": "api/Builder/CreateVuePage",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "sysTableInfo",
+        "Type": "VOL.Entity.DomainModels.Sys_TableInfo",
+        "IsRequired": true
+      },
+      {
+        "Name": "vuePath",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.Builder.BuilderController",
+    "Method": "DelTree",
+    "RelativePath": "api/Builder/delTree",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "table_Id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.Builder.BuilderController",
+    "Method": "GetTableTree",
+    "RelativePath": "api/Builder/GetTableTree",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.Builder.BuilderController",
+    "Method": "LoadTable",
+    "RelativePath": "api/Builder/LoadTableInfo",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "parentId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "tableName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "columnCNName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "nameSpace",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "foldername",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "table_Id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "isTreeLoad",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.Builder.BuilderController",
+    "Method": "SaveEidt",
+    "RelativePath": "api/Builder/Save",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tableInfo",
+        "Type": "VOL.Entity.DomainModels.Sys_TableInfo",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.Builder.BuilderController",
+    "Method": "SyncTable",
+    "RelativePath": "api/Builder/syncTable",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tableName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.Sys.IServices.IFormCollectionObjectService, VOL.Sys, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/FormCollectionObject/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.FormDesignOptionsController",
+    "Method": "GetFormOptions",
+    "RelativePath": "api/FormDesignOptions/getFormOptions",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.FormDesignOptionsController",
+    "Method": "GetList",
+    "RelativePath": "api/FormDesignOptions/getList",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.Sys.IServices.IFormDesignOptionsService, VOL.Sys, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/FormDesignOptions/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.FormDesignOptionsController",
+    "Method": "Submit",
+    "RelativePath": "api/FormDesignOptions/submit",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "saveModel",
+        "Type": "VOL.Entity.DomainModels.SaveModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_MenuController",
+    "Method": "DelMenu",
+    "RelativePath": "api/menu/delMenu",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "menuId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_MenuController",
+    "Method": "GetMenu",
+    "RelativePath": "api/menu/getMenu",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.Sys.IServices.ISys_MenuService, VOL.Sys, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/menu/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_MenuController",
+    "Method": "GetTreeItem",
+    "RelativePath": "api/menu/getTreeItem",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "menuId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_MenuController",
+    "Method": "GetTreeMenu",
+    "RelativePath": "api/menu/getTreeMenu",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_MenuController",
+    "Method": "GetTreeMenu",
+    "RelativePath": "api/menu/getTreeMenu",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_MenuController",
+    "Method": "Save",
+    "RelativePath": "api/menu/save",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "menu",
+        "Type": "VOL.Entity.DomainModels.Sys_Menu",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_Bom_DetailService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_Bom_Detail/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_Bom_MainService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_Bom_Main/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_CustomerService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_Customer/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_DefectiveProductRecordService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_DefectiveProductRecord/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_EquipmentFaultRecordService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_EquipmentFaultRecord/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_EquipmentMaintenanceService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_EquipmentMaintenance/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_EquipmentManagementService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_EquipmentManagement/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_EquipmentRepairService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_EquipmentRepair/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_InventoryManagementService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_InventoryManagement/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_LocationManagementService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_LocationManagement/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_MaterialService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_Material/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.MES.Controllers.MES_MaterialCatalogController",
+    "Method": "GetList",
+    "RelativePath": "api/MES_MaterialCatalog/getList",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_MaterialCatalogService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_MaterialCatalog/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_PackagingService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_Packaging/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_ProcessService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_Process/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_ProcessReportService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_ProcessReport/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_ProcessRouteService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_ProcessRoute/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_ProductInboundService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_ProductInbound/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_ProductionLineService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_ProductionLine/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_ProductionLineDeviceService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_ProductionLineDevice/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_ProductionOrderService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_ProductionOrder/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_ProductionPlanChangeRecordService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_ProductionPlanChangeRecord/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_ProductionPlanDetailService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_ProductionPlanDetail/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_ProductionReportingService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_ProductionReporting/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_ProductionReportingDetailService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_ProductionReportingDetail/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_ProductOutboundService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_ProductOutbound/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_QualityInspectionPlanService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_QualityInspectionPlan/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_QualityInspectionPlanDetailService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_QualityInspectionPlanDetail/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_QualityInspectionRecordService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_QualityInspectionRecord/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_SchedulingPlanService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_SchedulingPlan/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_SupplierService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_Supplier/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.IMES_WarehouseManagementService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/MES_WarehouseManagement/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_RoleController",
+    "Method": "GetCurrentTreePermission",
+    "RelativePath": "api/role/getCurrentTreePermission",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_RoleController",
+    "Method": "GetPageData",
+    "RelativePath": "api/role/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_RoleController",
+    "Method": "GetTreeTableChildrenData",
+    "RelativePath": "api/role/getTreeTableChildrenData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "roleId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_RoleController",
+    "Method": "GetTreeTableRootData",
+    "RelativePath": "api/role/getTreeTableRootData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "options",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_RoleController",
+    "Method": "GetUserChildRoles",
+    "RelativePath": "api/role/getUserChildRoles",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_RoleController",
+    "Method": "GetUserTreePermission",
+    "RelativePath": "api/role/getUserTreePermission",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "roleId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_RoleController",
+    "Method": "SavePermission",
+    "RelativePath": "api/role/savePermission",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userPermissions",
+        "Type": "System.Collections.Generic.List\u00601[[VOL.Sys.Services.UserPermissions, VOL.Sys, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      },
+      {
+        "Name": "roleId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_DepartmentController",
+    "Method": "GetPageData",
+    "RelativePath": "api/Sys_Department/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_DepartmentController",
+    "Method": "GetTreeTableChildrenData",
+    "RelativePath": "api/Sys_Department/getTreeTableChildrenData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "departmentId",
+        "Type": "System.Guid",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_DepartmentController",
+    "Method": "GetTreeTableRootData",
+    "RelativePath": "api/Sys_Department/getTreeTableRootData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "options",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_DictionaryController",
+    "Method": "GetBuilderDictionary",
+    "RelativePath": "api/Sys_Dictionary/GetBuilderDictionary",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.Sys.IServices.ISys_DictionaryService, VOL.Sys, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/Sys_Dictionary/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_DictionaryController",
+    "Method": "GetRemoteDefaultKeyValue",
+    "RelativePath": "api/Sys_Dictionary/getRemoteDefaultKeyValue",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dicNo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "key",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_DictionaryController",
+    "Method": "GetSearchDictionary",
+    "RelativePath": "api/Sys_Dictionary/getSearchDictionary",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dicNo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "value",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_DictionaryController",
+    "Method": "GetTableDictionary",
+    "RelativePath": "api/Sys_Dictionary/getTableDictionary",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "keyData",
+        "Type": "System.Collections.Generic.Dictionary\u00602[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Object[], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_DictionaryController",
+    "Method": "GetVueDictionary",
+    "RelativePath": "api/Sys_Dictionary/GetVueDictionary",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dicNos",
+        "Type": "System.String[]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_DictionaryListController",
+    "Method": "DownLoadTemplate",
+    "RelativePath": "api/Sys_DictionaryList/DownLoadTemplate",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_DictionaryListController",
+    "Method": "Export",
+    "RelativePath": "api/Sys_DictionaryList/Export",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.Sys.IServices.ISys_DictionaryListService, VOL.Sys, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/Sys_DictionaryList/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_DictionaryListController",
+    "Method": "Import",
+    "RelativePath": "api/Sys_DictionaryList/Import",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "fileInput",
+        "Type": "System.Collections.Generic.List\u00601[[Microsoft.AspNetCore.Http.IFormFile, Microsoft.AspNetCore.Http.Features, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.Sys.IServices.ISys_LogService, VOL.Sys, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/Sys_Log/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.Sys.IServices.ISys_QuartzLogService, VOL.Sys, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/Sys_QuartzLog/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.Sys.IServices.ISys_QuartzOptionsService, VOL.Sys, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/Sys_QuartzOptions/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_QuartzOptionsController",
+    "Method": "Pause",
+    "RelativePath": "api/Sys_QuartzOptions/pause",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "taskOptions",
+        "Type": "VOL.Entity.DomainModels.Sys_QuartzOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_QuartzOptionsController",
+    "Method": "Run",
+    "RelativePath": "api/Sys_QuartzOptions/run",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "taskOptions",
+        "Type": "VOL.Entity.DomainModels.Sys_QuartzOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_QuartzOptionsController",
+    "Method": "Start",
+    "RelativePath": "api/Sys_QuartzOptions/start",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "taskOptions",
+        "Type": "VOL.Entity.DomainModels.Sys_QuartzOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_QuartzOptionsController",
+    "Method": "TaskTest",
+    "RelativePath": "api/Sys_QuartzOptions/taskTest",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_QuartzOptionsController",
+    "Method": "TaskTest",
+    "RelativePath": "api/Sys_QuartzOptions/taskTest",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_QuartzOptionsController",
+    "Method": "Test2",
+    "RelativePath": "api/Sys_QuartzOptions/test2",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_QuartzOptionsController",
+    "Method": "Test2",
+    "RelativePath": "api/Sys_QuartzOptions/test2",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_RoleController",
+    "Method": "GetCurrentTreePermission",
+    "RelativePath": "api/Sys_Role/getCurrentTreePermission",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_RoleController",
+    "Method": "GetPageData",
+    "RelativePath": "api/Sys_Role/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_RoleController",
+    "Method": "GetTreeTableChildrenData",
+    "RelativePath": "api/Sys_Role/getTreeTableChildrenData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "roleId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_RoleController",
+    "Method": "GetTreeTableRootData",
+    "RelativePath": "api/Sys_Role/getTreeTableRootData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "options",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_RoleController",
+    "Method": "GetUserChildRoles",
+    "RelativePath": "api/Sys_Role/getUserChildRoles",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_RoleController",
+    "Method": "GetUserTreePermission",
+    "RelativePath": "api/Sys_Role/getUserTreePermission",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "roleId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_RoleController",
+    "Method": "SavePermission",
+    "RelativePath": "api/Sys_Role/savePermission",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userPermissions",
+        "Type": "System.Collections.Generic.List\u00601[[VOL.Sys.Services.UserPermissions, VOL.Sys, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      },
+      {
+        "Name": "roleId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_UserController",
+    "Method": "GetCurrentUserInfo",
+    "RelativePath": "api/Sys_User/getCurrentUserInfo",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.Sys.IServices.ISys_UserService, VOL.Sys, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/Sys_User/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_UserController",
+    "Method": "GetVierificationCode",
+    "RelativePath": "api/Sys_User/getVierificationCode",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_UserController",
+    "Method": "Login",
+    "RelativePath": "api/Sys_User/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginInfo",
+        "Type": "VOL.Entity.DomainModels.LoginInfo",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_UserController",
+    "Method": "Login",
+    "RelativePath": "api/Sys_User/login",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginInfo",
+        "Type": "VOL.Entity.DomainModels.LoginInfo",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_UserController",
+    "Method": "ModifyPwd",
+    "RelativePath": "api/Sys_User/modifyPwd",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "info",
+        "Type": "System.Collections.Generic.Dictionary\u00602[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_UserController",
+    "Method": "ModifyUserPwd",
+    "RelativePath": "api/Sys_User/modifyUserPwd",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginInfo",
+        "Type": "VOL.Entity.DomainModels.LoginInfo",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_UserController",
+    "Method": "ReplaceToken",
+    "RelativePath": "api/Sys_User/replaceToken",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_UserController",
+    "Method": "UpdateUserInfo",
+    "RelativePath": "api/Sys_User/updateUserInfo",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "user",
+        "Type": "VOL.Entity.DomainModels.Sys_User",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_WorkFlowController",
+    "Method": "GetFields",
+    "RelativePath": "api/Sys_WorkFlow/getFields",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "table",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_WorkFlowController",
+    "Method": "GetNodeDic",
+    "RelativePath": "api/Sys_WorkFlow/getNodeDic",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_WorkFlowController",
+    "Method": "GetOptions",
+    "RelativePath": "api/Sys_WorkFlow/getOptions",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.Sys.IServices.ISys_WorkFlowService, VOL.Sys, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/Sys_WorkFlow/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_WorkFlowController",
+    "Method": "GetSteps",
+    "RelativePath": "api/Sys_WorkFlow/getSteps",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ids",
+        "Type": "System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": true
+      },
+      {
+        "Name": "tableName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_WorkFlowController",
+    "Method": "GetTableInfo",
+    "RelativePath": "api/Sys_WorkFlow/getTableInfo",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.Sys.IServices.ISys_WorkFlowStepService, VOL.Sys, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/Sys_WorkFlowStep/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_WorkFlowTableController",
+    "Method": "GetPageData",
+    "RelativePath": "api/Sys_WorkFlowTable/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.Sys.IServices.ISys_WorkFlowTableAuditLogService, VOL.Sys, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/Sys_WorkFlowTableAuditLog/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.Sys.IServices.ISys_WorkFlowTableStepService, VOL.Sys, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/Sys_WorkFlowTableStep/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.MES.IServices.ITestServiceService, VOL.MES, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/TestService/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_UserController",
+    "Method": "GetCurrentUserInfo",
+    "RelativePath": "api/User/getCurrentUserInfo",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Core.Controllers.Basic.ApiBaseController\u00601[[VOL.Sys.IServices.ISys_UserService, VOL.Sys, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "GetPageData",
+    "RelativePath": "api/User/GetPageData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loadData",
+        "Type": "VOL.Entity.DomainModels.PageDataOptions",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_UserController",
+    "Method": "GetVierificationCode",
+    "RelativePath": "api/User/getVierificationCode",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_UserController",
+    "Method": "Login",
+    "RelativePath": "api/User/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginInfo",
+        "Type": "VOL.Entity.DomainModels.LoginInfo",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_UserController",
+    "Method": "Login",
+    "RelativePath": "api/User/login",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginInfo",
+        "Type": "VOL.Entity.DomainModels.LoginInfo",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_UserController",
+    "Method": "ModifyPwd",
+    "RelativePath": "api/User/modifyPwd",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "info",
+        "Type": "System.Collections.Generic.Dictionary\u00602[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_UserController",
+    "Method": "ModifyUserPwd",
+    "RelativePath": "api/User/modifyUserPwd",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginInfo",
+        "Type": "VOL.Entity.DomainModels.LoginInfo",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_UserController",
+    "Method": "ReplaceToken",
+    "RelativePath": "api/User/replaceToken",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.Sys.Controllers.Sys_UserController",
+    "Method": "UpdateUserInfo",
+    "RelativePath": "api/User/updateUserInfo",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "user",
+        "Type": "VOL.Entity.DomainModels.Sys_User",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.ObjectActionValidatorExampleController",
+    "Method": "Test1",
+    "RelativePath": "validatorExample/test1",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "phoneNo",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.ObjectActionValidatorExampleController",
+    "Method": "Test1",
+    "RelativePath": "validatorExample/test1",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "phoneNo",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.ObjectActionValidatorExampleController",
+    "Method": "Test2",
+    "RelativePath": "validatorExample/test2",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "phoneNo",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.ObjectActionValidatorExampleController",
+    "Method": "Test2",
+    "RelativePath": "validatorExample/test2",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "phoneNo",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.ObjectActionValidatorExampleController",
+    "Method": "Test3",
+    "RelativePath": "validatorExample/test3",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "local",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "qty",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.ObjectActionValidatorExampleController",
+    "Method": "Test3",
+    "RelativePath": "validatorExample/test3",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "local",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "qty",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.ObjectActionValidatorExampleController",
+    "Method": "Test4",
+    "RelativePath": "validatorExample/Test4",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginInfo",
+        "Type": "VOL.Entity.DomainModels.LoginInfo",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.ObjectActionValidatorExampleController",
+    "Method": "Test4",
+    "RelativePath": "validatorExample/Test4",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginInfo",
+        "Type": "VOL.Entity.DomainModels.LoginInfo",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.ObjectActionValidatorExampleController",
+    "Method": "Test5",
+    "RelativePath": "validatorExample/Test5",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginInfo",
+        "Type": "VOL.Entity.DomainModels.LoginInfo",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.ObjectActionValidatorExampleController",
+    "Method": "Test5",
+    "RelativePath": "validatorExample/Test5",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginInfo",
+        "Type": "VOL.Entity.DomainModels.LoginInfo",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.ObjectActionValidatorExampleController",
+    "Method": "Test6",
+    "RelativePath": "validatorExample/Test6",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginInfo",
+        "Type": "VOL.Entity.DomainModels.LoginInfo",
+        "IsRequired": true
+      },
+      {
+        "Name": "phoneNo",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VOL.WebApi.Controllers.ObjectActionValidatorExampleController",
+    "Method": "Test6",
+    "RelativePath": "validatorExample/Test6",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginInfo",
+        "Type": "VOL.Entity.DomainModels.LoginInfo",
+        "IsRequired": true
+      },
+      {
+        "Name": "phoneNo",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

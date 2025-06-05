@@ -1,0 +1,140 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\2025HXSmartConstruct\\CCIOFFICE.NETCORE\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{4DB3C91B-93FE-4937-8B58-DDD3F57D4607}|VOL.WebApi\\VOL.WebApi.csproj|d:\\2025hxsmartconstruct\\ccioffice.netcore\\vol.webapi\\controllers\\sys\\partial\\sys_usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4DB3C91B-93FE-4937-8B58-DDD3F57D4607}|VOL.WebApi\\VOL.WebApi.csproj|solutionrelative:vol.webapi\\controllers\\sys\\partial\\sys_usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4DB3C91B-93FE-4937-8B58-DDD3F57D4607}|VOL.WebApi\\VOL.WebApi.csproj|d:\\2025hxsmartconstruct\\ccioffice.netcore\\vol.webapi\\controllers\\sys\\sys_usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4DB3C91B-93FE-4937-8B58-DDD3F57D4607}|VOL.WebApi\\VOL.WebApi.csproj|solutionrelative:vol.webapi\\controllers\\sys\\sys_usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4DB3C91B-93FE-4937-8B58-DDD3F57D4607}|VOL.WebApi\\VOL.WebApi.csproj|d:\\2025hxsmartconstruct\\ccioffice.netcore\\vol.webapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{4DB3C91B-93FE-4937-8B58-DDD3F57D4607}|VOL.WebApi\\VOL.WebApi.csproj|solutionrelative:vol.webapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C71993AA-586E-4AF4-AD77-B5D7A07B3B7B}|VOL.Builder\\VOL.Builder.csproj|d:\\2025hxsmartconstruct\\ccioffice.netcore\\vol.builder\\iservices\\core\\partial\\isys_tableinfoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C71993AA-586E-4AF4-AD77-B5D7A07B3B7B}|VOL.Builder\\VOL.Builder.csproj|solutionrelative:vol.builder\\iservices\\core\\partial\\isys_tableinfoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C71993AA-586E-4AF4-AD77-B5D7A07B3B7B}|VOL.Builder\\VOL.Builder.csproj|d:\\2025hxsmartconstruct\\ccioffice.netcore\\vol.builder\\iservices\\core\\isys_tableinfoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C71993AA-586E-4AF4-AD77-B5D7A07B3B7B}|VOL.Builder\\VOL.Builder.csproj|solutionrelative:vol.builder\\iservices\\core\\isys_tableinfoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C71993AA-586E-4AF4-AD77-B5D7A07B3B7B}|VOL.Builder\\VOL.Builder.csproj|d:\\2025hxsmartconstruct\\ccioffice.netcore\\vol.builder\\repositories\\core\\sys_tableinforepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C71993AA-586E-4AF4-AD77-B5D7A07B3B7B}|VOL.Builder\\VOL.Builder.csproj|solutionrelative:vol.builder\\repositories\\core\\sys_tableinforepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C71993AA-586E-4AF4-AD77-B5D7A07B3B7B}|VOL.Builder\\VOL.Builder.csproj|d:\\2025hxsmartconstruct\\ccioffice.netcore\\vol.builder\\services\\core\\partial\\sys_tableinfoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C71993AA-586E-4AF4-AD77-B5D7A07B3B7B}|VOL.Builder\\VOL.Builder.csproj|solutionrelative:vol.builder\\services\\core\\partial\\sys_tableinfoservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Sys_UserController.cs",
+              "DocumentMoniker": "D:\\2025HXSmartConstruct\\CCIOFFICE.NETCORE\\VOL.WebApi\\Controllers\\Sys\\Partial\\Sys_UserController.cs",
+              "RelativeDocumentMoniker": "VOL.WebApi\\Controllers\\Sys\\Partial\\Sys_UserController.cs",
+              "ToolTip": "D:\\2025HXSmartConstruct\\CCIOFFICE.NETCORE\\VOL.WebApi\\Controllers\\Sys\\Partial\\Sys_UserController.cs",
+              "RelativeToolTip": "VOL.WebApi\\Controllers\\Sys\\Partial\\Sys_UserController.cs",
+              "ViewState": "AgIAAJcAAAAAAAAAAAAgwKQAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-05T06:53:50.217Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Sys_UserController.cs",
+              "DocumentMoniker": "D:\\2025HXSmartConstruct\\CCIOFFICE.NETCORE\\VOL.WebApi\\Controllers\\Sys\\Sys_UserController.cs",
+              "RelativeDocumentMoniker": "VOL.WebApi\\Controllers\\Sys\\Sys_UserController.cs",
+              "ToolTip": "D:\\2025HXSmartConstruct\\CCIOFFICE.NETCORE\\VOL.WebApi\\Controllers\\Sys\\Sys_UserController.cs",
+              "RelativeToolTip": "VOL.WebApi\\Controllers\\Sys\\Sys_UserController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-05T06:53:43.529Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\2025HXSmartConstruct\\CCIOFFICE.NETCORE\\VOL.WebApi\\appsettings.json",
+              "RelativeDocumentMoniker": "VOL.WebApi\\appsettings.json",
+              "ToolTip": "D:\\2025HXSmartConstruct\\CCIOFFICE.NETCORE\\VOL.WebApi\\appsettings.json",
+              "RelativeToolTip": "VOL.WebApi\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAA+AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-06-05T06:53:04.562Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ISys_TableInfoService.cs",
+              "DocumentMoniker": "D:\\2025HXSmartConstruct\\CCIOFFICE.NETCORE\\VOL.Builder\\IServices\\Core\\Partial\\ISys_TableInfoService.cs",
+              "RelativeDocumentMoniker": "VOL.Builder\\IServices\\Core\\Partial\\ISys_TableInfoService.cs",
+              "ToolTip": "D:\\2025HXSmartConstruct\\CCIOFFICE.NETCORE\\VOL.Builder\\IServices\\Core\\Partial\\ISys_TableInfoService.cs",
+              "RelativeToolTip": "VOL.Builder\\IServices\\Core\\Partial\\ISys_TableInfoService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-05T03:46:18.535Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ISys_TableInfoService.cs",
+              "DocumentMoniker": "D:\\2025HXSmartConstruct\\CCIOFFICE.NETCORE\\VOL.Builder\\IServices\\Core\\ISys_TableInfoService.cs",
+              "RelativeDocumentMoniker": "VOL.Builder\\IServices\\Core\\ISys_TableInfoService.cs",
+              "ToolTip": "D:\\2025HXSmartConstruct\\CCIOFFICE.NETCORE\\VOL.Builder\\IServices\\Core\\ISys_TableInfoService.cs",
+              "RelativeToolTip": "VOL.Builder\\IServices\\Core\\ISys_TableInfoService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-05T03:46:15.717Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Sys_TableInfoRepository.cs",
+              "DocumentMoniker": "D:\\2025HXSmartConstruct\\CCIOFFICE.NETCORE\\VOL.Builder\\Repositories\\Core\\Sys_TableInfoRepository.cs",
+              "RelativeDocumentMoniker": "VOL.Builder\\Repositories\\Core\\Sys_TableInfoRepository.cs",
+              "ToolTip": "D:\\2025HXSmartConstruct\\CCIOFFICE.NETCORE\\VOL.Builder\\Repositories\\Core\\Sys_TableInfoRepository.cs",
+              "RelativeToolTip": "VOL.Builder\\Repositories\\Core\\Sys_TableInfoRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-05T03:46:08.667Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Sys_TableInfoService.cs",
+              "DocumentMoniker": "D:\\2025HXSmartConstruct\\CCIOFFICE.NETCORE\\VOL.Builder\\Services\\Core\\Partial\\Sys_TableInfoService.cs",
+              "RelativeDocumentMoniker": "VOL.Builder\\Services\\Core\\Partial\\Sys_TableInfoService.cs",
+              "ToolTip": "D:\\2025HXSmartConstruct\\CCIOFFICE.NETCORE\\VOL.Builder\\Services\\Core\\Partial\\Sys_TableInfoService.cs",
+              "RelativeToolTip": "VOL.Builder\\Services\\Core\\Partial\\Sys_TableInfoService.cs",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAAAwJAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-04T21:27:28.776Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

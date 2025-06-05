@@ -1,0 +1,4888 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "VOL.Core对外三方Api",
+    "description": "xxx接口文档",
+    "version": "v2"
+  },
+  "paths": {
+    "/api/alioss/getAccessToken": {
+      "get": {
+        "tags": [
+          "AliOSS"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Builder/GetTableTree": {
+      "post": {
+        "tags": [
+          "Builder"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Builder/CreateVuePage": {
+      "post": {
+        "tags": [
+          "Builder"
+        ],
+        "parameters": [
+          {
+            "name": "vuePath",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_TableInfo"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_TableInfo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_TableInfo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_TableInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Builder/CreateModel": {
+      "post": {
+        "tags": [
+          "Builder"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_TableInfo"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_TableInfo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_TableInfo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_TableInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Builder/Save": {
+      "post": {
+        "tags": [
+          "Builder"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_TableInfo"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_TableInfo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_TableInfo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_TableInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Builder/CreateServices": {
+      "post": {
+        "tags": [
+          "Builder"
+        ],
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "nameSpace",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "foldername",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "partial",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "api",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Builder/LoadTableInfo": {
+      "post": {
+        "tags": [
+          "Builder"
+        ],
+        "parameters": [
+          {
+            "name": "parentId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "tableName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "columnCNName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "nameSpace",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "foldername",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "table_Id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "isTreeLoad",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Builder/delTree": {
+      "post": {
+        "tags": [
+          "Builder"
+        ],
+        "parameters": [
+          {
+            "name": "table_Id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Builder/syncTable": {
+      "post": {
+        "tags": [
+          "Builder"
+        ],
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/FormCollectionObject/GetPageData": {
+      "post": {
+        "tags": [
+          "FormCollectionObject"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/FormDesignOptions/getFormOptions": {
+      "get": {
+        "tags": [
+          "FormDesignOptions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/FormDesignOptions/submit": {
+      "post": {
+        "tags": [
+          "FormDesignOptions"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveModel"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/FormDesignOptions/getList": {
+      "get": {
+        "tags": [
+          "FormDesignOptions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/FormDesignOptions/GetPageData": {
+      "post": {
+        "tags": [
+          "FormDesignOptions"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_Bom_Detail/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_Bom_Detail"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_Bom_Main/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_Bom_Main"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_Customer/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_Customer"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_DefectiveProductRecord/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_DefectiveProductRecord"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_EquipmentFaultRecord/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_EquipmentFaultRecord"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_EquipmentMaintenance/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_EquipmentMaintenance"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_EquipmentManagement/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_EquipmentManagement"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_EquipmentRepair/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_EquipmentRepair"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_InventoryManagement/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_InventoryManagement"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_LocationManagement/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_LocationManagement"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_Material/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_Material"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_MaterialCatalog/getList": {
+      "get": {
+        "tags": [
+          "MES_MaterialCatalog"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_MaterialCatalog/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_MaterialCatalog"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_Packaging/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_Packaging"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_Process/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_Process"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_ProcessReport/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_ProcessReport"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_ProcessRoute/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_ProcessRoute"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_ProductInbound/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_ProductInbound"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_ProductionLine/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_ProductionLine"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_ProductionLineDevice/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_ProductionLineDevice"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_ProductionOrder/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_ProductionOrder"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_ProductionPlanChangeRecord/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_ProductionPlanChangeRecord"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_ProductionPlanDetail/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_ProductionPlanDetail"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_ProductionReporting/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_ProductionReporting"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_ProductionReportingDetail/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_ProductionReportingDetail"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_ProductOutbound/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_ProductOutbound"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_QualityInspectionPlan/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_QualityInspectionPlan"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_QualityInspectionPlanDetail/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_QualityInspectionPlanDetail"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_QualityInspectionRecord/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_QualityInspectionRecord"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_SchedulingPlan/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_SchedulingPlan"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_Supplier/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_Supplier"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MES_WarehouseManagement/GetPageData": {
+      "post": {
+        "tags": [
+          "MES_WarehouseManagement"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/validatorExample/test1": {
+      "post": {
+        "tags": [
+          "ObjectActionValidatorExample"
+        ],
+        "parameters": [
+          {
+            "name": "userName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "phoneNo",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "ObjectActionValidatorExample"
+        ],
+        "parameters": [
+          {
+            "name": "userName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "phoneNo",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/validatorExample/test2": {
+      "post": {
+        "tags": [
+          "ObjectActionValidatorExample"
+        ],
+        "parameters": [
+          {
+            "name": "userName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "phoneNo",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "ObjectActionValidatorExample"
+        ],
+        "parameters": [
+          {
+            "name": "userName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "phoneNo",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/validatorExample/test3": {
+      "post": {
+        "tags": [
+          "ObjectActionValidatorExample"
+        ],
+        "parameters": [
+          {
+            "name": "local",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "qty",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "ObjectActionValidatorExample"
+        ],
+        "parameters": [
+          {
+            "name": "local",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "qty",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/validatorExample/Test4": {
+      "post": {
+        "tags": [
+          "ObjectActionValidatorExample"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "ObjectActionValidatorExample"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/validatorExample/Test5": {
+      "post": {
+        "tags": [
+          "ObjectActionValidatorExample"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "ObjectActionValidatorExample"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/validatorExample/Test6": {
+      "post": {
+        "tags": [
+          "ObjectActionValidatorExample"
+        ],
+        "parameters": [
+          {
+            "name": "phoneNo",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "ObjectActionValidatorExample"
+        ],
+        "parameters": [
+          {
+            "name": "phoneNo",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_Department/GetPageData": {
+      "post": {
+        "tags": [
+          "Sys_Department"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_Department/getTreeTableRootData": {
+      "post": {
+        "tags": [
+          "Sys_Department"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_Department/getTreeTableChildrenData": {
+      "post": {
+        "tags": [
+          "Sys_Department"
+        ],
+        "parameters": [
+          {
+            "name": "departmentId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_Dictionary/GetVueDictionary": {
+      "post": {
+        "tags": [
+          "Sys_Dictionary"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_Dictionary/getTableDictionary": {
+      "post": {
+        "tags": [
+          "Sys_Dictionary"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": { }
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": { }
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": { }
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": { }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_Dictionary/getSearchDictionary": {
+      "post": {
+        "tags": [
+          "Sys_Dictionary"
+        ],
+        "parameters": [
+          {
+            "name": "dicNo",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "value",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_Dictionary/getRemoteDefaultKeyValue": {
+      "post": {
+        "tags": [
+          "Sys_Dictionary"
+        ],
+        "parameters": [
+          {
+            "name": "dicNo",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_Dictionary/GetBuilderDictionary": {
+      "post": {
+        "tags": [
+          "Sys_Dictionary"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_Dictionary/GetPageData": {
+      "post": {
+        "tags": [
+          "Sys_Dictionary"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_DictionaryList/Export": {
+      "post": {
+        "tags": [
+          "Sys_DictionaryList"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_DictionaryList/Import": {
+      "post": {
+        "tags": [
+          "Sys_DictionaryList"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fileInput": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              },
+              "encoding": {
+                "fileInput": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_DictionaryList/DownLoadTemplate": {
+      "get": {
+        "tags": [
+          "Sys_DictionaryList"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_DictionaryList/GetPageData": {
+      "post": {
+        "tags": [
+          "Sys_DictionaryList"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_Log/GetPageData": {
+      "post": {
+        "tags": [
+          "Sys_Log"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/menu/getTreeMenu": {
+      "get": {
+        "tags": [
+          "Sys_Menu"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Sys_Menu"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/menu/getMenu": {
+      "post": {
+        "tags": [
+          "Sys_Menu"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/menu/getTreeItem": {
+      "post": {
+        "tags": [
+          "Sys_Menu"
+        ],
+        "parameters": [
+          {
+            "name": "menuId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/menu/save": {
+      "post": {
+        "tags": [
+          "Sys_Menu"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_Menu"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_Menu"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_Menu"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_Menu"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/menu/delMenu": {
+      "post": {
+        "tags": [
+          "Sys_Menu"
+        ],
+        "parameters": [
+          {
+            "name": "menuId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/menu/GetPageData": {
+      "post": {
+        "tags": [
+          "Sys_Menu"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_QuartzLog/GetPageData": {
+      "post": {
+        "tags": [
+          "Sys_QuartzLog"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_QuartzOptions/test2": {
+      "get": {
+        "tags": [
+          "Sys_QuartzOptions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Sys_QuartzOptions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_QuartzOptions/taskTest": {
+      "get": {
+        "tags": [
+          "Sys_QuartzOptions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Sys_QuartzOptions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_QuartzOptions/run": {
+      "post": {
+        "tags": [
+          "Sys_QuartzOptions"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_QuartzOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_QuartzOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_QuartzOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_QuartzOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_QuartzOptions/start": {
+      "post": {
+        "tags": [
+          "Sys_QuartzOptions"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_QuartzOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_QuartzOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_QuartzOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_QuartzOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_QuartzOptions/pause": {
+      "post": {
+        "tags": [
+          "Sys_QuartzOptions"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_QuartzOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_QuartzOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_QuartzOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_QuartzOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_QuartzOptions/GetPageData": {
+      "post": {
+        "tags": [
+          "Sys_QuartzOptions"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/role/getCurrentTreePermission": {
+      "post": {
+        "tags": [
+          "Sys_Role"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_Role/getCurrentTreePermission": {
+      "post": {
+        "tags": [
+          "Sys_Role"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/role/getUserTreePermission": {
+      "post": {
+        "tags": [
+          "Sys_Role"
+        ],
+        "parameters": [
+          {
+            "name": "roleId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_Role/getUserTreePermission": {
+      "post": {
+        "tags": [
+          "Sys_Role"
+        ],
+        "parameters": [
+          {
+            "name": "roleId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/role/savePermission": {
+      "post": {
+        "tags": [
+          "Sys_Role"
+        ],
+        "parameters": [
+          {
+            "name": "roleId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/UserPermissions"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/UserPermissions"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/UserPermissions"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/UserPermissions"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_Role/savePermission": {
+      "post": {
+        "tags": [
+          "Sys_Role"
+        ],
+        "parameters": [
+          {
+            "name": "roleId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/UserPermissions"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/UserPermissions"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/UserPermissions"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/UserPermissions"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/role/getUserChildRoles": {
+      "post": {
+        "tags": [
+          "Sys_Role"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_Role/getUserChildRoles": {
+      "post": {
+        "tags": [
+          "Sys_Role"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/role/GetPageData": {
+      "post": {
+        "tags": [
+          "Sys_Role"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_Role/GetPageData": {
+      "post": {
+        "tags": [
+          "Sys_Role"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/role/getTreeTableRootData": {
+      "post": {
+        "tags": [
+          "Sys_Role"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_Role/getTreeTableRootData": {
+      "post": {
+        "tags": [
+          "Sys_Role"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/role/getTreeTableChildrenData": {
+      "post": {
+        "tags": [
+          "Sys_Role"
+        ],
+        "parameters": [
+          {
+            "name": "roleId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_Role/getTreeTableChildrenData": {
+      "post": {
+        "tags": [
+          "Sys_Role"
+        ],
+        "parameters": [
+          {
+            "name": "roleId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/login": {
+      "post": {
+        "tags": [
+          "Sys_User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Sys_User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_User/login": {
+      "post": {
+        "tags": [
+          "Sys_User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Sys_User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/replaceToken": {
+      "post": {
+        "tags": [
+          "Sys_User"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_User/replaceToken": {
+      "post": {
+        "tags": [
+          "Sys_User"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/modifyPwd": {
+      "post": {
+        "tags": [
+          "Sys_User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_User/modifyPwd": {
+      "post": {
+        "tags": [
+          "Sys_User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/getCurrentUserInfo": {
+      "post": {
+        "tags": [
+          "Sys_User"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_User/getCurrentUserInfo": {
+      "post": {
+        "tags": [
+          "Sys_User"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/modifyUserPwd": {
+      "post": {
+        "tags": [
+          "Sys_User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_User/modifyUserPwd": {
+      "post": {
+        "tags": [
+          "Sys_User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/getVierificationCode": {
+      "get": {
+        "tags": [
+          "Sys_User"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_User/getVierificationCode": {
+      "get": {
+        "tags": [
+          "Sys_User"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/updateUserInfo": {
+      "post": {
+        "tags": [
+          "Sys_User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_User"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_User"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_User"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_User/updateUserInfo": {
+      "post": {
+        "tags": [
+          "Sys_User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_User"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_User"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_User"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sys_User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/GetPageData": {
+      "post": {
+        "tags": [
+          "Sys_User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_User/GetPageData": {
+      "post": {
+        "tags": [
+          "Sys_User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_WorkFlow/getTableInfo": {
+      "get": {
+        "tags": [
+          "Sys_WorkFlow"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_WorkFlow/getNodeDic": {
+      "get": {
+        "tags": [
+          "Sys_WorkFlow"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_WorkFlow/getSteps": {
+      "post": {
+        "tags": [
+          "Sys_WorkFlow"
+        ],
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_WorkFlow/getFields": {
+      "post": {
+        "tags": [
+          "Sys_WorkFlow"
+        ],
+        "parameters": [
+          {
+            "name": "table",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_WorkFlow/getOptions": {
+      "get": {
+        "tags": [
+          "Sys_WorkFlow"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_WorkFlow/GetPageData": {
+      "post": {
+        "tags": [
+          "Sys_WorkFlow"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_WorkFlowStep/GetPageData": {
+      "post": {
+        "tags": [
+          "Sys_WorkFlowStep"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_WorkFlowTable/GetPageData": {
+      "post": {
+        "tags": [
+          "Sys_WorkFlowTable"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_WorkFlowTableAuditLog/GetPageData": {
+      "post": {
+        "tags": [
+          "Sys_WorkFlowTableAuditLog"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sys_WorkFlowTableStep/GetPageData": {
+      "post": {
+        "tags": [
+          "Sys_WorkFlowTableStep"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/TestService/GetPageData": {
+      "post": {
+        "tags": [
+          "TestService"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageDataOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "LoginInfo": {
+        "required": [
+          "password",
+          "userName",
+          "uuid",
+          "verificationCode"
+        ],
+        "type": "object",
+        "properties": {
+          "userName": {
+            "maxLength": 50,
+            "minLength": 1,
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 50,
+            "minLength": 1,
+            "type": "string"
+          },
+          "verificationCode": {
+            "maxLength": 6,
+            "minLength": 1,
+            "type": "string"
+          },
+          "uuid": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PageDataOptions": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rows": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tableName": {
+            "type": "string",
+            "nullable": true
+          },
+          "sort": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "string",
+            "nullable": true
+          },
+          "wheres": {
+            "type": "string",
+            "nullable": true
+          },
+          "export": {
+            "type": "boolean"
+          },
+          "value": {
+            "nullable": true
+          },
+          "filter": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchParameters"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SaveModel": {
+        "type": "object",
+        "properties": {
+          "mainData": {
+            "type": "object",
+            "additionalProperties": {
+              "nullable": true
+            },
+            "nullable": true
+          },
+          "detailData": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": { }
+            },
+            "nullable": true
+          },
+          "delKeys": {
+            "type": "array",
+            "items": { },
+            "nullable": true
+          },
+          "extra": {
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SearchParameters": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
+          },
+          "displayType": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Sys_Actions": {
+        "type": "object",
+        "properties": {
+          "action_Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "menu_Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "text": {
+            "type": "string",
+            "nullable": true
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Sys_Menu": {
+        "required": [
+          "menu_Id",
+          "menuName",
+          "parentId"
+        ],
+        "type": "object",
+        "properties": {
+          "menu_Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parentId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "menuName": {
+            "maxLength": 50,
+            "minLength": 1,
+            "type": "string"
+          },
+          "tableName": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "url": {
+            "maxLength": 10000,
+            "type": "string",
+            "nullable": true
+          },
+          "auth": {
+            "maxLength": 10000,
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "icon": {
+            "maxLength": 50,
+            "type": "string",
+            "nullable": true
+          },
+          "orderNo": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "creator": {
+            "maxLength": 50,
+            "type": "string",
+            "nullable": true
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "modifier": {
+            "maxLength": 50,
+            "type": "string",
+            "nullable": true
+          },
+          "modifyDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "enable": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "menuType": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Sys_Actions"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Sys_QuartzOptions": {
+        "required": [
+          "cronExpression",
+          "groupName",
+          "id",
+          "taskName"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "taskName": {
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          },
+          "groupName": {
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          },
+          "method": {
+            "maxLength": 50,
+            "type": "string",
+            "nullable": true
+          },
+          "timeOut": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "cronExpression": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "apiUrl": {
+            "maxLength": 2000,
+            "type": "string",
+            "nullable": true
+          },
+          "postData": {
+            "type": "string",
+            "nullable": true
+          },
+          "authKey": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "authValue": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "describe": {
+            "maxLength": 2000,
+            "type": "string",
+            "nullable": true
+          },
+          "lastRunTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "createID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "creator": {
+            "maxLength": 30,
+            "type": "string",
+            "nullable": true
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "modifyID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "modifier": {
+            "maxLength": 30,
+            "type": "string",
+            "nullable": true
+          },
+          "modifyDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Sys_TableColumn": {
+        "type": "object",
+        "properties": {
+          "table_Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "columnId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "columnName": {
+            "type": "string",
+            "nullable": true
+          },
+          "columnCnName": {
+            "type": "string",
+            "nullable": true
+          },
+          "columnType": {
+            "type": "string",
+            "nullable": true
+          },
+          "tableName": {
+            "type": "string",
+            "nullable": true
+          },
+          "maxlength": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "isNull": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "isDisplay": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "isKey": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "columnformat": {
+            "type": "string",
+            "nullable": true
+          },
+          "script": {
+            "type": "string",
+            "nullable": true
+          },
+          "dropNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "isImage": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "sortable": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "columnWidth": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "searchRowNo": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "searchColNo": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "searchType": {
+            "type": "string",
+            "nullable": true
+          },
+          "editRowNo": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "editColNo": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "editType": {
+            "type": "string",
+            "nullable": true
+          },
+          "colSize": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "isReadDataset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "enable": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "apiInPut": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "apiIsNull": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "apiOutPut": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "createID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "creator": {
+            "type": "string",
+            "nullable": true
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "modifyID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "modifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "modifyDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "orderNo": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "isColumnData": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Sys_TableInfo": {
+        "type": "object",
+        "properties": {
+          "table_Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parentId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "tableName": {
+            "type": "string",
+            "nullable": true
+          },
+          "tableTrueName": {
+            "type": "string",
+            "nullable": true
+          },
+          "columnCNName": {
+            "type": "string",
+            "nullable": true
+          },
+          "namespace": {
+            "type": "string",
+            "nullable": true
+          },
+          "folderName": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataTableType": {
+            "type": "string",
+            "nullable": true
+          },
+          "editorType": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderNo": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "uploadField": {
+            "type": "string",
+            "nullable": true
+          },
+          "uploadMaxCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "richText": {
+            "type": "string",
+            "nullable": true
+          },
+          "expressField": {
+            "type": "string",
+            "nullable": true
+          },
+          "dbServer": {
+            "type": "string",
+            "nullable": true
+          },
+          "sortName": {
+            "type": "string",
+            "nullable": true
+          },
+          "detailCnName": {
+            "type": "string",
+            "nullable": true
+          },
+          "detailName": {
+            "type": "string",
+            "nullable": true
+          },
+          "enable": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "cnName": {
+            "type": "string",
+            "nullable": true
+          },
+          "tableColumns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Sys_TableColumn"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Sys_User": {
+        "required": [
+          "enable",
+          "role_Id",
+          "user_Id",
+          "userName",
+          "userTrueName"
+        ],
+        "type": "object",
+        "properties": {
+          "userName": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "user_Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "gender": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "headImageUrl": {
+            "maxLength": 500,
+            "type": "string",
+            "nullable": true
+          },
+          "dept_Id": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "deptName": {
+            "maxLength": 150,
+            "type": "string",
+            "nullable": true
+          },
+          "role_Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roleName": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "token": {
+            "maxLength": 500,
+            "type": "string",
+            "nullable": true
+          },
+          "appType": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "deptIds": {
+            "maxLength": 2000,
+            "type": "string",
+            "nullable": true
+          },
+          "userTrueName": {
+            "maxLength": 20,
+            "minLength": 1,
+            "type": "string"
+          },
+          "userPwd": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "isRegregisterPhone": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "phoneNo": {
+            "maxLength": 11,
+            "type": "string",
+            "nullable": true
+          },
+          "tel": {
+            "maxLength": 20,
+            "type": "string",
+            "nullable": true
+          },
+          "createID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "creator": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "enable": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "modifyID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "modifier": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "modifyDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "auditStatus": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "auditor": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "auditDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "lastLoginDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "lastModifyPwdDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "address": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "mobile": {
+            "maxLength": 100,
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "maxLength": 100,
+            "type": "string",
+            "nullable": true
+          },
+          "remark": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "orderNo": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserPermissions": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pid": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "text": {
+            "type": "string",
+            "nullable": true
+          },
+          "isApp": {
+            "type": "boolean"
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Sys_Actions"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "apiKey",
+        "description": "JWT授权token前面需要加上字段Bearer与一个空格,如Bearer token",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
+}
