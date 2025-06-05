@@ -55,7 +55,10 @@ namespace VOL.WebApi
             Services = services;
             // services.Replace( ServiceDescriptor.Transient<IControllerActivator, ServiceBasedControllerActivator>());
             services.AddSession();
-            services.AddMemoryCache();
+            services.AddMemoryCache(options =>
+            {
+                options.SizeLimit = 1024 * 1024 * 256; // 256MB size limit
+            });
             services.AddHttpContextAccessor();
             services.AddMvc(options =>
             {

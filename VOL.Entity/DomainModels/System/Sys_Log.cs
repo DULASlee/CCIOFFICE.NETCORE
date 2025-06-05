@@ -143,6 +143,13 @@ namespace VOL.Entity.DomainModels
        [Column(TypeName="datetime")]
        public DateTime? EndDate { get; set; }
 
+       /// <summary>
+       /// Log Level
+       /// </summary>
+       [Display(Name ="Log Level")]
+       [MaxLength(20)]
+       [Column(TypeName="varchar(20)")]
+       public string LogLevel { get; set; }
        
     }
 }

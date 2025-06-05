@@ -212,49 +212,58 @@ namespace VOL.Core.Utilities
 
 
 
-            using (ExcelPackage package = new ExcelPackage())
+            try
             {
-                var worksheet = package.Workbook.Worksheets.Add("sheet1");
-                for (int i = 0; i < table.Columns.Count; i++)
+                using (ExcelPackage package = new ExcelPackage())
                 {
-                    using (ExcelRange range = worksheet.Cells[1, i + 1])
+                    var worksheet = package.Workbook.Worksheets.Add("sheet1");
+                    for (int i = 0; i < table.Columns.Count; i++)
                     {
-                        worksheet.Cells[1, i + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        worksheet.Cells[1, i + 1].Style.Fill.BackgroundColor.SetColor(Color.Gray);  //背景色
-                        worksheet.Cells[1, i + 1].Style.Font.Color.SetColor(Color.White);
-                    }
-                    CellOptions options = cellOptions.Where(x => x.ColumnName == table.Columns[i].ColumnName).FirstOrDefault();
-                    if (options != null)
-                    {
-                        worksheet.Column(i + 1).Width = options.ColumnWidth / 6.00;
-                        worksheet.Cells[1, i + 1].Value = options.ColumnCNName;
-                    }
-                    else
-                    {
-                        worksheet.Column(i + 1).Width = 15;
-                        worksheet.Cells[1, i + 1].Value = table.Columns[i].ColumnName;
-                    }
-                }
-
-                for (int i = 0; i < table.Rows.Count; i++)
-                {
-                    for (int j = 0; j < table.Columns.Count; j++)
-                    {
-                        string cellValue = (table.Rows[i][j] ?? "").ToString();
-                        if (dicNoKeys.Exists(x => x.ColumnName == table.Columns[j].ColumnName))
+                        using (ExcelRange range = worksheet.Cells[1, i + 1]) // This using seems redundant for ExcelRange if not further manipulated
                         {
-                            cellOptions.Where(x => x.ColumnName == table.Columns[j].ColumnName)
-                                .Select(s => s.KeyValues)
-                                .FirstOrDefault()
-                                .TryGetValue(cellValue, out string result);
-                            cellValue = result ?? cellValue;
+                            worksheet.Cells[1, i + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            worksheet.Cells[1, i + 1].Style.Fill.BackgroundColor.SetColor(Color.Gray);  //背景色
+                            worksheet.Cells[1, i + 1].Style.Font.Color.SetColor(Color.White);
                         }
-                        worksheet.Cells[i + 2, j + 1].Value = cellValue;
+                        CellOptions options = cellOptions.Where(x => x.ColumnName == table.Columns[i].ColumnName).FirstOrDefault();
+                        if (options != null)
+                        {
+                            worksheet.Column(i + 1).Width = options.ColumnWidth / 6.00;
+                            worksheet.Cells[1, i + 1].Value = options.ColumnCNName;
+                        }
+                        else
+                        {
+                            worksheet.Column(i + 1).Width = 15;
+                            worksheet.Cells[1, i + 1].Value = table.Columns[i].ColumnName;
+                        }
                     }
+
+                    for (int i = 0; i < table.Rows.Count; i++)
+                    {
+                        for (int j = 0; j < table.Columns.Count; j++)
+                        {
+                            string cellValue = (table.Rows[i][j] ?? "").ToString();
+                            if (dicNoKeys.Exists(x => x.ColumnName == table.Columns[j].ColumnName))
+                            {
+                                cellOptions.Where(x => x.ColumnName == table.Columns[j].ColumnName)
+                                    .Select(s => s.KeyValues)
+                                    .FirstOrDefault()
+                                    ?.TryGetValue(cellValue, out string result); // Added null conditional operator
+                                cellValue = result ?? cellValue;
+                            }
+                            worksheet.Cells[i + 2, j + 1].Value = cellValue;
+                        }
+                    }
+                    package.SaveAs(new FileInfo(savePath + fileName));
                 }
-                package.SaveAs(new FileInfo(savePath + fileName));
+                return savePath + fileName;
             }
-            return savePath + fileName;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error exporting DataTable to Excel file {fileName}: {ex.ToString()}"); // Or use a proper logger
+                // Re-throw to allow service layer to handle and potentially return a user-friendly error.
+                throw;
+            }
         }
 
 
@@ -406,107 +415,103 @@ namespace VOL.Core.Utilities
                 || x.PropertyType == typeof(DateTime?))
                 .Select(s => s.Name).ToArray();
             }
-
-            using (ExcelPackage package = new ExcelPackage())
+            try
             {
-                var worksheet = package.Workbook.Worksheets.Add("sheet1");
-                for (int i = 0; i < propertyInfo.Count; i++)
+                using (ExcelPackage package = new ExcelPackage())
                 {
-                    string columnName = propertyInfo[i].Name;
-                    using (ExcelRange range = worksheet.Cells[1, i + 1])
+                    var worksheet = package.Workbook.Worksheets.Add("sheet1");
+                    for (int i = 0; i < propertyInfo.Count; i++)
                     {
+                        string columnName = propertyInfo[i].Name;
+                        // Removed redundant using (ExcelRange range = worksheet.Cells[1, i + 1])
                         worksheet.Cells[1, i + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        //默认灰色背景，白色字体
                         Color backgroundColor = Color.Gray;
-                        //字体颜色
                         Color fontColor = Color.White;
-                        //下载模板并且是必填项，将表格设置为黄色
                         if (template)
                         {
                             fontColor = Color.Black;
                             if (cellOptions.Exists(x => x.ColumnName == columnName && x.Requierd))
-                            {
-                                backgroundColor = Color.Yellow;  //黄色必填
-                            }
+                                backgroundColor = Color.Yellow;
                             else
-                            {
                                 backgroundColor = Color.White;
-                            }
                         }
-                        worksheet.Cells[1, i + 1].Style.Fill.BackgroundColor.SetColor(backgroundColor);  //背景色
-                        worksheet.Cells[1, i + 1].Style.Font.Color.SetColor(fontColor);//字体颜色
-                    }
-                    CellOptions options = cellOptions.Where(x => x.ColumnName == columnName).FirstOrDefault();
-                    if (options != null)
-                    {
-                        worksheet.Column(i + 1).Width = options.ColumnWidth / 6.00;
-                        worksheet.Cells[1, i + 1].Value = options.ColumnCNName;
-                    }
-                    else
-                    {
-                        columnName = propertyInfo[i].GetTypeCustomValue<DisplayAttribute>(x => x.Name) ?? columnName;
-                        worksheet.Column(i + 1).Width = 15;
-                        worksheet.Cells[1, i + 1].Value = columnName;
-                    }
-                }
-                //下载模板直接返回
-                if (template)
-                {
-                    package.SaveAs(new FileInfo(fullPath));
-                    return fullPath;
-                }
-                //2021.01.24修复多选类型，导出excel文件没有转换数据源的问题
-                IEnumerable<string> GetListValues(string cellValues, string propertyName)
-                {
-                    var values = cellValues.Split(",");
-                    for (int i = 0; i < values.Length; i++)
-                    {
-                        cellOptions.Where(x => x.ColumnName == propertyName)
-                      .Select(s => s.KeyValues)
-                      .FirstOrDefault()
-                     .TryGetValue(values[i], out string result);
-                        yield return result ?? values[i];
-                    }
+                        worksheet.Cells[1, i + 1].Style.Fill.BackgroundColor.SetColor(backgroundColor);
+                        worksheet.Cells[1, i + 1].Style.Font.Color.SetColor(fontColor);
 
-                }
-                for (int i = 0; i < list.Count; i++)
-                {
-                    for (int j = 0; j < propertyInfo.Count; j++)
-                    {
-                        object cellValue = null;
-                        if (dateArr != null && dateArr.Contains(propertyInfo[j].Name))
+                        CellOptions options = cellOptions.Where(x => x.ColumnName == columnName).FirstOrDefault();
+                        if (options != null)
                         {
-                            object value = propertyInfo[j].GetValue(list[i]);
-                            cellValue = value == null ? "" : ((DateTime)value).ToString("yyyy-MM-dd HH:mm:sss").Replace(" 00:00:00", "");
+                            worksheet.Column(i + 1).Width = options.ColumnWidth / 6.00;
+                            worksheet.Cells[1, i + 1].Value = options.ColumnCNName;
                         }
                         else
                         {
-                            cellValue = propertyInfo[j].GetValue(list[i]);
+                            columnName = propertyInfo[i].GetTypeCustomValue<DisplayAttribute>(x => x.Name) ?? columnName;
+                            worksheet.Column(i + 1).Width = 15;
+                            worksheet.Cells[1, i + 1].Value = columnName;
                         }
-                        if (cellValue != null && dicNoKeys.Exists(x => x.ColumnName == propertyInfo[j].Name))
+                    }
+
+                    if (template)
+                    {
+                        package.SaveAs(new FileInfo(fullPath));
+                        return fullPath;
+                    }
+
+                    IEnumerable<string> GetListValues(string currentCellValues, string propertyName)
+                    {
+                        var values = currentCellValues.Split(',');
+                        foreach (var val in values) // Changed loop var
                         {
-                            //2021.01.24修复多选类型，导出excel文件没有转换数据源的问题
-                            if (selectList.Contains(propertyInfo[j].Name))
+                            cellOptions.Where(x => x.ColumnName == propertyName)
+                                  .Select(s => s.KeyValues)
+                                  .FirstOrDefault()
+                                  ?.TryGetValue(val, out string result); // Added null conditional
+                            yield return result ?? val;
+                        }
+                    }
+
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        for (int j = 0; j < propertyInfo.Count; j++)
+                        {
+                            object cellValue = null;
+                            if (dateArr != null && dateArr.Contains(propertyInfo[j].Name))
                             {
-                                cellValue = string.Join(",", GetListValues(cellValue.ToString(), propertyInfo[j].Name));
+                                object value = propertyInfo[j].GetValue(list[i]);
+                                cellValue = value == null ? "" : ((DateTime)value).ToString("yyyy-MM-dd HH:mm:sss").Replace(" 00:00:00", "");
                             }
                             else
                             {
-                                cellOptions.Where(x => x.ColumnName == propertyInfo[j].Name)
-                            .Select(s => s.KeyValues)
-                            .FirstOrDefault()
-                            .TryGetValue(cellValue.ToString(), out string result);
-                                cellValue = result ?? cellValue;
+                                cellValue = propertyInfo[j].GetValue(list[i]);
                             }
-
+                            if (cellValue != null && dicNoKeys.Exists(x => x.ColumnName == propertyInfo[j].Name))
+                            {
+                                if (selectList.Contains(propertyInfo[j].Name))
+                                {
+                                    cellValue = string.Join(",", GetListValues(cellValue.ToString(), propertyInfo[j].Name));
+                                }
+                                else
+                                {
+                                    cellOptions.Where(x => x.ColumnName == propertyInfo[j].Name)
+                                        .Select(s => s.KeyValues)
+                                        .FirstOrDefault()
+                                        ?.TryGetValue(cellValue.ToString(), out string result); // Added null conditional
+                                    cellValue = result ?? cellValue;
+                                }
+                            }
+                            worksheet.Cells[i + 2, j + 1].Value = cellValue;
                         }
-                        worksheet.Cells[i + 2, j + 1].Value = cellValue;
                     }
+                    package.SaveAs(new FileInfo(fullPath));
                 }
-
-                package.SaveAs(new FileInfo(fullPath));
+                return fullPath;
             }
-            return fullPath;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error exporting List<{typeof(T).Name}> to Excel file {fileName}: {ex.ToString()}"); // Or use a proper logger
+                throw;
+            }
         }
 
 
@@ -607,52 +612,73 @@ namespace VOL.Core.Utilities
             fileName = Guid.NewGuid() + "_" + fileName;
             if (!Directory.Exists(fullPath)) Directory.CreateDirectory(fullPath);
 
-            using (ExcelPackage package = new ExcelPackage())
+            try
             {
-                var worksheet = package.Workbook.Worksheets.Add("sheet1");
-                int j = 0;
-                foreach (var item in rows[0])
+                using (ExcelPackage package = new ExcelPackage())
                 {
-                    object cellValue = item.Key;
-
-                    int i = 0;
-                    worksheet.Cells[1 + i, j + 1].Value = cellValue;
-                    //worksheet.Column(j + 1).Width = 11;
-                    worksheet.Row(i + 1).Height = 20;//设置行高
-                    var style = worksheet.Cells[i + 1, j + 1].Style;
-                    style.Fill.PatternType = ExcelFillStyle.Solid;
-                    style.HorizontalAlignment = ExcelHorizontalAlignment.Center;//水平居中
-                    style.VerticalAlignment = ExcelVerticalAlignment.Center;//垂直剧中
-                    style.Font.Bold = true;//字体为粗体
-                                           //style
-                    style.Fill.BackgroundColor.SetColor(Color.FromArgb(216, 216, 216));//背景色
-                    style.Border.BorderAround(ExcelBorderStyle.Thin, Color.FromArgb(191, 191, 191));//边框
-
-                    onFillCell?.Invoke(worksheet, i, j, cellValue);
-                    j++;
-                }
-                for (int i = 0; i < rows.Count; i++)
-                {
-                    var row = rows[i];
-                    j = 0;
-                    foreach (var item in row)
+                    var worksheet = package.Workbook.Worksheets.Add("sheet1");
+                    if (rows == null || !rows.Any() || rows[0] == null || !rows[0].Any())
                     {
-                        object cellValue = item.Value;
-                        worksheet.Cells[i + 2, j + 1].Value = cellValue;
-
-                        onFillCell?.Invoke(worksheet, i + 1, j, cellValue);
-                        j++;
+                        // Handle empty or invalid rows input, perhaps log and return or throw.
+                        // For now, let it proceed, EPPlus might handle or throw, which will be caught.
+                        // Or, add specific handling:
+                        // Console.WriteLine($"Warning: ExportGeneralExcel called with empty or invalid rows for file {fileName}");
+                        // package.SaveAs(new FileInfo(fullPath + fileName)); // Save an empty file
+                        // return path + fileName;
                     }
-                    worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
-                    for (var col = 1; col <= worksheet.Dimension.End.Column; col++)
+                    else // Proceed if there's data for headers
                     {
-                        worksheet.Column(col).Width = worksheet.Column(col).Width + 2;
+                        int j = 0;
+                        foreach (var item in rows[0]) // Assumes first row's keys are headers
+                        {
+                            object cellValue = item.Key;
+                            worksheet.Cells[1, j + 1].Value = cellValue;
+                            worksheet.Row(1).Height = 20;
+                            var style = worksheet.Cells[1, j + 1].Style;
+                            style.Fill.PatternType = ExcelFillStyle.Solid;
+                            style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                            style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                            style.Font.Bold = true;
+                            style.Fill.BackgroundColor.SetColor(Color.FromArgb(216, 216, 216));
+                            style.Border.BorderAround(ExcelBorderStyle.Thin, Color.FromArgb(191, 191, 191));
+                            onFillCell?.Invoke(worksheet, 0, j, cellValue); // For header row i=0
+                            j++;
+                        }
                     }
+
+                    for (int i = 0; i < rows.Count; i++)
+                    {
+                        var row = rows[i];
+                        int j = 0; // Reset j for each row
+                        foreach (var item in row)
+                        {
+                            object cellValue = item.Value;
+                            worksheet.Cells[i + 2, j + 1].Value = cellValue; // Data starts at row 2
+                            onFillCell?.Invoke(worksheet, i + 1, j, cellValue); // For data rows i = 0 to N-1, maps to excel row i+2
+                            j++;
+                        }
+                    }
+
+                    if (worksheet.Dimension != null) // Check if worksheet has any cells
+                    {
+                        worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+                        for (var col = 1; col <= worksheet.Dimension.End.Column; col++)
+                        {
+                            if (worksheet.Column(col).Width < 80) // Prevent extremely wide columns from AutoFit
+                                worksheet.Column(col).Width = worksheet.Column(col).Width + 2;
+                        }
+                    }
+
+                    saveBefore?.Invoke(worksheet);
+                    package.SaveAs(new FileInfo(fullPath + fileName));
                 }
-                saveBefore?.Invoke(worksheet);
-                package.SaveAs(new FileInfo(fullPath + fileName));
+                return path + fileName;
             }
-            return path + fileName;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in ExportGeneralExcel for file {fileName}: {ex.ToString()}"); // Or use a proper logger
+                throw;
+            }
         }
 
 

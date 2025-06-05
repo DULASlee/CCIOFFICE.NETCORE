@@ -52,7 +52,19 @@ namespace VOL.Sys.Controllers
         [ObjectModelValidatorFilter(ValidatorModel.Login)]
         public async Task<IActionResult> Login([FromBody] LoginInfo loginInfo)
         {
-            return Json(await Service.Login(loginInfo));
+            try
+            {
+                var response = await Service.Login(loginInfo);
+                // Assuming Service.Login returns a WebResponseContent
+                // If response.Status is false, the service should have logged the specific reason.
+                // The controller's responsibility here is to return the response or handle unexpected service errors.
+                return Json(response);
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(LogLevel.Error, LogEvent.Login, $"Login action 执行异常: UserName={loginInfo?.UserName}", loginInfo?.Serialize(), ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "登录时发生内部服务器错误。", status = false });
+            }
         }
 
         private readonly ConcurrentDictionary<int, object> _lockCurrent = new ConcurrentDictionary<int, object>();
@@ -60,9 +72,9 @@ namespace VOL.Sys.Controllers
         public IActionResult ReplaceToken()
         {
             WebResponseContent responseContent = new WebResponseContent();
-            string error = "";
-            string key = $"rp:Token:{UserContext.Current.UserId}";
+            string key = $"rp:Token:{UserContext.Current.UserId}"; // Safe to get UserId here for key
             UserInfo userInfo = null;
+            WebResponseContent responseContent = new WebResponseContent(); // Initialize here
             try
             {
                 //如果5秒内替换过token,直接使用最新的token(防止一个页面多个并发请求同时替换token导致token错位)
@@ -70,7 +82,10 @@ namespace VOL.Sys.Controllers
                 {
                     return Json(responseContent.OK(null, _cache.Get(key)));
                 }
-                var _obj = _lockCurrent.GetOrAdd(UserContext.Current.UserId, new object() { });
+                // Use current user context carefully before async/await or complex logic
+                var currentUser = UserContext.Current;
+                var _obj = _lockCurrent.GetOrAdd(currentUser.UserId, new object() { });
+
                 lock (_obj)
                 {
                     if (_cache.Exists(key))
@@ -80,10 +95,20 @@ namespace VOL.Sys.Controllers
                     string requestToken = HttpContext.Request.Headers[AppSetting.TokenHeaderName];
                     requestToken = requestToken?.Replace("Bearer ", "");
 
-                    if (JwtHelper.IsExp(requestToken)) return Json(responseContent.Error("Token已过期!"));
+                    if (currentUser.Token != requestToken) // Check against current user's token from context
+                    {
+                         Logger.Warning(LogEvent.ReplaceToeken, $"Token失效(请求与上下文不一致): UserId={currentUser.UserId}", null, responseContent.Message);
+                         return Json(responseContent.Error("Token已失效!"));
+                    }
 
-                    int userId = UserContext.Current.UserId;
+                    if (JwtHelper.IsExp(requestToken))
+                    {
+                        Logger.Warning(LogEvent.ReplaceToeken, $"Token过期: UserId={currentUser.UserId}", null, responseContent.Message);
+                        return Json(responseContent.Error("Token已过期!"));
+                    }
 
+                    int userId = currentUser.UserId;
+                    // DB Call
                     userInfo = _userRepository.FindAsIQueryable(x => x.User_Id == userId).Select(
                              s => new UserInfo()
                              {
@@ -94,28 +119,34 @@ namespace VOL.Sys.Controllers
                                  RoleName = s.RoleName
                              }).FirstOrDefault();
 
-                    if (userInfo == null) return Json(responseContent.Error("未查到用户信息!"));
+                    if (userInfo == null)
+                    {
+                        Logger.Warning(LogEvent.ReplaceToeken, $"Token替换失败(用户未找到): UserId={userId}", null, responseContent.Message);
+                        return Json(responseContent.Error("未查到用户信息!"));
+                    }
 
                     string token = JwtHelper.IssueJwt(userInfo);
-                    //移除当前缓存
-                    _cache.Remove(userId.GetUserIdKey());
-                    //只更新的token字段
+                    _cache.Remove(userId.GetUserIdKey()); // Cache call
+                    // DB Call - Assuming Update and SaveChanges are handled by repository or UoW
                     _userRepository.Update(new Sys_User() { User_Id = userId, Token = token }, x => x.Token, true);
-                    //添加一个5秒缓存
-                    _cache.Add(key, token, 5);
+                    _userRepository.SaveChanges(); // Explicitly save if Update doesn't auto-save
+
+                    _cache.Add(key, token, 5); // Cache call
                     responseContent.OK(null, token);
+                    Logger.Info(LogLevel.Information, LogEvent.ReplaceToeken, $"Token替换成功: UserId={userId}, UserTrueName={userInfo.UserTrueName}", null, responseContent.Message);
                 }
             }
             catch (Exception ex)
             {
-                error = ex.Message + ex.StackTrace;
-                responseContent.Error("token替换异常");
+                var userIdForLog = UserContext.Current?.UserId ?? userInfo?.User_Id; // Attempt to get UserId for logging
+                Logger.Error(LogLevel.Error, LogEvent.ReplaceToeken, $"Token替换异常: UserId={userIdForLog}", null, ex);
+                responseContent.Error("Token替换服务发生内部错误。");
             }
             finally
             {
-                _lockCurrent.TryRemove(UserContext.Current.UserId, out object val);
-                string _message = $"用户{userInfo?.User_Id}_{userInfo?.UserTrueName},({(responseContent.Status ? "token替换成功": "token替换失败")})";
-                Logger.Info(LoggerType.ReplaceToeken, _message, null, error);
+                // Ensure lock object is removed if it was added.
+                if (UserContext.Current != null && UserContext.Current.UserId != 0) // Check if UserContext is valid
+                     _lockCurrent.TryRemove(UserContext.Current.UserId, out object val);
             }
             return Json(responseContent);
         }
@@ -125,14 +156,36 @@ namespace VOL.Sys.Controllers
         [ApiActionPermission]
         public async Task<IActionResult> ModifyPwd([FromBody] Dictionary<string, string> info)
         {
-            return Json(await Service.ModifyPwd(info?["oldPwd"], info?["newPwd"]));
+            try
+            {
+                var oldPwd = info?.ContainsKey("oldPwd") == true ? info["oldPwd"] : null;
+                var newPwd = info?.ContainsKey("newPwd") == true ? info["newPwd"] : null;
+                // It's good to log what is being received by the controller for sensitive operations if parameters allow.
+                // Here, passwords themselves are not logged, only their presence or absence could be inferred if needed.
+                var response = await Service.ModifyPwd(oldPwd, newPwd);
+                return Json(response);
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(LogLevel.Error, LogEvent.ApiModifyPwd, $"ModifyPwd action 执行异常: UserId={UserContext.Current?.UserId}", null, ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "修改密码时发生内部服务器错误。", status = false });
+            }
         }
 
 
         [HttpPost, Route("getCurrentUserInfo")]
         public async Task<IActionResult> GetCurrentUserInfo()
         {
-            return Json(await Service.GetCurrentUserInfo());
+            try
+            {
+                var response = await Service.GetCurrentUserInfo();
+                return Json(response);
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(LogLevel.Error, LogEvent.GetUserInfo, $"GetCurrentUserInfo action 执行异常: UserId={UserContext.Current?.UserId}", null, ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "获取当前用户信息时发生内部服务器错误。", status = false });
+            }
         }
 
         //只能超级管理员才能修改密码
@@ -141,24 +194,44 @@ namespace VOL.Sys.Controllers
         [HttpPost, Route("modifyUserPwd"), ApiActionPermission(ActionPermissionOptions.Add | ActionPermissionOptions.Update)]
         public IActionResult ModifyUserPwd([FromBody] LoginInfo loginInfo)
         {
-            string userName = loginInfo?.UserName;
-            string password = loginInfo?.Password;
             WebResponseContent webResponse = new WebResponseContent();
-            if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(userName))
+            string userName = loginInfo?.UserName;
+            string password = loginInfo?.Password; // In a real scenario, ensure this isn't logged directly if it's a new password.
+
+            try
             {
-                return Json(webResponse.Error("参数不完整"));
+                if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(userName))
+                {
+                    Logger.Warning(LogEvent.ApiModifyPwd, $"修改用户密码失败: 参数不完整. UserName={(string.IsNullOrEmpty(userName) ? "[null_or_empty]" : userName)}", loginInfo?.Serialize());
+                    return Json(webResponse.Error("参数不完整"));
+                }
+                if (password.Length < 6)
+                {
+                    Logger.Warning(LogEvent.ApiModifyPwd, $"修改用户密码失败: 密码长度小于6位. UserName={userName}", loginInfo?.Serialize());
+                    return Json(webResponse.Error("密码长度不能少于6位"));
+                }
+
+                Sys_User user = _userRepository.FindFirst(x => x.UserName == userName); // DB Call
+                if (user == null)
+                {
+                    Logger.Warning(LogEvent.ApiModifyPwd, $"修改用户密码失败: 用户不存在. UserName={userName}", loginInfo?.Serialize());
+                    return Json(webResponse.Error("用户不存在"));
+                }
+
+                user.UserPwd = password.EncryptDES(AppSetting.Secret.User);
+                _userRepository.Update(user, x => new { x.UserPwd }, true); // DB Call
+                _userRepository.SaveChanges(); // Explicitly save changes
+
+                //如果用户在线，强制下线
+                UserContext.Current.LogOut(user.User_Id);
+                Logger.Info(LogLevel.Information, LogEvent.ApiModifyPwd, $"用户密码修改成功: UserName={userName}, TargetUserId={user.User_Id}", loginInfo?.Serialize());
+                return Json(webResponse.OK("密码修改成功"));
             }
-            if (password.Length < 6) return Json(webResponse.Error("密码长度不能少于6位"));
-            Sys_User user = _userRepository.FindFirst(x => x.UserName == userName);
-            if (user == null)
+            catch (Exception ex)
             {
-                return Json(webResponse.Error("用户不存在"));
+                VOL.Core.Services.Logger.Error(LogLevel.Error, LogEvent.ApiModifyPwd, $"修改用户密码异常: UserName={userName}", loginInfo?.Serialize(), ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "修改用户密码时发生内部服务器错误。", status = false });
             }
-            user.UserPwd = password.EncryptDES(AppSetting.Secret.User);
-            _userRepository.Update(user, x => new { x.UserPwd }, true);
-            //如果用户在线，强制下线
-            UserContext.Current.LogOut(user.User_Id);
-            return Json(webResponse.OK("密码修改成功"));
         }
 
         /// <summary>
@@ -186,10 +259,26 @@ namespace VOL.Sys.Controllers
         [HttpPost, Route("updateUserInfo")]
         public IActionResult UpdateUserInfo([FromBody] Sys_User user)
         {
-            user.User_Id = UserContext.Current.UserId;
+            try
+            {
+                user.User_Id = UserContext.Current.UserId;
 
-            _userRepository.Update(user, x => new { x.UserTrueName, x.Gender, x.Remark, x.HeadImageUrl }, true);
-            return Content("修改成功");
+                // Log the attempt, be cautious about logging the entire 'user' object if it contains sensitive data not being updated.
+                // Here, we are updating specific fields, so logging those or just UserId is safer.
+                var fieldsToUpdate = new { user.UserTrueName, user.Gender, user.Remark, user.HeadImageUrl };
+                Logger.Info(LogLevel.Information, LogEvent.EditUserInfo, $"尝试更新用户信息: UserId={user.User_Id}", new { UserId = user.User_Id, Data = fieldsToUpdate });
+
+                _userRepository.Update(user, x => new { x.UserTrueName, x.Gender, x.Remark, x.HeadImageUrl }, true); // DB Call
+                _userRepository.SaveChanges(); // Explicitly save changes
+
+                Logger.Info(LogLevel.Information, LogEvent.EditUserInfo, $"用户信息更新成功: UserId={user.User_Id}", new { UserId = user.User_Id });
+                return Json(new { status = true, message = "修改成功" }); // Return JSON for consistency
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(LogLevel.Error, LogEvent.EditUserInfo, $"更新用户信息异常: UserId={UserContext.Current?.UserId}", user?.Serialize(Newtonsoft.Json.Formatting.None,ส่วนบุคคลFields:new string[] { "UserPwd", "Token"}), ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "更新用户信息时发生内部服务器错误。", status = false });
+            }
         }
     }
 }

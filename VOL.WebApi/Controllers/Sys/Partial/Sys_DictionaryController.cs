@@ -15,7 +15,20 @@ namespace VOL.Sys.Controllers
         [ApiActionPermission()]
         public IActionResult GetVueDictionary([FromBody] string[] dicNos)
         {
-            return Content(Service.GetVueDictionary(dicNos).Serialize());
+            try
+            {
+                var result = Service.GetVueDictionary(dicNos);
+                // Assuming Service.GetVueDictionary returns a structured object, not pre-serialized JSON
+                // If it returns an object that should be serialized to JSON for the response:
+                return Json(result);
+                // If Service.GetVueDictionary itself returns a JSON string, then Content(result, "application/json") is fine.
+                // The original code .Serialize() suggests it might be returning an object.
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, "获取Vue字典时出错", new { DicNos = dicNos?.Serialize() }, null, ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "获取字典时发生内部服务器错误。" });
+            }
         }
         /// <summary>
         /// table加载数据后刷新当前table数据的字典项(适用字典数据量比较大的情况)
@@ -25,7 +38,16 @@ namespace VOL.Sys.Controllers
         [HttpPost, Route("getTableDictionary")]
         public IActionResult GetTableDictionary([FromBody] Dictionary<string, object[]> keyData)
         {
-            return Json(Service.GetTableDictionary(keyData));
+            try
+            {
+                var result = Service.GetTableDictionary(keyData);
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, "获取表格字典数据时出错", new { KeyDataCount = keyData?.Count }, null, ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "获取表格字典数据时发生内部服务器错误。" });
+            }
         }
         /// <summary>
         /// 远程搜索
@@ -35,7 +57,16 @@ namespace VOL.Sys.Controllers
         [HttpPost, Route("getSearchDictionary"), AllowAnonymous]
         public IActionResult GetSearchDictionary(string dicNo, string value)
         {
-            return Json(Service.GetSearchDictionary(dicNo, value));
+            try
+            {
+                var result = Service.GetSearchDictionary(dicNo, value);
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, $"远程搜索字典时出错: DicNo={dicNo}", new { DicNo = dicNo, Value = value }, null, ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "远程搜索字典时发生内部服务器错误。" });
+            }
         }
 
         /// <summary>
@@ -47,7 +78,16 @@ namespace VOL.Sys.Controllers
         [HttpPost, Route("getRemoteDefaultKeyValue"), AllowAnonymous]
         public async Task<IActionResult> GetRemoteDefaultKeyValue(string dicNo, string key)
         {
-            return Json(await Service.GetRemoteDefaultKeyValue(dicNo, key));
+            try
+            {
+                var result = await Service.GetRemoteDefaultKeyValue(dicNo, key);
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, $"获取远程字典默认键值时出错: DicNo={dicNo}, Key={key}", new { DicNo = dicNo, Key = key }, null, ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "获取远程字典默认键值时发生内部服务器错误。" });
+            }
         }
         /// <summary>
         /// 代码生成器获取所有字典项(超级管理权限)
@@ -57,7 +97,16 @@ namespace VOL.Sys.Controllers
         // [ApiActionPermission(ActionRolePermission.SuperAdmin)]
         public async Task<IActionResult> GetBuilderDictionary()
         {
-            return Json(await Service.GetBuilderDictionary());
+            try
+            {
+                var result = await Service.GetBuilderDictionary();
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, "代码生成器获取所有字典项时出错", null, null, ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "获取代码生成器字典项时发生内部服务器错误。" });
+            }
         }
 
     }

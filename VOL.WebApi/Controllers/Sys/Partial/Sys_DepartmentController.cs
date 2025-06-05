@@ -66,36 +66,45 @@ namespace VOL.Sys.Controllers
         [ApiActionPermission(ActionPermissionOptions.Search)]
         public async Task<ActionResult> GetTreeTableRootData([FromBody] PageDataOptions options)
         {
-            //页面加载根节点数据条件x => x.ParentId == 0,自己根据需要设置
-            var query = _repository.FindAsIQueryable(x => true);
-            if (UserContext.Current.IsSuperAdmin)
+            try
             {
-                query = query.Where(x => x.ParentId == null);
-            }
-            else
-            {
-                var deptIds = UserContext.Current.DeptIds;
-                var list = DepartmentContext.GetAllDept().Where(c => deptIds.Contains(c.id)).ToList();
-                deptIds = list.Where(c => !list.Any(x => x.id == c.parentId)).Select(x => x.id).ToList();
-                query = query.Where(x => deptIds.Contains(x.DepartmentId));
-            }
-            var queryChild = _repository.FindAsIQueryable(x => true);
-            var rows = await query.TakeOrderByPage(options.Page, options.Rows)
-                .OrderBy(x => x.DepartmentName).Select(s => new
+                //页面加载根节点数据条件x => x.ParentId == 0,自己根据需要设置
+                var query = _repository.FindAsIQueryable(x => true);
+                if (UserContext.Current.IsSuperAdmin)
                 {
-                    s.DepartmentId,
-                    s.ParentId,
-                    s.DepartmentName,
-                    s.DepartmentCode,
-                    s.Enable,
-                    s.Remark,
-                    s.CreateDate,
-                    s.Creator,
-                    s.Modifier,
-                    s.ModifyDate,
-                    hasChildren = queryChild.Any(x => x.ParentId == s.DepartmentId)
-                }).ToListAsync();
-            return JsonNormal(new { total = await query.CountAsync(), rows });
+                    query = query.Where(x => x.ParentId == null);
+                }
+                else
+                {
+                    var deptIds = UserContext.Current.DeptIds;
+                    var list = DepartmentContext.GetAllDept().Where(c => deptIds.Contains(c.id)).ToList();
+                    deptIds = list.Where(c => !list.Any(x => x.id == c.parentId)).Select(x => x.id).ToList();
+                    query = query.Where(x => deptIds.Contains(x.DepartmentId));
+                }
+                var queryChild = _repository.FindAsIQueryable(x => true); // Used for sub-query for hasChildren
+                var rows = await query.TakeOrderByPage(options.Page, options.Rows)
+                    .OrderBy(x => x.DepartmentName).Select(s => new
+                    {
+                        s.DepartmentId,
+                        s.ParentId,
+                        s.DepartmentName,
+                        s.DepartmentCode,
+                        s.Enable,
+                        s.Remark,
+                        s.CreateDate,
+                        s.Creator,
+                        s.Modifier,
+                        s.ModifyDate,
+                        hasChildren = queryChild.Any(x => x.ParentId == s.DepartmentId)
+                    }).ToListAsync();
+                var total = await query.CountAsync(); // Separate count query
+                return JsonNormal(new { total = total, rows = rows });
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, $"获取部门树形表格根数据时出错", options.Serialize(), null, ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "获取部门数据时发生内部服务器错误。" });
+            }
         }
 
         /// <summary>
@@ -106,24 +115,33 @@ namespace VOL.Sys.Controllers
         [ApiActionPermission(ActionPermissionOptions.Search)]
         public async Task<ActionResult> GetTreeTableChildrenData(Guid departmentId)
         {
-            //点击节点时，加载子节点数据
-            var query = _repository.FindAsIQueryable(x => true);
-            var rows = await query.Where(x => x.ParentId == departmentId)
-                .Select(s => new
-                {
-                    s.DepartmentId,
-                    s.ParentId,
-                    s.DepartmentName,
-                    s.DepartmentCode,
-                    s.Enable,
-                    s.Remark,
-                    s.CreateDate,
-                    s.Creator,
-                    s.Modifier,
-                    s.ModifyDate,
-                    hasChildren = query.Any(x => x.ParentId == s.DepartmentId)
-                }).ToListAsync();
-            return JsonNormal(new { rows });
+            try
+            {
+                //点击节点时，加载子节点数据
+                var query = _repository.FindAsIQueryable(x => true); // Base query
+                var queryChild = _repository.FindAsIQueryable(x => true); // For hasChildren sub-query
+                var rows = await query.Where(x => x.ParentId == departmentId)
+                    .Select(s => new
+                    {
+                        s.DepartmentId,
+                        s.ParentId,
+                        s.DepartmentName,
+                        s.DepartmentCode,
+                        s.Enable,
+                        s.Remark,
+                        s.CreateDate,
+                        s.Creator,
+                        s.Modifier,
+                        s.ModifyDate,
+                        hasChildren = queryChild.Any(x => x.ParentId == s.DepartmentId) // Use queryChild here
+                    }).ToListAsync();
+                return JsonNormal(new { rows = rows });
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, $"获取部门树形表格子数据时出错: ParentDepartmentId={departmentId}", new { ParentDepartmentId = departmentId }, null, ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "获取部门子数据时发生内部服务器错误。" });
+            }
         }
     }
 }

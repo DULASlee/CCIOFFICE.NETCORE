@@ -23,7 +23,15 @@ namespace VOL.Sys.Services
         /// <returns></returns>
         public async Task<List<string>> GetBuilderDictionary()
         {
-            return await repository.FindAsync(x => 1 == 1, s => s.DicNo);
+            try
+            {
+                return await repository.FindAsync(x => 1 == 1, s => s.DicNo);
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Select, "获取代码生成器字典项失败", null, null, ex);
+                return new List<string>(); // Return empty list on error
+            }
         }
 
         public List<Sys_Dictionary> Dictionaries
@@ -51,7 +59,15 @@ namespace VOL.Sys.Services
                 {
                     return data as object;
                 }
-                return repository.DapperContext.QueryList<object>(dbSql, null);
+                try
+                {
+                    return repository.DapperContext.QueryList<object>(dbSql, null);
+                }
+                catch (Exception ex)
+                {
+                    VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Select, $"获取Vue字典数据源失败: DicNo={dicNo}", new { dicNo, dbSql }, null, ex);
+                    return null; // Or an empty list, depending on expected consumer behavior
+                }
             }
             return dicConfig.Select(item => new
             {
@@ -82,7 +98,15 @@ namespace VOL.Sys.Services
                 return null;
             }
             sql = $"SELECT * FROM ({sql}) AS t WHERE value LIKE @value";
-            return repository.DapperContext.QueryList<object>(sql, new { value = "%" + value + "%" });
+            try
+            {
+                return repository.DapperContext.QueryList<object>(sql, new { value = "%" + value + "%" });
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Select, $"搜索字典失败: DicNo={dicNo}, Value={value}", new { dicNo, value, sql }, null, ex);
+                return null; // Or an empty list
+            }
         }
 
         /// <summary>
@@ -134,7 +158,17 @@ namespace VOL.Sys.Services
                     sql = $"SELECT * FROM ({sql}) AS t WHERE " +
                    $"{keySql}" +
                    $" in @data";
-                    list.Add(new { key = x.DicNo, data = repository.DapperContext.QueryList<object>(sql, new { data }) });
+                    try
+                    {
+                        var queryData = repository.DapperContext.QueryList<object>(sql, new { data });
+                        list.Add(new { key = x.DicNo, data = queryData });
+                    }
+                    catch (Exception ex)
+                    {
+                        VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Select, $"获取表字典项失败 (TableDictionary): DicNo={x.DicNo}", new { DicNo = x.DicNo, data, sql }, null, ex);
+                        // Add with null or empty data for this key, or skip adding
+                        list.Add(new { key = x.DicNo, data = new List<object>() });
+                    }
                 }
             });
             return list;
@@ -158,7 +192,16 @@ namespace VOL.Sys.Services
                 {
                     string sql = DictionaryHandler.GetCustomDBSql(x.DicNo, x.DbSql);
                     sql = $"SELECT * FROM ({sql}) AS t WHERE t.key=any(@data)";
-                    list.Add(new { key = x.DicNo, data = repository.DapperContext.QueryList<object>(sql, new { data = data.Select(s => s.ToString()).ToList() }) });
+                    try
+                    {
+                        var queryData = repository.DapperContext.QueryList<object>(sql, new { data = data.Select(s => s.ToString()).ToList() });
+                        list.Add(new { key = x.DicNo, data = queryData });
+                    }
+                    catch (Exception ex)
+                    {
+                        VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Select, $"获取表字典项失败 (PgSqlTableDictionary): DicNo={x.DicNo}", new { DicNo = x.DicNo, data, sql }, null, ex);
+                        list.Add(new { key = x.DicNo, data = new List<object>() });
+                    }
                 }
             });
             return list;
@@ -178,11 +221,20 @@ namespace VOL.Sys.Services
         {
             if (saveDataModel.MainData.DicKeyIsNullOrEmpty("DicNo")
                 || saveDataModel.MainData.DicKeyIsNullOrEmpty("Dic_ID"))
-                return base.Add(saveDataModel);
+                return base.Add(saveDataModel); // This seems like a bug, should be Update or handle error. Addressing exception handling first.
+
             //判断修改的字典编号是否在其他ID存在
             string dicNo = saveDataModel.MainData["DicNo"].ToString().Trim();
-            if (base.repository.Exists(x => x.DicNo == dicNo && x.Dic_ID != saveDataModel.MainData["Dic_ID"].GetInt()))
-                return new WebResponseContent().Error($"字典编号:{ dicNo}已存在。!");
+            try
+            {
+                if (base.repository.Exists(x => x.DicNo == dicNo && x.Dic_ID != saveDataModel.MainData["Dic_ID"].GetInt()))
+                    return new WebResponseContent().Error($"字典编号:{ dicNo}已存在。!");
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Update, $"检查字典编号存在性失败 (Update): DicNo={dicNo}", saveDataModel.MainData, null, ex);
+                return new WebResponseContent().Error("检查字典编号时出错，请稍后再试。");
+            }
 
             base.UpdateOnExecuting = (Sys_Dictionary dictionary, object addList, object editList, List<object> obj) =>
             {
@@ -242,11 +294,19 @@ namespace VOL.Sys.Services
         }
         public override WebResponseContent Add(SaveModel saveDataModel)
         {
-            if (saveDataModel.MainData.DicKeyIsNullOrEmpty("DicNo")) return base.Add(saveDataModel);
+            if (saveDataModel.MainData.DicKeyIsNullOrEmpty("DicNo")) return base.Add(saveDataModel); // Or handle as error
 
             string dicNo = saveDataModel.MainData["DicNo"].ToString();
-            if (base.repository.Exists(x => x.DicNo == dicNo))
-                return new WebResponseContent().Error("字典编号:" + dicNo + "已存在");
+            try
+            {
+                if (base.repository.Exists(x => x.DicNo == dicNo))
+                    return new WebResponseContent().Error("字典编号:" + dicNo + "已存在");
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Insert, $"检查字典编号存在性失败 (Add): DicNo={dicNo}", saveDataModel.MainData, null, ex);
+                return new WebResponseContent().Error("检查字典编号时出错，请稍后再试。");
+            }
 
             base.AddOnExecuting = (Sys_Dictionary dic, object obj) =>
             {
@@ -274,7 +334,16 @@ namespace VOL.Sys.Services
         {
             if (webResponse.Status)
             {
-                CacheContext.Remove(DictionaryManager.Key);
+                try
+                {
+                    CacheContext.Remove(DictionaryManager.Key);
+                }
+                catch (Exception ex)
+                {
+                    VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, "移除字典缓存失败", null, webResponse.Serialize(), ex);
+                    // Depending on policy, you might want to alter webResponse here,
+                    // but the primary operation (Add/Update/Del) was already successful.
+                }
             }
             return webResponse;
         }

@@ -68,21 +68,32 @@ namespace VOL.Sys.Services
 
             QueryRelativeExpression = (IQueryable<Sys_WorkFlowTable> queryable) =>
             {
-                if (!UserContext.Current.IsSuperAdmin)
+                try
                 {
-                    var user = UserContext.Current.UserInfo;
+                    if (!UserContext.Current.IsSuperAdmin)
+                    {
+                        var user = UserContext.Current.UserInfo;
                         //显示当前用户需要审批的数据
                         var deptIds = user.DeptIds.Select(s => s.ToString());
-                    var stepQuery = _stepRepository.FindAsIQueryable(x => (x.StepType == (int)AuditType.用户审批 && x.StepValue == user.User_Id.ToString())
-                      || (x.StepType == (int)AuditType.角色审批 && x.StepValue == user.Role_Id.ToString())
-                      || (x.StepType == (int)AuditType.部门审批 && deptIds.Contains(x.StepValue))
-                       );
-                    queryable = queryable.Where(x => stepQuery.Any(c => x.WorkFlowTable_Id == c.WorkFlowTable_Id));
-                }
+                        // DB Call via _stepRepository
+                        var stepQuery = _stepRepository.FindAsIQueryable(x => (x.StepType == (int)AuditType.用户审批 && x.StepValue == user.User_Id.ToString())
+                          || (x.StepType == (int)AuditType.角色审批 && x.StepValue == user.Role_Id.ToString())
+                          || (x.StepType == (int)AuditType.部门审批 && deptIds.Contains(x.StepValue))
+                           );
+                        queryable = queryable.Where(x => stepQuery.Any(c => x.WorkFlowTable_Id == c.WorkFlowTable_Id));
+                    }
 
-                if (expression != null)
+                    if (expression != null)
+                    {
+                        queryable = queryable.Where(expression);
+                    }
+                }
+                catch (Exception ex)
                 {
-                    return queryable.Where(expression);
+                    VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Select, $"构建工作流列表查询表达式失败", new { options = options.Serialize() }, null, ex);
+                    // Depending on policy, either return a query that yields no results or rethrow.
+                    // Returning a query for no results is safer to prevent unexpected data exposure.
+                    return queryable.Where(x => false);
                 }
                 return queryable;
             };

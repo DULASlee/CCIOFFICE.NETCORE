@@ -74,12 +74,22 @@ namespace VOL.WebApi.Controllers.OSS
             //     }));
 
             // }
-            // catch (ServerException e)
+            // catch (ServerException e) // Specific Aliyun SDK exception
             // {
-            //     string message = $"获取sts异常：{e.Message + e.StackTrace}";
-            //     Console.WriteLine(message);
-            //     Logger.Error(message);
-            //     return Json(webResponse.Error(message));
+            //     string logMessage = $"获取阿里云OSS STS凭证时发生服务端异常";
+            //     VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, logMessage, null, null, e);
+            //     return StatusCode(StatusCodes.Status500InternalServerError, new { message = "获取上传凭证失败：服务端通讯错误。", status = false });
+            // }
+            // catch (ClientException e) // Specific Aliyun SDK exception
+            // {
+            //     string logMessage = $"获取阿里云OSS STS凭证时发生客户端异常";
+            //     VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, logMessage, null, null, e);
+            //     return StatusCode(StatusCodes.Status500InternalServerError, new { message = "获取上传凭证失败：客户端请求错误。", status = false });
+            // }
+            // catch (Exception ex) // General exception
+            // {
+            //     VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, "获取阿里云OSS STS凭证时发生未知错误", null, null, ex);
+            //     return StatusCode(StatusCodes.Status500InternalServerError, new { message = "获取上传凭证时发生未知内部服务器错误。", status = false });
             // }
             return Content("");
         }

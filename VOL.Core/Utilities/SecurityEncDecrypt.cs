@@ -25,18 +25,21 @@ namespace VOL.Core.Utilities
                 byte[] rgbKey = Encoding.UTF8.GetBytes(encryptKey.Substring(0, 16));
                 byte[] rgbIV = Keys;
                 byte[] inputByteArray = Encoding.UTF8.GetBytes(encryptString);
-                var DCSP = Aes.Create();
-                MemoryStream mStream = new MemoryStream();
-                CryptoStream cStream = new CryptoStream(mStream, DCSP.CreateEncryptor(rgbKey, rgbIV), CryptoStreamMode.Write);
-                cStream.Write(inputByteArray, 0, inputByteArray.Length);
-                cStream.FlushFinalBlock();
-                return Convert.ToBase64String(mStream.ToArray());
+                using (var DCSP = Aes.Create()) // Aes.Create() returns an IDisposable object
+                using (MemoryStream mStream = new MemoryStream())
+                using (CryptoStream cStream = new CryptoStream(mStream, DCSP.CreateEncryptor(rgbKey, rgbIV), CryptoStreamMode.Write))
+                {
+                    cStream.Write(inputByteArray, 0, inputByteArray.Length);
+                    cStream.FlushFinalBlock();
+                    return Convert.ToBase64String(mStream.ToArray());
+                }
             }
             catch (Exception ex)
             {
-                throw new Exception("数据库密码加密异常" + ex.Message);
+                // Consider logging the exception here before throwing a new one, or rethrow original
+                Logger.Error(Enums.LogEvent.Exception, "数据库密码加密异常", encryptString?.Length.ToString(), null, ex); // Log original exception
+                throw new Exception("数据库密码加密异常: " + ex.Message, ex); // Wrap original exception
             }
-
         }
 
         /// <summary> 
@@ -53,20 +56,25 @@ namespace VOL.Core.Utilities
                 byte[] rgbKey = Encoding.UTF8.GetBytes(decryptKey.Substring(0, 16));
                 byte[] rgbIV = Keys;
                 byte[] inputByteArray = Convert.FromBase64String(decryptString);
-                var DCSP = Aes.Create();
-                MemoryStream mStream = new MemoryStream();
-                CryptoStream cStream = new CryptoStream(mStream, DCSP.CreateDecryptor(rgbKey, rgbIV), CryptoStreamMode.Write);
-                Byte[] inputByteArrays = new byte[inputByteArray.Length];
-                cStream.Write(inputByteArray, 0, inputByteArray.Length);
-                cStream.FlushFinalBlock();
-                return Encoding.UTF8.GetString(mStream.ToArray());
+                using (var DCSP = Aes.Create()) // Aes.Create() returns an IDisposable object
+                using (MemoryStream mStream = new MemoryStream())
+                using (CryptoStream cStream = new CryptoStream(mStream, DCSP.CreateDecryptor(rgbKey, rgbIV), CryptoStreamMode.Write))
+                {
+                    // Byte[] inputByteArrays = new byte[inputByteArray.Length]; // This line seems unused
+                    cStream.Write(inputByteArray, 0, inputByteArray.Length);
+                    cStream.FlushFinalBlock();
+                    return Encoding.UTF8.GetString(mStream.ToArray());
+                }
             }
             catch (Exception ex)
             {
-               Logger.Error("解密异常：str:" + decryptString + ",Key:" + decryptKey+"---"+ ex.Message);
-                return null;
+               // Avoid logging the key. Log length of string if it's not sensitive, or a generic message.
+               Logger.Error(Enums.LogLevel.Error, Enums.LogEvent.Exception, "DES解密失败", $"StringLength: {decryptString?.Length}", null, ex);
+               // Returning null on decrypt failure can be problematic. Consider throwing an exception
+               // or having the method return a TryDecrypt pattern (bool success, out string result).
+               // For now, preserving existing behavior of returning null.
+               return null;
             }
-
         }
         #endregion
     }

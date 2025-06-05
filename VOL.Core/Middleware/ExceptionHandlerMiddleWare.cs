@@ -44,26 +44,30 @@ namespace VOL.Core.Middleware
                 }
                 else
                 {
-                    Logger.Info(LoggerType.Info);
+                    Logger.Info(LogEvent.Info);
                 }
             }
             catch (Exception exception)
             {
                 var env = context.RequestServices.GetService(typeof(IWebHostEnvironment)) as IWebHostEnvironment;
-                string message = exception.Message + exception.StackTrace + exception.InnerException;
-                Logger.Error(LoggerType.Exception, message);
-                if (!env.IsDevelopment())
+                string detailedMessage = exception.ToString(); // Get full exception details
+                // Changed to use LogLevel.Critical
+                Logger.Error(LogLevel.Critical, LogEvent.Exception, null, null, detailedMessage);
+                string responseMessage = "服务器处理异常";
+                if (env.IsDevelopment())
                 {
-                    message = "服务器处理异常";
-                }
-                else
-                {
-                    Console.WriteLine($"服务器处理出现异常:{message}");
+                    // In development, you might want to expose more details, but for a generic handler, consistency is also good.
+                    // For now, keeping the response message generic even in dev for this middleware,
+                    // as specific unhandled exceptions might be better thrown and caught by dev exception page.
+                    // The detailed log is always available.
+                    // responseMessage = detailedMessage; // Optionally, for dev, show more detail.
+                    Console.WriteLine($"服务器处理出现异常:{detailedMessage}");
                 }
                 context.Response.StatusCode = 500;
                 context.Response.ContentType = ApplicationContentType.JSON;
-                await context.Response.WriteAsync(new { message, status = false }.Serialize(), Encoding.UTF8);
+                await context.Response.WriteAsync(new { message = responseMessage, status = false }.Serialize(), Encoding.UTF8);
             }
         }
     }
 }
+                }

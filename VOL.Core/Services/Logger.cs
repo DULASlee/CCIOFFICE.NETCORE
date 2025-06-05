@@ -24,11 +24,26 @@ namespace VOL.Core.Services
     /// </summary>
     public static class Logger
     {
-        public static ConcurrentQueue<Sys_Log> loggerQueueData = new ConcurrentQueue<Sys_Log>();
+        private const int _maxQueueSize = 10000; // Max queue size
+        public static BlockingCollection<Sys_Log> loggerQueueData = new BlockingCollection<Sys_Log>(_maxQueueSize);
         private static DateTime lastClearFileDT = DateTime.Now.AddDays(-1);
         private static string _loggerPath = AppSetting.DownLoadPath + "Logger\\Queue\\";
+        private static readonly LogLevel _minimumLogLevel; // Added field for minimum log level
+
         static Logger()
         {
+            // Read and parse the minimum log level from configuration
+            string configuredLevel = AppSetting.Configuration.GetValue<string>("Logging:LogLevel:Default");
+            if (string.IsNullOrEmpty(configuredLevel) || !Enum.TryParse(configuredLevel, true, out _minimumLogLevel))
+            {
+                _minimumLogLevel = LogLevel.Information; // Default if not set or invalid
+                Console.WriteLine($"日志级别未配置或配置错误，默认为: {_minimumLogLevel}"); // Log to console if logger itself can't be used yet
+            }
+            else
+            {
+                Console.WriteLine($"日志级别配置为: {_minimumLogLevel}");
+            }
+
             Task.Run(() =>
             {
                 Start();
@@ -49,65 +64,111 @@ namespace VOL.Core.Services
 
         public static void Info(string message)
         {
-            Info(LoggerType.Info, message);
+            Info(LogEvent.Info, message);
         }
-        public static void Info(LoggerType loggerType, string message = null)
+        public static void Info(LogEvent logEvent, string message = null)
         {
-            Info(loggerType, message, null, null);
+            Info(LogLevel.Information, logEvent, message, null, null);
         }
-        public static void Info(LoggerType loggerType, string requestParam, string resposeParam, string ex = null)
+        public static void Info(LogEvent logEvent, string requestParam, string resposeParam, string ex = null)
         {
-            Add(loggerType, requestParam, resposeParam, ex, LoggerStatus.Info);
+            Add(LogLevel.Information, logEvent, requestParam, resposeParam, ex, LoggerStatus.Info);
+        }
+        // Overload for Info that accepts LogLevel directly
+        public static void Info(LogLevel logLevel, LogEvent logEvent, string requestParam, string resposeParam, string ex = null)
+        {
+            Add(logLevel, logEvent, requestParam, resposeParam, ex, LoggerStatus.Info);
         }
 
         public static void OK(string message)
         {
-            OK(LoggerType.Success, message);
+            OK(LogEvent.Success, message);
         }
-        public static void OK(LoggerType loggerType, string message = null)
+        public static void OK(LogEvent logEvent, string message = null)
         {
-            OK(loggerType, message, null, null);
+            OK(LogLevel.Information, logEvent, message, null, null);
         }
-        public static void OK(LoggerType loggerType, string requestParam, string resposeParam, string ex = null)
+        public static void OK(LogEvent logEvent, string requestParam, string resposeParam, string ex = null)
         {
-            Add(loggerType, requestParam, resposeParam, ex, LoggerStatus.Success);
+            Add(LogLevel.Information, logEvent, requestParam, resposeParam, ex, LoggerStatus.Success);
         }
+        // Overload for OK that accepts LogLevel directly (though typically Information for OK/Success)
+        public static void OK(LogLevel logLevel, LogEvent logEvent, string requestParam, string resposeParam, string ex = null)
+        {
+            Add(logLevel, logEvent, requestParam, resposeParam, ex, LoggerStatus.Success);
+        }
+
         public static void Error(string message)
         {
-            Error(LoggerType.Error, message);
+            Error(LogEvent.Error, message);
         }
-        public static void Error(LoggerType loggerType, string message)
+        public static void Error(LogEvent logEvent, string message)
         {
-            Error(loggerType, message, null, null);
+            Error(LogLevel.Error, logEvent, message, null, null);
         }
-        public static void Error(LoggerType loggerType, string requestParam, string resposeParam, string ex = null)
+        public static void Error(LogEvent logEvent, string requestParam, string resposeParam, string ex = null)
         {
-            Add(loggerType, requestParam, resposeParam, ex, LoggerStatus.Error);
+            Add(LogLevel.Error, logEvent, requestParam, resposeParam, ex, LoggerStatus.Error);
         }
+        // Overload for Error that accepts LogLevel directly
+        public static void Error(LogLevel logLevel, LogEvent logEvent, string requestParam, string resposeParam, string ex = null)
+        {
+            Add(logLevel, logEvent, requestParam, resposeParam, ex, LoggerStatus.Error);
+        }
+
+        // Warning methods
+        public static void Warning(string message)
+        {
+            Warning(LogEvent.Info, message); // Default LogEvent to Info if not specified for a simple warning message
+        }
+        public static void Warning(LogEvent logEvent, string message)
+        {
+            Warning(LogLevel.Warning, logEvent, message, null, null);
+        }
+        public static void Warning(LogEvent logEvent, string requestParam, string resposeParam, string ex = null)
+        {
+            Add(LogLevel.Warning, logEvent, requestParam, resposeParam, ex, LoggerStatus.Info); // LoggerStatus might need a 'Warning' state too
+        }
+        public static void Warning(LogLevel logLevel, LogEvent logEvent, string requestParam, string resposeParam, string ex = null)
+        {
+            Add(logLevel, logEvent, requestParam, resposeParam, ex, LoggerStatus.Info); // LoggerStatus might need a 'Warning' state too
+        }
+
+
         /// <summary>
         /// 多线程调用日志
         /// </summary>
         /// <param name="message"></param>
         public static void AddAsync(string message, string ex = null)
         {
-            AddAsync(LoggerType.Info, null, message, ex, ex != null ? LoggerStatus.Error : LoggerStatus.Info);
+            LogLevel logLevel = ex != null ? LogLevel.Error : LogLevel.Information;
+            AddAsync(logLevel, LogEvent.Info, null, message, ex, ex != null ? LoggerStatus.Error : LoggerStatus.Info);
         }
-        public static void AddAsync(LoggerType loggerType, string requestParameter, string responseParameter, string ex, LoggerStatus status)
+        public static void AddAsync(LogLevel logLevel, LogEvent logEvent, string requestParameter, string responseParameter, string ex, LoggerStatus status)
         {
+            if (logLevel < _minimumLogLevel) // Apply filter
+            {
+                return;
+            }
             var log = new Sys_Log()
             {
                 BeginDate = DateTime.Now,
                 EndDate = DateTime.Now,
                 User_Id = 0,
                 UserName = "",
-                //  Role_Id = ,
-                LogType = loggerType.ToString(),
+                LogLevel = logLevel.ToString(),
+                LogType = logEvent.ToString(), // This is LogEvent now
                 ExceptionInfo = ex,
                 RequestParameter = requestParameter,
                 ResponseParameter = responseParameter,
                 Success = (int)status
             };
-            loggerQueueData.Enqueue(log);
+            if (!loggerQueueData.TryAdd(log))
+            {
+                // Queue is full, log was not added.
+                string consoleMessage = $"Warning: Logger queue is full ({_maxQueueSize} items). Log message dropped. Event: {log.LogType}, Level: {log.LogLevel}, URL: {log.Url}";
+                Console.WriteLine(consoleMessage);
+            }
         }
         /// <summary>
         /// 
@@ -116,13 +177,18 @@ namespace VOL.Core.Services
         /// <param name="responseParameter">响应参数</param>
         /// <param name="success">响应结果1、成功,2、异常，0、其他</param>
         /// <param name="userInfo">用户数据</param>
-        public static void Add(LoggerType loggerType, string requestParameter, string responseParameter, string ex, LoggerStatus status)
+        public static void Add(LogLevel logLevel, LogEvent logEvent, string requestParameter, string responseParameter, string ex, LoggerStatus status)
         {
-            Add(loggerType.ToString(), requestParameter, responseParameter, ex, status);
+            Add(logLevel, logEvent.ToString(), requestParameter, responseParameter, ex, status);
         }
 
-        public static void Add(string loggerType, string requestParameter, string responseParameter, string ex, LoggerStatus status)
+        public static void Add(LogLevel logLevel, string logEventName, string requestParameter, string responseParameter, string ex, LoggerStatus status)
         {
+            if (logLevel < _minimumLogLevel) // Apply filter
+            {
+                return;
+            }
+
             Sys_Log log = null;
             try
             {
@@ -131,7 +197,7 @@ namespace VOL.Core.Services
                 ActionObserver cctionObserver = (context.RequestServices.GetService(typeof(ActionObserver)) as ActionObserver);
                 if (context == null)
                 {
-                    WriteText($"未获取到httpcontext信息,type:{loggerType},reqParam:{requestParameter},respParam:{responseParameter},ex:{ex},success:{status.ToString()}");
+                    WriteText($"未获取到httpcontext信息,type:{logEvent},reqParam:{requestParameter},respParam:{responseParameter},ex:{ex},success:{status.ToString()}"); // Used logEvent
                     return;
                 }
                 UserInfo userInfo = UserContext.Current.UserInfo;
@@ -143,7 +209,8 @@ namespace VOL.Core.Services
                     User_Id = userInfo.User_Id,
                     UserName = userInfo.UserTrueName,
                     Role_Id = userInfo.Role_Id,
-                    LogType = loggerType,
+                    LogLevel = logLevel.ToString(),
+                    LogType = logEventName, // This was the old loggerType
                     ExceptionInfo = ex,
                     RequestParameter = requestParameter,
                     ResponseParameter = responseParameter,
@@ -157,31 +224,48 @@ namespace VOL.Core.Services
                 {
                     BeginDate = DateTime.Now,
                     EndDate = DateTime.Now,
-                    LogType = loggerType.ToString(),
+                    LogLevel = logLevel.ToString(), // Assign LogLevel
+                    LogType = logEvent.ToString(),
                     RequestParameter = requestParameter,
                     ResponseParameter = responseParameter,
                     Success = (int)status,
                     ExceptionInfo = ex + exception.Message
                 };
             }
-            loggerQueueData.Enqueue(log);
+            if (!loggerQueueData.TryAdd(log))
+            {
+                // Queue is full, log was not added.
+                string consoleMessage = $"Warning: Logger queue is full ({_maxQueueSize} items). Log message dropped. Event: {log.LogType}, Level: {log.LogLevel}, URL: {log.Url}";
+                Console.WriteLine(consoleMessage);
+            }
         }
 
         private static void Start()
         {
             DataTable queueTable = CreateEmptyTable();
-            //  List<Sys_Log> list = new List<Sys_Log>();
             while (true)
             {
                 try
                 {
-                    if (loggerQueueData.Count() > 0 && queueTable.Rows.Count < 500)
+                    // Attempt to fill the batch table up to 500 rows
+                    while (queueTable.Rows.Count < 500)
                     {
-                        DequeueToTable(queueTable); continue;
+                        if (loggerQueueData.TryTake(out Sys_Log log, TimeSpan.FromMilliseconds(50))) // Short timeout
+                        {
+                            DequeueToTable(queueTable, log); // Pass the dequeued log directly
+                        }
+                        else
+                        {
+                            // Queue is empty or was empty during the timeout
+                            break;
+                        }
                     }
-                    //每5秒写一次数据
-                    Thread.Sleep(1000);
-                    if (queueTable.Rows.Count == 0) { continue; }
+
+                    if (queueTable.Rows.Count == 0)
+                    {
+                        Thread.Sleep(1000); // Wait if batch is empty
+                        continue;
+                    }
 
                     DBServerProvider.SqlDapper.BulkInsert(queueTable, "Sys_Log", SqlBulkCopyOptions.KeepIdentity, null, _loggerPath);
                     queueTable.Clear();
@@ -209,9 +293,11 @@ namespace VOL.Core.Services
             }
         }
 
-        private static void DequeueToTable(DataTable queueTable)
+        private static void DequeueToTable(DataTable queueTable, Sys_Log log) // log is now passed as parameter
         {
-            loggerQueueData.TryDequeue(out Sys_Log log);
+            // loggerQueueData.TryDequeue(out Sys_Log log); // Dequeue happens in Start() method now
+            if (log == null) return; // Should not happen if called from Start() correctly
+
             DataRow row = queueTable.NewRow();
             if (log.BeginDate == null)
             {
@@ -233,12 +319,14 @@ namespace VOL.Core.Services
             row["User_Id"] = log.User_Id ?? -1;
             row["UserName"] = log.UserName;
             row["Role_Id"] = log.Role_Id ?? -1;
+            row["LogLevel"] = log.LogLevel; // New assignment
             queueTable.Rows.Add(row);
         }
         private static DataTable CreateEmptyTable()
         {
             DataTable queueTable = new DataTable();
-            queueTable.Columns.Add("LogType", typeof(string));
+            queueTable.Columns.Add("LogType", typeof(string)); // This is LogEvent now
+            queueTable.Columns.Add("LogLevel", typeof(string)); // New column
             queueTable.Columns.Add("RequestParameter", typeof(string));
             queueTable.Columns.Add("ResponseParameter", typeof(string));
             queueTable.Columns.Add("ExceptionInfo", typeof(string));

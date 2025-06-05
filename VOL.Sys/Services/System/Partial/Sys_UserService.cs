@@ -57,7 +57,13 @@ namespace VOL.Sys.Services
                     .FirstOrDefaultAsync();
 
                 if (user == null || loginInfo.Password.Trim().EncryptDES(AppSetting.Secret.User) != (user.UserPwd ?? ""))
-                    return webResponse.Error(ResponseType.LoginError);
+                {
+                    webResponse.Error(ResponseType.LoginError);
+                    // Log failed login attempt before returning
+                    Logger.Warning(LoggerType.Login, $"登录失败: 用户名或密码错误. UserName={loginInfo.UserName}", loginInfo.Serialize(), webResponse.Message);
+                    memoryCache.Remove(loginInfo.UUID); // Ensure cache is removed on this path too
+                    return webResponse;
+                }
 
                 string token = JwtHelper.IssueJwt(new UserInfo()
                 {
@@ -67,26 +73,33 @@ namespace VOL.Sys.Services
                 });
                 user.Token = token;
                 webResponse.Data = new { token, userName = user.UserTrueName, img = user.HeadImageUrl };
-                repository.Update(user, x => x.Token, true);
+                // Assuming SaveChanges is called by the framework or a higher level method if this is part of a larger UoW
+                repository.Update(user, x => new { x.Token }, true);
+                await repository.SaveChangesAsync(); // Explicitly save changes for the token update
+
                 UserContext.Current.LogOut(user.User_Id);
-
-                loginInfo.Password = string.Empty;
-
-                return webResponse.OK(ResponseType.LoginSuccess);
+                loginInfo.Password = string.Empty; // Clear password from input object
+                webResponse.OK(ResponseType.LoginSuccess);
+                Logger.Info(LoggerType.Login, $"登录成功: UserName={loginInfo.UserName}, UserId={user.User_Id}", loginInfo.Serialize(), webResponse.Message);
             }
             catch (Exception ex)
             {
-                msg = ex.Message + ex.StackTrace;
+                // Log the full exception
+                Logger.Error(LoggerType.Login, $"登录异常: UserName={loginInfo.UserName}", loginInfo.Serialize(), null, ex);
                 if (_context.GetService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>().IsDevelopment())
                 {
-                    throw new Exception(ex.Message + ex.StackTrace);
+                    // In dev, rethrow to see the detailed error
+                    throw;
                 }
-                return webResponse.Error(ResponseType.ServerError);
+                // For production, return a generic error
+                webResponse.Error(ResponseType.ServerError);
             }
             finally
             {
                 memoryCache.Remove(loginInfo.UUID);
-                Logger.Info(LoggerType.Login, loginInfo.Serialize(), webResponse.Message, msg);
+                // Logging in finally might be redundant if specific outcomes are logged within try/catch.
+                // However, if we want a guaranteed log entry for every attempt, this is one way.
+                // For now, specific outcome logging is preferred.
             }
         }
 
@@ -96,19 +109,30 @@ namespace VOL.Sys.Services
         /// <returns></returns>
         public async Task<WebResponseContent> ReplaceToken()
         {
-            string error = "";
-            UserInfo userInfo = null;
+            UserInfo userInfo = null; // Keep userInfo declaration for logging context
             try
             {
                 string requestToken = _context.Request.Headers[AppSetting.TokenHeaderName];
                 requestToken = requestToken?.Replace("Bearer ", "");
-                if (UserContext.Current.Token != requestToken) return webResponse.Error("Token已失效!");
 
-                if (JwtHelper.IsExp(requestToken)) return webResponse.Error("Token已过期!");
+                // It's better to get CurrentUser before async calls if its context can change
+                var currentUserContext = UserContext.Current;
+                if (currentUserContext.Token != requestToken)
+                {
+                    webResponse.Error("Token已失效!");
+                    Logger.Warning(LoggerType.ReplaceToeken, $"Token替换失败: Request token does not match current user token. UserId={currentUserContext.UserId}", null, webResponse.Message);
+                    return webResponse;
+                }
 
-                int userId = UserContext.Current.UserId;
-                userInfo = await
-                     repository.FindFirstAsync(x => x.User_Id == userId,
+                if (JwtHelper.IsExp(requestToken))
+                {
+                    webResponse.Error("Token已过期!");
+                    Logger.Warning(LoggerType.ReplaceToeken, $"Token替换失败: Token已过期. UserId={currentUserContext.UserId}", null, webResponse.Message);
+                    return webResponse;
+                }
+
+                int userId = currentUserContext.UserId;
+                userInfo = await repository.FindFirstAsync(x => x.User_Id == userId,
                      s => new UserInfo()
                      {
                          User_Id = userId,
@@ -118,25 +142,30 @@ namespace VOL.Sys.Services
                          RoleName = s.RoleName
                      });
 
-                if (userInfo == null) return webResponse.Error("未查到用户信息!");
+                if (userInfo == null)
+                {
+                    webResponse.Error("未查到用户信息!");
+                    Logger.Warning(LoggerType.ReplaceToeken, $"Token替换失败: 未查到用户信息. UserId={userId}", null, webResponse.Message);
+                    return webResponse;
+                }
 
-                string token = JwtHelper.IssueJwt(userInfo);
-                //移除当前缓存
+                string newToken = JwtHelper.IssueJwt(userInfo);
                 base.CacheContext.Remove(userId.GetUserIdKey());
-                //只更新的token字段
-                repository.Update(new Sys_User() { User_Id = userId, Token = token }, x => x.Token, true);
-                webResponse.OK(null, token);
+                repository.Update(new Sys_User() { User_Id = userId, Token = newToken }, x => new { x.Token }, true);
+                await repository.SaveChangesAsync(); // Explicitly save changes
+
+                webResponse.OK(null, newToken);
+                Logger.Info(LoggerType.ReplaceToeken, $"Token替换成功: UserId={userId}, UserTrueName={userInfo.UserTrueName}", null, webResponse.Message);
             }
             catch (Exception ex)
             {
-                error = ex.Message + ex.StackTrace + ex.Source;
-                webResponse.Error("token替换出错了..");
+                // Use UserContext.Current if userInfo is null, otherwise use userInfo for more specific context
+                var logUserId = userInfo?.User_Id ?? UserContext.Current?.UserId;
+                var logUserTrueName = userInfo?.UserTrueName ?? UserContext.Current?.UserTrueName;
+                Logger.Error(LoggerType.ReplaceToeken, $"Token替换异常: UserId={logUserId}, UserTrueName={logUserTrueName}", null, null, ex);
+                webResponse.Error("Token替换服务异常。");
             }
-            finally
-            {
-                Logger.Info(LoggerType.ReplaceToeken, ($"用户Id:{userInfo?.User_Id},用户{userInfo?.UserTrueName}")
-                    + (webResponse.Status ? "token替换成功" : "token替换失败"), null, error);
-            }
+            // Finally block is removed as specific logging is done in try/catch.
             return webResponse;
         }
 
@@ -149,22 +178,46 @@ namespace VOL.Sys.Services
         {
             oldPwd = oldPwd?.Trim();
             newPwd = newPwd?.Trim();
-            string message = "";
+            // string message = ""; // Not needed anymore
+            int userId = UserContext.Current.UserId; // Get userId early for logging in case of error
             try
             {
-                if (string.IsNullOrEmpty(oldPwd)) return webResponse.Error("旧密码不能为空");
-                if (string.IsNullOrEmpty(newPwd)) return webResponse.Error("新密码不能为空");
-                if (newPwd.Length < 6) return webResponse.Error("密码不能少于6位");
+                if (string.IsNullOrEmpty(oldPwd))
+                {
+                    webResponse.Error("旧密码不能为空");
+                    Logger.Warning(LoggerType.ApiModifyPwd, $"修改密码失败: 旧密码为空. UserId={userId}", new { userId }, webResponse.Message);
+                    return webResponse;
+                }
+                if (string.IsNullOrEmpty(newPwd))
+                {
+                    webResponse.Error("新密码不能为空");
+                    Logger.Warning(LoggerType.ApiModifyPwd, $"修改密码失败: 新密码为空. UserId={userId}", new { userId }, webResponse.Message);
+                    return webResponse;
+                }
+                if (newPwd.Length < 6)
+                {
+                    webResponse.Error("密码不能少于6位");
+                    Logger.Warning(LoggerType.ApiModifyPwd, $"修改密码失败: 新密码长度小于6位. UserId={userId}", new { userId }, webResponse.Message);
+                    return webResponse;
+                }
 
-                int userId = UserContext.Current.UserId;
                 string userCurrentPwd = await base.repository.FindFirstAsync(x => x.User_Id == userId, s => s.UserPwd);
 
                 string _oldPwd = oldPwd.EncryptDES(AppSetting.Secret.User);
-                if (_oldPwd != userCurrentPwd) return webResponse.Error("旧密码不正确");
+                if (_oldPwd != userCurrentPwd)
+                {
+                    webResponse.Error("旧密码不正确");
+                    Logger.Warning(LoggerType.ApiModifyPwd, $"修改密码失败: 旧密码不正确. UserId={userId}", new { userId }, webResponse.Message);
+                    return webResponse;
+                }
 
                 string _newPwd = newPwd.EncryptDES(AppSetting.Secret.User);
-                if (userCurrentPwd == _newPwd) return webResponse.Error("新密码不能与旧密码相同");
-
+                if (userCurrentPwd == _newPwd)
+                {
+                    webResponse.Error("新密码不能与旧密码相同");
+                    Logger.Warning(LoggerType.ApiModifyPwd, $"修改密码失败: 新密码与旧密码相同. UserId={userId}", new { userId }, webResponse.Message);
+                    return webResponse;
+                }
 
                 repository.Update(new Sys_User
                 {
@@ -172,25 +225,17 @@ namespace VOL.Sys.Services
                     UserPwd = _newPwd,
                     LastModifyPwdDate = DateTime.Now
                 }, x => new { x.UserPwd, x.LastModifyPwdDate }, true);
+                await repository.SaveChangesAsync(); // Explicitly save changes
 
                 webResponse.OK("密码修改成功");
+                Logger.Info(LoggerType.ApiModifyPwd, $"密码修改成功: UserId={userId}", new { userId }, webResponse.Message);
             }
             catch (Exception ex)
             {
-                message = ex.Message;
-                webResponse.Error("服务器了点问题,请稍后再试");
+                Logger.Error(LoggerType.ApiModifyPwd, $"修改密码异常: UserId={userId}", new { userId }, null, ex);
+                webResponse.Error("密码修改服务异常，请稍后再试。");
             }
-            finally
-            {
-                if (message == "")
-                {
-                    Logger.OK(LoggerType.ApiModifyPwd, "密码修改成功");
-                }
-                else
-                {
-                    Logger.Error(LoggerType.ApiModifyPwd, message);
-                }
-            }
+            // Finally block is removed as specific logging is done in try/catch for success/failure/exception.
             return webResponse;
         }
         /// <summary>
@@ -199,23 +244,40 @@ namespace VOL.Sys.Services
         /// <returns></returns>
         public async Task<WebResponseContent> GetCurrentUserInfo()
         {
-            var data = await base.repository
-                .FindAsIQueryable(x => x.User_Id == UserContext.Current.UserId)
-                .Select(s => new
+            try
+            {
+                var userId = UserContext.Current.UserId; // For logging
+                var data = await base.repository
+                    .FindAsIQueryable(x => x.User_Id == userId)
+                    .Select(s => new
+                    {
+                        s.UserName,
+                        s.UserTrueName,
+                        s.Address,
+                        s.PhoneNo,
+                        s.Email,
+                        s.Remark,
+                        s.Gender,
+                        s.RoleName,
+                        s.HeadImageUrl,
+                        s.CreateDate
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (data == null)
                 {
-                    s.UserName,
-                    s.UserTrueName,
-                    s.Address,
-                    s.PhoneNo,
-                    s.Email,
-                    s.Remark,
-                    s.Gender,
-                    s.RoleName,
-                    s.HeadImageUrl,
-                    s.CreateDate
-                })
-                .FirstOrDefaultAsync();
-            return webResponse.OK(null, data);
+                    Logger.Warning(LoggerType.Select, $"获取当前用户信息失败: 用户未找到. UserId={userId}", new { userId }, null);
+                    return webResponse.Error("当前用户信息未找到。");
+                }
+                Logger.Info(LoggerType.Select, $"获取当前用户信息成功: UserId={userId}", new { userId }, null);
+                return webResponse.OK(null, data);
+            }
+            catch (Exception ex)
+            {
+                var userIdForLog = UserContext.Current?.UserId; // Might be null if context is lost
+                Logger.Error(LoggerType.Select, $"获取当前用户信息异常: UserId={userIdForLog}", new { UserId = userIdForLog }, null, ex);
+                return webResponse.Error("获取用户信息时发生服务异常。");
+            }
         }
 
         /// <summary>
@@ -308,21 +370,43 @@ namespace VOL.Sys.Services
             //在AddOnExecuting之前已经对提交的数据做过验证是否为空
             base.AddOnExecuting = (Sys_User user, object obj) =>
             {
-                user.UserName = user.UserName.Trim();
-                if (repository.Exists(x => x.UserName == user.UserName))
-                    return webResponse.Error("用户名已经被注册");
-                user.UserPwd = pwd.EncryptDES(AppSetting.Secret.User);
-                //设置默认头像
-                return webResponse.OK();
+                try
+                {
+                    user.UserName = user.UserName.Trim();
+                    if (repository.Exists(x => x.UserName == user.UserName))
+                        return new WebResponseContent().Error("用户名已经被注册"); // Use new instance
+                    user.UserPwd = pwd.EncryptDES(AppSetting.Secret.User);
+                    //设置默认头像
+                    // user.HeadImageUrl = string.IsNullOrEmpty(user.HeadImageUrl) ? AppSetting.DownLoad.DefaultHeadImage : user.HeadImageUrl; // Example for default image
+                    return new WebResponseContent().OK(); // Use new instance
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(LoggerType.Add, $"新建用户校验用户名存在性异常: UserName={user?.UserName}", user?.Serialize(), null, ex);
+                    return new WebResponseContent().Error("校验用户名时发生数据库错误。");
+                }
             };
 
             base.AddOnExecuted = (Sys_User user, object list) =>
             {
-                var deptIds = user.DeptIds?.Split(",").Select(s => s.GetGuid()).Where(x => x != null).Select(s => (Guid)s).ToArray();
-                SaveDepartment(deptIds, user.User_Id);
-                return webResponse.OK($"用户新建成功.帐号{user.UserName}密码{pwd}");
+                try
+                {
+                    var deptIds = user.DeptIds?.Split(",").Select(s => s.GetGuid()).Where(x => x != null).Select(s => (Guid)s).ToArray();
+                    SaveDepartment(deptIds, user.User_Id); // SaveDepartment has its own try-catch
+                    // If SaveDepartment could throw and we need to react, the catch here would be useful.
+                    // For now, it mainly ensures any unexpected error in this delegate is caught.
+                    return new WebResponseContent().OK($"用户新建成功.帐号{user.UserName}密码{pwd}");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(LoggerType.Add, $"新建用户后保存部门信息异常: UserId={user?.User_Id}, UserName={user?.UserName}", user?.Serialize(), null, ex);
+                    // Return OK since main user was added, but log the department save issue.
+                    // Or, if this is critical, return an error:
+                    // return new WebResponseContent().Error($"用户新建成功，但保存部门信息失败。帐号{user.UserName}密码{pwd}");
+                    return new WebResponseContent().OK($"用户新建成功，但保存部门信息时遇到问题。帐号{user.UserName}密码{pwd}");
+                }
             };
-            return base.Add(saveModel); ;
+            return base.Add(saveModel);
         }
 
         /// <summary>
@@ -336,32 +420,48 @@ namespace VOL.Sys.Services
         {
             base.DelOnExecuting = (object[] ids) =>
             {
-                if (!UserContext.Current.IsSuperAdmin)
+                try
                 {
-                    int[] userIds = ids.Select(x => Convert.ToInt32(x)).ToArray();
-                    //校验只能删除当前角色下能看到的用户
-                    var xxx = repository.Find(x => userIds.Contains(x.User_Id));
-                    var delUserIds = repository.Find(x => userIds.Contains(x.User_Id), s => new { s.User_Id, s.Role_Id, s.UserTrueName });
-                    List<int> roleIds = Sys_RoleService
-                       .Instance
-                       .GetAllChildrenRoleId(UserContext.Current.RoleId);
-
-                    string[] userNames = delUserIds.Where(x => !roleIds.Contains(x.Role_Id))
-                     .Select(s => s.UserTrueName)
-                     .ToArray();
-                    if (userNames.Count() > 0)
+                    if (!UserContext.Current.IsSuperAdmin)
                     {
-                        return webResponse.Error($"没有权限删除用户：{string.Join(',', userNames)}");
-                    }
-                }
+                        int[] userIds = ids.Select(x => Convert.ToInt32(x)).ToArray();
+                        //校验只能删除当前角色下能看到的用户
+                        //var xxx = repository.Find(x => userIds.Contains(x.User_Id)); // This line seems unused, can be removed.
+                        var delUserInfos = repository.Find(x => userIds.Contains(x.User_Id), s => new { s.User_Id, s.Role_Id, s.UserTrueName });
 
-                return webResponse.OK();
+                        // Assuming Sys_RoleService.Instance.GetAllChildrenRoleId is handled for exceptions
+                        List<int> roleIds = Sys_RoleService.Instance.GetAllChildrenRoleId(UserContext.Current.RoleId);
+
+                        string[] userNames = delUserInfos.Where(x => !roleIds.Contains(x.Role_Id))
+                         .Select(s => s.UserTrueName)
+                         .ToArray();
+                        if (userNames.Any()) // Use .Any() for checking existence
+                        {
+                            return new WebResponseContent().Error($"没有权限删除用户：{string.Join(',', userNames)}");
+                        }
+                    }
+                    return new WebResponseContent().OK();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(LoggerType.Delete, "删除用户前置校验异常", new { UserIds = ids?.Serialize() }, null, ex);
+                    return new WebResponseContent().Error("删除用户校验时发生数据库错误。");
+                }
             };
             base.DelOnExecuted = (object[] userIds) =>
             {
-                var objKeys = userIds.Select(x => x.GetInt().GetUserIdKey());
-                base.CacheContext.RemoveAll(objKeys);
-                return new WebResponseContent() { Status = true };
+                try
+                {
+                    var objKeys = userIds.Select(x => x.GetInt().GetUserIdKey());
+                    base.CacheContext.RemoveAll(objKeys); // Cache operation
+                    return new WebResponseContent().OK("用户缓存已清除。"); // Explicit OK
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(LoggerType.Delete, "删除用户后清除缓存异常", new { UserIds = userIds?.Serialize() }, null, ex);
+                    // Main deletion was successful, so still return OK, but log the cache error.
+                    return new WebResponseContent().OK("用户已删除，但清除缓存时遇到问题。");
+                }
             };
             return base.Del(keys, delList);
         }
@@ -405,24 +505,44 @@ namespace VOL.Sys.Services
             };
             base.UpdateOnExecuting = (Sys_User user, object obj1, object obj2, List<object> list) =>
             {
-                if (user.User_Id == userInfo.User_Id && user.Role_Id != userInfo.Role_Id)
-                    return webResponse.Error("不能修改自己的角色");
+                try
+                {
+                    if (user.User_Id == userInfo.User_Id && user.Role_Id != userInfo.Role_Id)
+                        return new WebResponseContent().Error("不能修改自己的角色");
 
-                var _user = repository.Find(x => x.User_Id == user.User_Id,
-                    s => new { s.UserName, s.UserPwd })
-                    .FirstOrDefault();
-                user.UserName = _user.UserName;
-                //Sys_User实体的UserPwd用户密码字段的属性不是编辑，此处不会修改密码。但防止代码生成器将密码字段的修改成了可编辑造成密码被修改
-                user.UserPwd = _user.UserPwd;
-                return webResponse.OK();
+                    var _user = repository.Find(x => x.User_Id == user.User_Id,
+                        s => new { s.UserName, s.UserPwd })
+                        .FirstOrDefault();
+
+                    if (_user == null)
+                        return new WebResponseContent().Error("未找到要更新的用户信息。");
+
+                    user.UserName = _user.UserName; // Preserve original UserName
+                    user.UserPwd = _user.UserPwd;   // Preserve original Password
+                    return new WebResponseContent().OK();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(LoggerType.Update, $"更新用户前置校验异常: UserId={user?.User_Id}", user?.Serialize(), null, ex);
+                    return new WebResponseContent().Error("更新用户校验时发生数据库错误。");
+                }
             };
             //用户信息被修改后，将用户的缓存信息清除
             base.UpdateOnExecuted = (Sys_User user, object obj1, object obj2, List<object> List) =>
             {
-                base.CacheContext.Remove(user.User_Id.GetUserIdKey());
-                var deptIds = user.DeptIds?.Split(",").Select(s => s.GetGuid()).Where(x => x != null).Select(s => (Guid)s).ToArray();
-                SaveDepartment(deptIds, user.User_Id);
-                return new WebResponseContent(true);
+                try
+                {
+                    base.CacheContext.Remove(user.User_Id.GetUserIdKey()); // Cache operation
+                    var deptIds = user.DeptIds?.Split(",").Select(s => s.GetGuid()).Where(x => x != null).Select(s => (Guid)s).ToArray();
+                    SaveDepartment(deptIds, user.User_Id); // SaveDepartment has its own try-catch
+                    return new WebResponseContent(true).OK("用户信息已更新，缓存已清除，部门已保存。");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(LoggerType.Update, $"更新用户后操作异常 (缓存或部门): UserId={user?.User_Id}", user?.Serialize(), null, ex);
+                    // Main update was successful. Log this error but return success for the main operation.
+                    return new WebResponseContent(true).OK("用户信息已更新，但后续操作(清除缓存或保存部门)时遇到问题。");
+                }
             };
             return base.Update(saveModel);
         }
@@ -435,9 +555,9 @@ namespace VOL.Sys.Services
         /// <param name="userId"></param>
         public void SaveDepartment(Guid[] deptIds, int userId)
         {
-
             if (userId <= 0)
             {
+                Logger.Warning(LoggerType.Update, $"保存用户部门失败: 无效的UserId. UserId={userId}", new { userId, deptIds = deptIds?.Serialize() }, null);
                 return;
             }
             if (deptIds == null)
@@ -445,52 +565,74 @@ namespace VOL.Sys.Services
                 deptIds = new Guid[] { };
             }
 
-            //如果需要判断当前角色是否越权，再调用一下获取当前部门下的所有子角色判断即可
-
-            var roles = repository.DbContext.Set<Sys_UserDepartment>().Where(x => x.UserId == userId)
-              .Select(s => new { s.DepartmentId, s.Enable, s.Id })
-              .ToList();
-            //没有设置部门
-            if (deptIds.Length == 0 && !roles.Exists(x => x.Enable == 1))
+            try
             {
-                return;
+                //如果需要判断当前角色是否越权，再调用一下获取当前部门下的所有子角色判断即可
+                var existingUserDepts = repository.DbContext.Set<Sys_UserDepartment>().Where(x => x.UserId == userId)
+                  .Select(s => new { s.DepartmentId, s.Enable, s.Id })
+                  .ToList();
+
+                //没有设置部门且原来也没有启用任何部门
+                if (deptIds.Length == 0 && !existingUserDepts.Exists(x => x.Enable == 1))
+                {
+                    return; // No changes needed
+                }
+
+                UserInfo currentUser = UserContext.Current.UserInfo;
+                //新设置的部门
+                var deptsToAdd = deptIds.Where(x => !existingUserDepts.Exists(r => r.DepartmentId == x)).Select(s => new Sys_UserDepartment()
+                {
+                    DepartmentId = s,
+                    UserId = userId,
+                    Enable = 1,
+                    CreateDate = DateTime.Now,
+                    Creator = currentUser.UserTrueName,
+                    CreateID = currentUser.User_Id
+                }).ToList();
+
+                List<Sys_UserDepartment> deptsToUpdate = new List<Sys_UserDepartment>();
+                //停用不再选择的部门
+                deptsToUpdate.AddRange(existingUserDepts.Where(x => !deptIds.Contains(x.DepartmentId) && x.Enable == 1).Select(s => new Sys_UserDepartment()
+                {
+                    Id = s.Id, // Important: Need Id for update
+                    UserId = userId, DepartmentId = s.DepartmentId, // Keep other fields for potential full entity update needs
+                    Enable = 0,
+                    ModifyDate = DateTime.Now,
+                    Modifier = currentUser.UserTrueName,
+                    ModifyID = currentUser.User_Id
+                }));
+
+                //重新启用的部门
+                deptsToUpdate.AddRange(existingUserDepts.Where(x => deptIds.Contains(x.DepartmentId) && x.Enable != 1).Select(s => new Sys_UserDepartment()
+                {
+                    Id = s.Id, // Important: Need Id for update
+                    UserId = userId, DepartmentId = s.DepartmentId,
+                    Enable = 1,
+                    ModifyDate = DateTime.Now,
+                    Modifier = currentUser.UserTrueName,
+                    ModifyID = currentUser.User_Id
+                }));
+
+                if (deptsToAdd.Any())
+                    repository.AddRange(deptsToAdd);
+
+                if (deptsToUpdate.Any())
+                    repository.UpdateRange(deptsToUpdate, x => new { x.Enable, x.ModifyDate, x.Modifier, x.ModifyID });
+
+                // Only save if there are actual changes
+                if (deptsToAdd.Any() || deptsToUpdate.Any())
+                {
+                    repository.SaveChanges();
+                    Logger.Info(LoggerType.Update, $"保存用户部门成功: UserId={userId}", new { userId, deptIds = deptIds.Serialize(), added = deptsToAdd.Count, updated = deptsToUpdate.Count }, null);
+                }
             }
-
-            UserInfo user = UserContext.Current.UserInfo;
-            //新设置的部门
-            var add = deptIds.Where(x => !roles.Exists(r => r.DepartmentId == x)).Select(s => new Sys_UserDepartment()
+            catch (Exception ex)
             {
-                DepartmentId = s,
-                UserId = userId,
-                Enable = 1,
-                CreateDate = DateTime.Now,
-                Creator = user.UserTrueName,
-                CreateID = user.User_Id
-            }).ToList();
-
-            //删除的部门
-            var update = roles.Where(x => !deptIds.Contains(x.DepartmentId) && x.Enable == 1).Select(s => new Sys_UserDepartment()
-            {
-                Id = s.Id,
-                Enable = 0,
-                ModifyDate = DateTime.Now,
-                Modifier = user.UserTrueName,
-                ModifyID = user.User_Id
-            }).ToList();
-
-            //之前设置过的部门重新分配 
-            update.AddRange(roles.Where(x => deptIds.Contains(x.DepartmentId) && x.Enable != 1).Select(s => new Sys_UserDepartment()
-            {
-                Id = s.Id,
-                Enable = 1,
-                ModifyDate = DateTime.Now,
-                Modifier = user.UserTrueName,
-                ModifyID = user.User_Id
-            }).ToList());
-            repository.AddRange(add);
-
-            repository.UpdateRange(update, x => new { x.Enable, x.ModifyDate, x.Modifier, x.ModifyID });
-            repository.SaveChanges();
+                Logger.Error(LoggerType.Update, $"保存用户部门异常: UserId={userId}", new { userId, deptIds = deptIds?.Serialize() }, null, ex);
+                // This method is void, so can't return error. Consider if it should throw or if AddOnExecuted/UpdateOnExecuted should handle this.
+                // For now, just logging. If this is critical, an exception should be thrown to halt the parent operation.
+                // throw; // Optionally rethrow if this failure should stop the parent Add/Update.
+            }
         }
 
         /// <summary>

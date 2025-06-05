@@ -44,15 +44,23 @@ namespace VOL.MES.Controllers
         [Route("getList"), HttpGet]
         public async Task<IActionResult> GetList()
         {
-            var data = await _repository.FindAsIQueryable(x => true)
-                  .Select(s => new
-                  {
-                      id = s.CatalogID,
-                      s.ParentId,
-                      name = s.CatalogName
-                  })
-                  .ToListAsync();
-            return Json(data);
+            try
+            {
+                var data = await _repository.FindAsIQueryable(x => true)
+                      .Select(s => new
+                      {
+                          id = s.CatalogID,
+                          s.ParentId,
+                          name = s.CatalogName
+                      })
+                      .ToListAsync();
+                return Json(data);
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, "获取物料目录列表时出错", null, null, ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "获取物料目录列表时发生内部服务器错误。", status = false });
+            }
         }
 
     }

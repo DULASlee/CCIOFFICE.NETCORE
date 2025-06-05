@@ -69,7 +69,20 @@ namespace VOL.Sys.Services
             var result = base.Add(saveDataModel);
             if (result.Status)
             {
-                ops.AddJob(_schedulerFactory).GetAwaiter().GetResult();
+                try
+                {
+                    ops.AddJob(_schedulerFactory).GetAwaiter().GetResult();
+                }
+                catch (Exception ex)
+                {
+                    VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Insert, $"添加到调度器失败:{ops.Id}_{ops.TaskName}", ops.Serialize(), null, ex);
+                    // Decide if the main operation should still be considered successful
+                    // For now, we just log and the original result status is maintained.
+                    // If this failure should make the entire Add operation fail, you might need to:
+                    // result.Status = false;
+                    // result.Message = "添加主业务成功，但添加到调度器失败";
+                    // Or rethrow a custom exception if preferred.
+                }
             }
             return result;
         }
@@ -78,12 +91,33 @@ namespace VOL.Sys.Services
         {
             var ids = keys.Select(s => (Guid)(s.GetGuid())).ToArray();
 
-            repository.FindAsIQueryable(x => ids.Contains(x.Id)).ToList().ForEach(options =>
+            // It's good practice to fetch options before calling base.Del,
+            // as base.Del might commit transaction and make options unavailable if fetched later.
+            var optionsToRemove = repository.FindAsIQueryable(x => ids.Contains(x.Id)).ToList();
+
+            // Call base.Del first. If it fails, we don't proceed to scheduler removal.
+            var response = base.Del(keys, delList);
+            if (!response.Status)
             {
-                _schedulerFactory.Remove(options).GetAwaiter().GetResult();
+                return response;
+            }
+
+            // If base.Del was successful, try to remove from scheduler
+            optionsToRemove.ForEach(options =>
+            {
+                try
+                {
+                    _schedulerFactory.Remove(options).GetAwaiter().GetResult();
+                }
+                catch (Exception ex)
+                {
+                    VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Delete, $"从调度器移除失败:{options.Id}_{options.TaskName}", options.Serialize(), null, ex);
+                    // Potentially collect these errors to return a partial success message
+                    // For now, just logging. The main delete operation was successful.
+                }
             });
 
-            return base.Del(keys, delList);
+            return response;
         }
 
         public override WebResponseContent Update(SaveModel saveModel)
@@ -91,7 +125,18 @@ namespace VOL.Sys.Services
 
             UpdateOnExecuted = (Sys_QuartzOptions options, object addList, object updateList, List<object> delKeys) =>
             {
-                _schedulerFactory.Update(options).GetAwaiter().GetResult();
+                try
+                {
+                    _schedulerFactory.Update(options).GetAwaiter().GetResult();
+                }
+                catch (Exception ex)
+                {
+                    VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Update, $"更新调度器任务失败:{options.Id}_{options.TaskName}", options.Serialize(), null, ex);
+                    // The main entity update in DB was successful.
+                    // This error indicates a sync issue with the scheduler.
+                    // Consider if this should alter the overall response.
+                    // For now, returning webResponse.OK() as per original logic, but logging the error.
+                }
                 return webResponse.OK();
             };
             return base.Update(saveModel);
@@ -104,7 +149,18 @@ namespace VOL.Sys.Services
         /// <returns></returns>
         public async Task<object> Run(Sys_QuartzOptions taskOptions)
         {
-            return await _schedulerFactory.Run(taskOptions);
+            try
+            {
+                return await _schedulerFactory.Run(taskOptions);
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, $"手动执行任务失败:{taskOptions.Id}_{taskOptions.TaskName}", taskOptions.Serialize(), null, ex);
+                // Return a value indicating failure, or rethrow, depending on desired contract.
+                // For now, rethrowing to let the caller know something went wrong.
+                // If a specific return type is expected on failure, adjust accordingly.
+                throw;
+            }
         }
         /// <summary>
         /// 开启任务
@@ -114,13 +170,35 @@ namespace VOL.Sys.Services
         /// <returns></returns>
         public async Task<object> Start(Sys_QuartzOptions taskOptions)
         {
-            var result = await _schedulerFactory.Start(taskOptions);
+            object schedulerResult;
+            try
+            {
+                schedulerResult = await _schedulerFactory.Start(taskOptions);
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, $"启动任务失败:{taskOptions.Id}_{taskOptions.TaskName}", taskOptions.Serialize(), null, ex);
+                // Rethrow or return specific error object
+                throw;
+            }
+
             if (taskOptions.Status != (int)TriggerState.Normal)
             {
                 taskOptions.Status = (int)TriggerState.Normal;
-                _repository.Update(taskOptions, x => new { x.Status }, true);
+                try
+                {
+                    _repository.Update(taskOptions, x => new { x.Status }, true);
+                }
+                catch (Exception dbEx)
+                {
+                    VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Update, $"更新任务状态到Normal失败(DB):{taskOptions.Id}_{taskOptions.TaskName}", taskOptions.Serialize(), null, dbEx);
+                    // The task started in scheduler, but DB update of status failed.
+                    // This is a state inconsistency. Decide on how to handle.
+                    // Maybe rethrow, or return schedulerResult but with a warning.
+                    // For now, logging the error and the original schedulerResult will be returned.
+                }
             }
-            return result;
+            return schedulerResult;
         }
 
         /// <summary>
@@ -131,11 +209,32 @@ namespace VOL.Sys.Services
         /// <returns></returns>
         public async Task<object> Pause(Sys_QuartzOptions taskOptions)
         {
-            //  var result = await _schedulerFactory.Remove(taskOptions);
-            var result = await _schedulerFactory.Pause(taskOptions);
+            object schedulerResult;
+            try
+            {
+                //  var result = await _schedulerFactory.Remove(taskOptions); // Original commented out code
+                schedulerResult = await _schedulerFactory.Pause(taskOptions);
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, $"暂停任务失败:{taskOptions.Id}_{taskOptions.TaskName}", taskOptions.Serialize(), null, ex);
+                // Rethrow or return specific error object
+                throw;
+            }
+
             taskOptions.Status = (int)TriggerState.Paused;
-            _repository.Update(taskOptions, x => new { x.Status }, true);
-            return result;
+            try
+            {
+                _repository.Update(taskOptions, x => new { x.Status }, true);
+            }
+            catch (Exception dbEx)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Update, $"更新任务状态到Paused失败(DB):{taskOptions.Id}_{taskOptions.TaskName}", taskOptions.Serialize(), null, dbEx);
+                // The task was paused in scheduler, but DB update of status failed.
+                // This is a state inconsistency.
+                // For now, logging the error and the original schedulerResult will be returned.
+            }
+            return schedulerResult;
         }
     }
 }

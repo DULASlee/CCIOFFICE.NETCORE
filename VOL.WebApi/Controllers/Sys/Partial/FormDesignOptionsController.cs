@@ -46,10 +46,23 @@ namespace VOL.Sys.Controllers
         [Route("getFormOptions"), HttpGet]
         public async Task<IActionResult> GetFormOptions(Guid id)
         {
-            var options = await _formDesignOptionsRepository.FindAsIQueryable(x => x.FormId == id)
-                    .Select(s => new { s.Title, s.FormOptions })  
-                    .FirstOrDefaultAsync();
-            return Json(new { data = options });
+            try
+            {
+                var options = await _formDesignOptionsRepository.FindAsIQueryable(x => x.FormId == id)
+                        .Select(s => new { s.Title, s.FormOptions })
+                        .FirstOrDefaultAsync();
+                if (options == null)
+                {
+                    VOL.Core.Services.Logger.Warning(VOL.Core.Enums.LoggerType.Select, $"表单选项未找到: FormId={id}", new { FormId = id });
+                    return NotFound(new { message = $"表单选项未找到: FormId={id}" });
+                }
+                return Json(new { data = options });
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, $"获取表单选项时出错: FormId={id}", new { FormId = id }, null, ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "获取表单选项时发生内部服务器错误。" });
+            }
         }
         /// <summary>
         /// 
@@ -59,8 +72,27 @@ namespace VOL.Sys.Controllers
         [Route("submit"), HttpPost]
         public IActionResult Submit([FromBody] SaveModel saveModel)
         {
-            var result = FormCollectionObjectService.Instance.Add(saveModel);
-            return Json(result);
+            try
+            {
+                // Service call should ideally return a WebResponseContent or similar structured response
+                var result = FormCollectionObjectService.Instance.Add(saveModel);
+                // Assuming 'result' has a 'Status' property and 'Message' or 'Data' property
+                // For example, if result is WebResponseContent:
+                if (result.Status)
+                {
+                    return Json(result); // Or Ok(result) if appropriate
+                }
+                else
+                {
+                    VOL.Core.Services.Logger.Warning(VOL.Core.Enums.LoggerType.Add, $"表单提交失败: {result.Message}", saveModel.Serialize(), result.Serialize());
+                    return BadRequest(new { message = result.Message, data = result.Data });
+                }
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, "提交表单时出错", saveModel.Serialize(), null, ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "提交表单时发生内部服务器错误。" });
+            }
         }
         /// <summary>
         ///获取有数据的设计器
@@ -69,12 +101,20 @@ namespace VOL.Sys.Controllers
         [Route("getList"), HttpGet]
         public IActionResult GetList()
         {
-            var query = _formCollectionRepository.FindAsIQueryable(x => true);
-            var data = _formDesignOptionsRepository.FindAsIQueryable(x => query.Any(c => c.FormId == x.FormId))
-                  .Select(s => new { s.FormId, s.Title, s.FormOptions })
-                  .ToList();  
-            return Json(data);  
-
+            try
+            {
+                var query = _formCollectionRepository.FindAsIQueryable(x => true); // Defines query
+                // Actual DB call happens with .ToList()
+                var data = _formDesignOptionsRepository.FindAsIQueryable(x => query.Any(c => c.FormId == x.FormId))
+                      .Select(s => new { s.FormId, s.Title, s.FormOptions })
+                      .ToList();
+                return Json(data);
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, "获取有数据的设计器列表时出错", null, null, ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "获取设计器列表时发生内部服务器错误。" });
+            }
         }
     }
 }

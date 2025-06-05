@@ -109,10 +109,8 @@ namespace VOL.Core.Filters
                 }
                 if (!actionAuth)
                 {
-                    Logger.Info(LoggerType.Authorzie, $"没有权限操作," +
-                   $"用户ID{_userContext.UserId}:{_userContext.UserTrueName}," +
-                   $"角色ID:{_userContext.RoleId}:{_userContext.UserInfo.RoleName}," +
-                   $"操作权限{ActionPermission.TableName}:{ActionPermission.TableAction}");
+                    // Changed from Logger.Info to Logger.Warning
+                    Logger.Warning(LogEvent.Authorzie, $"没有权限操作,用户ID:{_userContext.UserId}({_userContext.UserTrueName}),角色ID:{_userContext.RoleId}({_userContext.UserInfo.RoleName}),操作权限:{ActionPermission.TableName}:{ActionPermission.TableAction}");
                     return ResponseContent.Error(ResponseType.NoPermissions);
                 }
             }

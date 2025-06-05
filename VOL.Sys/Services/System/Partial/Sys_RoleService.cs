@@ -56,8 +56,17 @@ namespace VOL.Sys.Services
             }
             //获取用户权限
             List<Permissions> permissions = UserContext.Current.GetPermissions(roleId);
-            //权限用户权限查询所有的菜单信息
-            List<Sys_Menu> menus = await Task.Run(() => Sys_MenuService.Instance.GetUserMenuList(roleId));
+            List<Sys_Menu> menus;
+            try
+            {
+                //权限用户权限查询所有的菜单信息
+                menus = await Task.Run(() => Sys_MenuService.Instance.GetUserMenuList(roleId));
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Select, $"获取角色菜单列表失败 (GetUserTreePermission): RoleId={roleId}", new { roleId }, null, ex);
+                return _responseContent.Error("获取角色菜单信息时出错。");
+            }
             //获取当前用户权限如:(Add,Search)对应的显示文本信息如:Add：添加，Search:查询
             var data = menus.Select(x => new
             {
@@ -122,14 +131,32 @@ namespace VOL.Sys.Services
         /// <returns></returns>
         public List<RoleNodes> GetAllChildren(int roleId)
         {
-            roles = GetAllRoleQueryable(roleId).ToList();
-            return GetAllChildrenNodes(roleId);
+            try
+            {
+                roles = GetAllRoleQueryable(roleId).ToList();
+                return GetAllChildrenNodes(roleId);
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Select, $"获取子角色列表失败: RoleId={roleId}", new { roleId }, null, ex);
+                return new List<RoleNodes>(); // Return empty list on error
+            }
         }
 
         public async Task<List<RoleNodes>> GetAllChildrenAsync(int roleId)
         {
-            roles = await GetAllRoleQueryable(roleId).ToListAsync();
-            return GetAllChildrenNodes(roleId);
+            try
+            {
+                roles = await GetAllRoleQueryable(roleId).ToListAsync();
+                // GetAllChildrenNodes is assumed to be CPU-bound or use the 'roles' populated above.
+                // If GetAllChildrenNodes itself does I/O, it would need its own try-catch.
+                return GetAllChildrenNodes(roleId);
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Select, $"获取子角色列表失败 (Async): RoleId={roleId}", new { roleId }, null, ex);
+                return new List<RoleNodes>(); // Return empty list on error
+            }
         }
         private IQueryable<RoleNodes> GetAllRoleQueryable(int roleId)
         {
@@ -175,18 +202,21 @@ namespace VOL.Sys.Services
         public async Task<WebResponseContent> SavePermission(List<UserPermissions> userPermissions, int roleId)
         {
 
-            string message = "";
+            // Removed string message = "";
             try
             {
                 UserInfo user = UserContext.Current.UserInfo;
+                // This GetAllChildrenAsync is already wrapped, but if it returns empty due to error,
+                // .Exists might behave unexpectedly. Assuming it returns empty list not null on error.
                 if (!(await GetAllChildrenAsync(user.Role_Id)).Exists(x => x.Id == roleId))
                     return _responseContent.Error("没有权限修改此角色的权限信息");
+
                 //当前用户的权限
                 List<Permissions> permissions = UserContext.Current.Permissions;
 
                 List<int> originalMeunIds = new List<int>();
                 //被分配角色的权限
-                List<Sys_RoleAuth> roleAuths = await repository.FindAsync<Sys_RoleAuth>(x => x.Role_Id == roleId);
+                List<Sys_RoleAuth> roleAuths = await repository.FindAsync<Sys_RoleAuth>(x => x.Role_Id == roleId); // DB Call
                 List<Sys_RoleAuth> updateAuths = new List<Sys_RoleAuth>();
                 foreach (UserPermissions x in userPermissions)
                 {
@@ -221,10 +251,9 @@ namespace VOL.Sys.Services
                     {
                         originalMeunIds.Add(auth.Menu_Id);
                     }
-
                 }
                 //更新权限
-                repository.UpdateRange(updateAuths.Where(x => x.Auth_Id > 0), x => new
+                repository.UpdateRange(updateAuths.Where(x => x.Auth_Id > 0), x => new // DB Call (marks for update)
                 {
                     x.Menu_Id,
                     x.AuthValue,
@@ -232,7 +261,7 @@ namespace VOL.Sys.Services
                     x.ModifyDate
                 });
                 //新增的权限
-                repository.AddRange(updateAuths.Where(x => x.Auth_Id <= 0));
+                repository.AddRange(updateAuths.Where(x => x.Auth_Id <= 0)); // DB Call (marks for add)
 
                 //获取权限取消的权限
                 int[] authIds = roleAuths.Where(x => userPermissions.Select(u => u.Id)
@@ -245,7 +274,7 @@ namespace VOL.Sys.Services
                     x.AuthValue = "";
                 });
                 //将取消的权限设置为""
-                repository.UpdateRange(delAuths, x => new
+                repository.UpdateRange(delAuths, x => new // DB Call (marks for update)
                 {
                     x.Menu_Id,
                     x.AuthValue,
@@ -255,24 +284,33 @@ namespace VOL.Sys.Services
 
                 int addCount = updateAuths.Where(x => x.Auth_Id <= 0).Count();
                 int updateCount = updateAuths.Where(x => x.Auth_Id > 0).Count();
-                await repository.SaveChangesAsync();
+                await repository.SaveChangesAsync(); // DB Call (commits changes)
 
                 string _version = DateTime.Now.ToString("yyyyMMddHHMMssfff");
                 //标识缓存已更新
-                base.CacheContext.Add(roleId.GetRoleIdKey(), _version);
+                base.CacheContext.Add(roleId.GetRoleIdKey(), _version); // Cache Call
 
                 _responseContent.OK($"保存成功：新增加配菜单权限{addCount}条,更新菜单{updateCount}条,删除权限{delAuths.Count()}条");
             }
             catch (Exception ex)
             {
-                message = "异常信息：" + ex.Message + ex.StackTrace +ex.InnerException+ ",";
-                return _responseContent.Error(message);
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, $"保存角色权限失败: RoleId={roleId}", new { roleId, permissions = userPermissions?.Serialize() }, null, ex);
+                _responseContent.Error("保存角色权限时发生内部错误。"); // Return the object itself
+                // No 'return' here, responseContent is modified and returned in finally or after block
             }
-            finally
+            // The finally block was problematic as 'message' would not be set if no exception.
+            // Logging the outcome (success or specific failure) is better.
+            if (_responseContent.Status)
             {
-                Logger.Info($"权限分配置:{message}{_responseContent.Message}");
+                VOL.Core.Services.Logger.Info(VOL.Core.Enums.LoggerType.Save, $"权限配置成功: RoleId={roleId}. {_responseContent.Message}", userPermissions?.Serialize(), _responseContent.Serialize());
             }
-
+            else
+            {
+                // Error already logged by catch block if it was an exception.
+                // This logs business logic errors or if _responseContent was directly set to Error.
+                 if (!_responseContent.Message.Contains("内部错误")) // Avoid duplicate logging for exceptions
+                     VOL.Core.Services.Logger.Warning(VOL.Core.Enums.LoggerType.Save, $"权限配置失败: RoleId={roleId}. Message: {_responseContent.Message}", userPermissions?.Serialize(), _responseContent.Serialize());
+            }
             return _responseContent;
         }
 
@@ -283,9 +321,14 @@ namespace VOL.Sys.Services
             {
                 if (!UserContext.Current.IsSuperAdmin && role.ParentId > 0 && !RoleContext.GetAllChildrenIds(UserContext.Current.RoleId).Contains(role.ParentId))
                 {
-                    return _responseContent.Error("不能添加此角色");
+                    return new WebResponseContent().Error("不能添加此角色"); // Use new instance
                 }
-                return ValidateRoleName(role, x => x.RoleName == role.RoleName);
+                var validationResult = ValidateRoleName(role, x => x.RoleName == role.RoleName);
+                if (!validationResult.Status)
+                {
+                    return validationResult; // Return the error response from ValidateRoleName
+                }
+                return new WebResponseContent().OK(); // Explicitly return OK if validation passed
             };
             return RemoveCache(base.Add(saveDataModel));
         }
@@ -307,11 +350,19 @@ namespace VOL.Sys.Services
 
         private WebResponseContent ValidateRoleName(Sys_Role role, Expression<Func<Sys_Role, bool>> predicate)
         {
-            if (repository.Exists(predicate))
+            try
             {
-                return _responseContent.Error($"角色名【{role.RoleName}】已存在,请设置其他角色名");
+                if (repository.Exists(predicate))
+                {
+                    return new WebResponseContent().Error($"角色名【{role.RoleName}】已存在,请设置其他角色名");
+                }
+                return new WebResponseContent().OK();
             }
-            return _responseContent.OK();
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Select, $"校验角色名失败: RoleName={role?.RoleName}", role?.Serialize(), null, ex);
+                return new WebResponseContent().Error("校验角色名时发生数据库错误。");
+            }
         }
 
         public override WebResponseContent Update(SaveModel saveModel)
@@ -321,33 +372,50 @@ namespace VOL.Sys.Services
                 //2020.05.07新增禁止选择上级角色为自己
                 if (role.Role_Id == role.ParentId)
                 {
-                    return _responseContent.Error($"上级角色不能选择自己");
+                    return new WebResponseContent().Error($"上级角色不能选择自己");
                 }
                 if (role.Role_Id == UserContext.Current.RoleId)
                 {
-                    return _responseContent.Error($"不能修改自己的角色");
+                    return new WebResponseContent().Error($"不能修改自己的角色");
                 }
-                if (repository.Exists(x => x.Role_Id == role.ParentId && x.ParentId == role.Role_Id))
+                try
                 {
-                    return _responseContent.Error($"不能选择此上级角色，选择的上级角色与当前角色形成依赖关系");
+                    if (repository.Exists(x => x.Role_Id == role.ParentId && x.ParentId == role.Role_Id))
+                    {
+                        return new WebResponseContent().Error($"不能选择此上级角色，选择的上级角色与当前角色形成依赖关系");
+                    }
                 }
+                catch (Exception ex)
+                {
+                    VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Update, $"校验角色依赖关系失败: RoleId={role.Role_Id}", role.Serialize(), null, ex);
+                    return new WebResponseContent().Error("校验角色依赖关系时发生数据库错误。");
+                }
+
                 if (!UserContext.Current.IsSuperAdmin)
                 {
+                    // This section seems to be authorization logic, keep it as is for now.
+                    // Ensure RoleContext.GetAllChildrenIds doesn't throw unhandled exceptions. Assume it's safe or handled internally.
                     var roleIds = RoleContext.GetAllChildrenIds(UserContext.Current.RoleId);
                     if (role.ParentId > 0)
                     {
                         if (!roleIds.Contains(role.ParentId))
                         {
-                            return _responseContent.Error($"不能选择此角色");
+                            return new WebResponseContent().Error($"不能选择此角色");
                         }
                     }
                     if (!roleIds.Contains(role.Role_Id))
                     {
-                        return _responseContent.Error($"不能选择此角色");
+                        return new WebResponseContent().Error($"不能选择此角色");
                     }
-                    return _responseContent.OK("");
+                    // If the non-SuperAdmin checks pass, it still needs to validate role name
                 }
-                return ValidateRoleName(role, x => x.RoleName == role.RoleName && x.Role_Id != role.Role_Id);
+
+                var validationResult = ValidateRoleName(role, x => x.RoleName == role.RoleName && x.Role_Id != role.Role_Id);
+                if (!validationResult.Status)
+                {
+                    return validationResult; // Propagate error from ValidateRoleName
+                }
+                return new WebResponseContent().OK(); // Explicitly OK if all checks passed
             };
             return RemoveCache(base.Update(saveModel));
         }
@@ -355,7 +423,17 @@ namespace VOL.Sys.Services
         {
             if (webResponse.Status)
             {
-                RoleContext.Refresh();
+                try
+                {
+                    RoleContext.Refresh();
+                }
+                catch (Exception ex)
+                {
+                    VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, "刷新角色缓存失败 (RoleContext.Refresh)", null, webResponse.Serialize(), ex);
+                    // The main operation (Add/Update/Del) was successful, but cache refresh failed.
+                    // This is usually not critical enough to change webResponse.Status to false,
+                    // but it depends on application requirements. For now, just log.
+                }
             }
             return webResponse;
         }

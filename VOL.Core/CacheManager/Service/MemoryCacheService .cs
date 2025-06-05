@@ -44,25 +44,35 @@ namespace VOL.Core.CacheManager
             {
                 throw new ArgumentNullException(nameof(value));
             }
-            _cache.Set(key, value);
+            var options = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(TimeSpan.FromHours(1))
+                .SetSize(1); // Set entry size
+            _cache.Set(key, value, options);
             return Exists(key);
         }
 
         public bool AddObject(string key, object value, int expireSeconds = -1, bool isSliding = false)
         {
+            MemoryCacheEntryOptions options = new MemoryCacheEntryOptions();
+            options.SetSize(1); // Set entry size
+
             if (expireSeconds != -1)
             {
-                _cache.Set(key,
-                    value,
-                    new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(new TimeSpan(0, 0, expireSeconds))
-                    );
+                if (isSliding)
+                {
+                    options.SetSlidingExpiration(TimeSpan.FromSeconds(expireSeconds));
+                }
+                else // If not sliding, make it absolute for the given seconds
+                {
+                    options.SetAbsoluteExpiration(TimeSpan.FromSeconds(expireSeconds));
+                }
             }
             else
             {
-                _cache.Set(key, value);
+                // Default expiration if expireSeconds is -1
+                options.SetAbsoluteExpiration(TimeSpan.FromHours(1)); // Default to 1 hour absolute
             }
-
+            _cache.Set(key, value, options);
             return true;
         }
         public bool Add(string key, string value, int expireSeconds = -1, bool isSliding = false)
@@ -100,6 +110,7 @@ namespace VOL.Core.CacheManager
                     new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(expiresSliding)
                     .SetAbsoluteExpiration(expiressAbsoulte)
+                    .SetSize(1) // Set entry size
                     );
 
             return Exists(key);
@@ -118,11 +129,13 @@ namespace VOL.Core.CacheManager
                 _cache.Set(key, value,
                     new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(expiresIn)
+                    .SetSize(1) // Set entry size
                     );
             else
                 _cache.Set(key, value,
                 new MemoryCacheEntryOptions()
                 .SetAbsoluteExpiration(expiresIn)
+                .SetSize(1) // Set entry size
                 );
 
             return Exists(key);

@@ -50,42 +50,78 @@ namespace VOL.Sys.Services
         {
             string path = null;
             string fileName = null;
-            WebResponseContent webResponse = new WebResponseContent();
+            // webResponse is declared at class level, ensure it's reset or use local instances for delegates.
+            // Using local instances for clarity within the delegate.
             ExportOnExecuting = (List<FormCollectionObject> list, List<string> columns) =>
             {
+                WebResponseContent localResponse = new WebResponseContent();
+                if (list == null || !list.Any())
+                {
+                    return localResponse.Error("没有可导出的数据。");
+                }
+
                 var formId = list[0].FormId;
-                var data = _designOptionsRepository.FindAsIQueryable(x => x.FormId == formId)
-                   .Select(s => new { s.Title, s.FormConfig }).FirstOrDefault();
+                dynamic formDesignData; // Use dynamic as its structure is simple { Title, FormConfig }
                 try
                 {
-                    List<FormOptions> formObj = data.FormConfig.DeserializeObject<List<FormOptions>>();
+                    formDesignData = _designOptionsRepository.FindAsIQueryable(x => x.FormId == formId)
+                                       .Select(s => new { s.Title, s.FormConfig })
+                                       .FirstOrDefault();
+                    if (formDesignData == null)
+                    {
+                        Logger.Warning(VOL.Core.Enums.LoggerType.Export, $"导出表单数据失败: 未找到表单设计. FormId={formId}", new { FormId = formId }, null);
+                        return localResponse.Error($"未找到ID为 {formId} 的表单设计。");
+                    }
+                }
+                catch (Exception exDb)
+                {
+                    VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Export, $"导出表单数据时查询表单设计失败: FormId={formId}", new { FormId = formId }, null, exDb);
+                    return localResponse.Error("查询表单设计时发生数据库错误。");
+                }
+
+                try
+                {
+                    List<FormOptions> formObj = formDesignData.FormConfig.DeserializeObject<List<FormOptions>>();
                     List<Dictionary<string, object>> listDic = new List<Dictionary<string, object>>();
                     foreach (var item in list)
                     {
-                            Dictionary<string, object> dic = new Dictionary<string, object>();
-                            var formData = item.FormData.DeserializeObject<Dictionary<string, string>>();
-                            dic.Add("标题", data.Title);
-  
-                            dic.Add("提交人", item.Creator);
-                            dic.Add("提交时间", item.CreateDate.ToString("yyyy-MM-dd HH:mm:sss"));
-                            foreach (var obj in formObj)
-                            {
-                                dic.Add(obj.Title, formData.Where(x => x.Key == obj.Field).Select(s => s.Value).FirstOrDefault());
-                            }
-                            listDic.Add(dic);
+                        Dictionary<string, object> dic = new Dictionary<string, object>();
+                        var formData = item.FormData.DeserializeObject<Dictionary<string, string>>();
+                        dic.Add("标题", formDesignData.Title);
+                        dic.Add("提交人", item.Creator);
+                        dic.Add("提交时间", item.CreateDate.ToString("yyyy-MM-dd HH:mm:sss"));
+                        foreach (var objConfig in formObj) // Renamed to avoid conflict
+                        {
+                            dic.Add(objConfig.Title, formData.Where(x => x.Key == objConfig.Field).Select(s => s.Value).FirstOrDefault());
+                        }
+                        listDic.Add(dic);
                     }
-                    fileName = data.Title + ".xlsx";
-                    path = EPPlusHelper.ExportGeneralExcel(listDic, fileName);
+                    string generatedFileName = formDesignData.Title + ".xlsx";
+                    string generatedPath = EPPlusHelper.ExportGeneralExcel(listDic, generatedFileName);
+
+                    // Signal to base.Export to use this path instead of its own logic
+                    localResponse.Code = "-1";
+                    // Assign to outer scope variables if they are indeed used by base.Export or other parts.
+                    // However, this pattern is risky. It's better if base.Export can take this path directly.
+                    path = generatedPath;
+                    fileName = generatedFileName;
+                    return localResponse.OK(null, generatedPath.EncryptDES(AppSetting.Secret.ExportFile));
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"解析表单出错：{data.Title},表单配置：{data.FormConfig},{ex.Message}");
-                    return webResponse.Error("获取表单出错");
+                    VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Export, $"导出表单数据时解析或生成Excel失败: FormId={formId}, Title={formDesignData.Title}", new { FormId = formId, Title = formDesignData.Title, FormConfig = formDesignData.FormConfig }, null, ex);
+                    return localResponse.Error("生成导出的表单文件时出错。");
                 }
-                webResponse.Code = "-1";
-                return webResponse.OK(null, path.EncryptDES(AppSetting.Secret.ExportFile));
             };
-            return base.Export(pageData);
+            // The base.Export(pageData) will use the 'path' and 'fileName' set in ExportOnExecuting if webResponse.Code == "-1"
+            // This interaction pattern with base class via side effects (setting path/fileName) and a special Code value is a bit fragile.
+            var exportResult = base.Export(pageData);
+            if (exportResult.Code == "-1" && !string.IsNullOrEmpty(path)) // path would have been set by ExportOnExecuting
+            {
+                 // If ExportOnExecuting was meant to completely override and provide the file:
+                 return new WebResponseContent().OK(null, path.EncryptDES(AppSetting.Secret.ExportFile));
+            }
+            return exportResult; // Return result from base.Export if not overridden
         } 
     }
 

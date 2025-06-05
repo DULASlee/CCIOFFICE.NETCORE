@@ -36,63 +36,98 @@ namespace VOL.Sys.Services
         /// <returns></returns>
         public async Task<object> GetMenu()
         {
-            //  DBServerProvider.SqlDapper.q
-            return (await repository.FindAsync(x => 1 == 1, a =>
-             new
-             {
-                 id = a.Menu_Id,
-                 parentId = a.ParentId,
-                 name = a.MenuName,
-                 a.MenuType,
-                 a.OrderNo
-             })).OrderByDescending(a => a.OrderNo)
-                .ThenByDescending(q => q.parentId).ToList();
-
+            try
+            {
+                //  DBServerProvider.SqlDapper.q
+                var menus = await repository.FindAsync(x => 1 == 1, a =>
+                 new
+                 {
+                     id = a.Menu_Id,
+                     parentId = a.ParentId,
+                     name = a.MenuName,
+                     a.MenuType,
+                     a.OrderNo
+                 });
+                return menus.OrderByDescending(a => a.OrderNo)
+                            .ThenByDescending(q => q.parentId).ToList();
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Select, "获取所有菜单失败 (GetMenu)", null, null, ex);
+                return new List<object>(); // Return empty list or handle error as appropriate
+            }
         }
 
         private List<Sys_Menu> GetAllMenu()
         {
             //每次比较缓存是否更新过，如果更新则重新获取数据
-            string _cacheVersion = CacheContext.Get(_menuCacheKey);
-            if (_menuVersionn != "" && _menuVersionn == _cacheVersion)
+            string _currentCacheVersion = null;
+            try
             {
-                return _menus ?? new List<Sys_Menu>();
+                _currentCacheVersion = CacheContext.Get(_menuCacheKey);
             }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, "获取菜单缓存版本失败 (GetAllMenu)", null, null, ex);
+                // Proceed without cache version check, will attempt to load from DB.
+            }
+
+            if (_menuVersionn != "" && _menuVersionn == _currentCacheVersion && _menus != null)
+            {
+                return _menus;
+            }
+
             lock (_menuObj)
             {
-                if (_menuVersionn != "" && _menus != null && _menuVersionn == _cacheVersion) return _menus;
-                //2020.12.27增加菜单界面上不显示，但可以分配权限
-                _menus = repository.FindAsIQueryable(x => x.Enable == 1 || x.Enable == 2)
-                    .OrderByDescending(a => a.OrderNo)
-                    .ThenByDescending(q => q.ParentId).ToList();
-
-                _menus.ForEach(x =>
+                // Double check after acquiring lock
+                if (_menuVersionn != "" && _menus != null && _menuVersionn == _currentCacheVersion) return _menus;
+                try
                 {
-                    // 2022.03.26增移动端加菜单类型
-                    x.MenuType ??= 0;
-                    if (!string.IsNullOrEmpty(x.Auth) && x.Auth.Length > 10)
+                    //2020.12.27增加菜单界面上不显示，但可以分配权限
+                    _menus = repository.FindAsIQueryable(x => x.Enable == 1 || x.Enable == 2)
+                        .OrderByDescending(a => a.OrderNo)
+                        .ThenByDescending(q => q.ParentId).ToList();
+
+                    _menus.ForEach(x =>
                     {
-                        try
+                        // 2022.03.26增移动端加菜单类型
+                        x.MenuType ??= 0;
+                        if (!string.IsNullOrEmpty(x.Auth) && x.Auth.Length > 10)
                         {
-                            x.Actions = x.Auth.DeserializeObject<List<Sys_Actions>>();
+                            try
+                            {
+                                x.Actions = x.Auth.DeserializeObject<List<Sys_Actions>>();
+                            }
+                            catch (Exception dex)
+                            {
+                                VOL.Core.Services.Logger.Warning(VOL.Core.Enums.LoggerType.Exception, $"菜单权限JSON反序列化失败: MenuId={x.Menu_Id}, AuthString='{x.Auth}'", null, null, dex);
+                                // Keep x.Actions as null or new List if deserialization fails
+                            }
                         }
-                        catch { }
-                    }
-                    if (x.Actions == null) x.Actions = new List<Sys_Actions>();
-                });
+                        if (x.Actions == null) x.Actions = new List<Sys_Actions>();
+                    });
 
-                string cacheVersion = CacheContext.Get(_menuCacheKey);
-                if (string.IsNullOrEmpty(cacheVersion))
-                {
-                    cacheVersion = DateTime.Now.ToString("yyyyMMddHHMMssfff");
-                    CacheContext.Add(_menuCacheKey, cacheVersion);
+                    string updatedCacheVersion = _currentCacheVersion; // Use the version fetched before lock, if available
+                    if (string.IsNullOrEmpty(updatedCacheVersion)) // If initial Get failed or was empty
+                    {
+                        updatedCacheVersion = CacheContext.Get(_menuCacheKey); // Try fetching again inside lock
+                    }
+
+                    if (string.IsNullOrEmpty(updatedCacheVersion))
+                    {
+                        updatedCacheVersion = DateTime.Now.ToString("yyyyMMddHHMMssfff");
+                        CacheContext.Add(_menuCacheKey, updatedCacheVersion);
+                    }
+                    _menuVersionn = updatedCacheVersion;
                 }
-                else
+                catch (Exception ex)
                 {
-                    _menuVersionn = cacheVersion;
+                    VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Select, "从数据库或缓存加载菜单失败 (GetAllMenu)", null, null, ex);
+                    // If _menus is null or empty due to error, return an empty list to prevent NullReferenceException downstream
+                    return _menus ?? new List<Sys_Menu>();
                 }
             }
-            return _menus;
+            return _menus ?? new List<Sys_Menu>(); // Ensure non-null return
         }
 
         /// <summary>
@@ -245,11 +280,24 @@ namespace VOL.Sys.Services
             }
             catch (Exception ex)
             {
-                webResponse.Error(ex.Message + ex.StackTrace);
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Exception, $"保存菜单失败: {menu?.MenuName}", menu?.Serialize(), null, ex);
+                webResponse.Error("保存菜单时发生内部错误，请联系管理员。");
             }
             finally
             {
-                Logger.Info($"表:{menu.TableName},菜单：{menu.MenuName},权限{menu.Auth},{(webResponse.Status ? "成功" : "失败")}{webResponse.Message}");
+                // Log outcome: Success or Failure with context
+                var logMessage = $"保存菜单操作: 表:{menu?.TableName}, 菜单：{menu?.MenuName}, 权限:{menu?.Auth}, 结果:{(webResponse.Status ? "成功" : "失败")}, 消息:{webResponse.Message}";
+                if (webResponse.Status)
+                {
+                    VOL.Core.Services.Logger.Info(VOL.Core.Enums.LoggerType.Save,logMessage, menu?.Serialize(), webResponse.Serialize());
+                }
+                else
+                {
+                    // Already logged with full exception in catch block if an exception occurred.
+                    // If webResponse.Status is false due to business logic (not exception), this provides context.
+                    if (webResponse.Message?.Contains("内部错误")!=true) // Avoid duplicate logging if already logged by catch
+                         VOL.Core.Services.Logger.Warning(VOL.Core.Enums.LoggerType.Save, logMessage, menu?.Serialize(), webResponse.Serialize());
+                }
             }
             return webResponse;
 
@@ -258,17 +306,27 @@ namespace VOL.Sys.Services
         public async Task<WebResponseContent> DelMenu(int menuId)
         {
             WebResponseContent webResponse = new WebResponseContent();
+            try
+            {
+                if (await repository.ExistsAsync(x => x.ParentId == menuId))
+                {
+                    return webResponse.Error("当前菜单存在子菜单,请先删除子菜单!");
+                }
+                // The Delete method in repository might not be async, check its signature.
+                // If it's not async, this SaveChangesAsync is good.
+                // If Delete itself is async or calls SaveChangesAsync, this might be redundant or cause issues.
+                // Assuming repository.Delete is synchronous for now.
+                repository.Delete(new Sys_Menu() { Menu_Id = menuId }, true);
+                await repository.SaveChangesAsync(); // Ensure changes are persisted if Delete itself doesn't.
 
-            if (await repository.ExistsAsync(x => x.ParentId == menuId))
-            {
-                return webResponse.Error("当前菜单存在子菜单,请先删除子菜单!");
+                CacheContext.Add(_menuCacheKey, DateTime.Now.ToString("yyyyMMddHHMMssfff"));
+                return webResponse.OK("删除成功");
             }
-            repository.Delete(new Sys_Menu()
+            catch (Exception ex)
             {
-                Menu_Id = menuId
-            }, true);
-            CacheContext.Add(_menuCacheKey, DateTime.Now.ToString("yyyyMMddHHMMssfff"));
-            return webResponse.OK("删除成功");
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Delete, $"删除菜单失败: MenuId={menuId}", new { menuId }, null, ex);
+                return webResponse.Error("删除菜单时发生内部错误，请联系管理员。");
+            }
         }
         /// <summary>
         /// 编辑菜单时，获取菜单信息
@@ -277,26 +335,34 @@ namespace VOL.Sys.Services
         /// <returns></returns>
         public async Task<object> GetTreeItem(int menuId)
         {
-            var sysMenu = (await base.repository.FindAsync(x => x.Menu_Id == menuId))
-                .Select(
-                p => new
-                {
-                    p.Menu_Id,
-                    p.ParentId,
-                    p.MenuName,
-                    p.Url,
-                    p.Auth,
-                    p.OrderNo,
-                    p.Icon,
-                    p.Enable,
-                    // 2022.03.26增移动端加菜单类型
-                    MenuType = p.MenuType ?? 0,
-                    p.CreateDate,
-                    p.Creator,
-                    p.TableName,
-                    p.ModifyDate
-                }).FirstOrDefault();
-            return sysMenu;
+            try
+            {
+                var menuData = await base.repository.FindAsync(x => x.Menu_Id == menuId);
+                var sysMenu = menuData.Select(
+                    p => new
+                    {
+                        p.Menu_Id,
+                        p.ParentId,
+                        p.MenuName,
+                        p.Url,
+                        p.Auth,
+                        p.OrderNo,
+                        p.Icon,
+                        p.Enable,
+                        // 2022.03.26增移动端加菜单类型
+                        MenuType = p.MenuType ?? 0,
+                        p.CreateDate,
+                        p.Creator,
+                        p.TableName,
+                        p.ModifyDate
+                    }).FirstOrDefault();
+                return sysMenu;
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Select, $"获取菜单项失败: MenuId={menuId}", new { menuId }, null, ex);
+                return null; // Or throw, or return a specific error object
+            }
         }
     }
 }

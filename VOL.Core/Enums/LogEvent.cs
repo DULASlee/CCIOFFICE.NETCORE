@@ -1,16 +1,17 @@
-﻿using System;
+// VOL.Core/Enums/LogEvent.cs
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace VOL.Core.Enums
 {
-    public enum LoggerType
+    public enum LogEvent // Renamed from LoggerType
     {
         System = 0,
         Info,
         Success,
         Error,
-        Authorzie,
+        Authorzie, // Note: Possible typo in original, keeping as is unless specified to change
         Global,
         Login,
         Exception,
@@ -48,7 +49,15 @@ namespace VOL.Core.Enums
         ExpertAuthority,
         ParEmpty,
         NoToken,
-        ReplaceToeken,
-        KafkaException
+        ReplaceToeken, // Note: Possible typo in original, keeping as is
+        KafkaException,
+        // Adding some values from standard LoggerType that might be missing or for clarity
+        // These were used in previous steps.
+        Update, // Often used for update operations
+        Select, // Often used for select/query operations
+        Insert, // Often used for insert operations
+        Delete  // Often used for delete operations
+        // Consider if the existing 'Error' and 'Exception' are sufficient or if more specific error events are needed.
+        // The list seems quite extensive already.
     }
 }

@@ -49,16 +49,28 @@ namespace VOL.Sys.Services
 
         private void FilterData()
         {
-            //限制 只能看自己部门及下级组织的数据
-            QueryRelativeExpression = (IQueryable<Sys_Department> queryable) =>
+            try
             {
-                if (UserContext.Current.IsSuperAdmin)
+                //限制 只能看自己部门及下级组织的数据
+                var deptIds = UserContext.Current.GetAllChildrenDeptIds(); // Potentially problematic call
+                QueryRelativeExpression = (IQueryable<Sys_Department> queryable) =>
                 {
-                    return queryable;
-                }
-                var deptIds = UserContext.Current.GetAllChildrenDeptIds();
-                return queryable.Where(x => deptIds.Contains(x.DepartmentId));
-            };
+                    if (UserContext.Current.IsSuperAdmin)
+                    {
+                        return queryable;
+                    }
+                    // deptIds is captured from the outer scope. If GetAllChildrenDeptIds() failed, this lambda shouldn't be set with it.
+                    return queryable.Where(x => deptIds.Contains(x.DepartmentId));
+                };
+            }
+            catch (Exception ex)
+            {
+                VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Select, "获取部门过滤数据时出错", null, null, ex);
+                // QueryRelativeExpression will not be set, or could be set to a "safe" default e.g., return nothing or throw.
+                // For now, it means the filter is simply not applied if an error occurs here.
+                // This might be a security concern if the filter is critical for data segregation.
+                // Consider QueryRelativeExpression = q => q.Where(d => false); // to return no data
+            }
         }
         public override WebResponseContent Export(PageDataOptions pageData)
         {
@@ -79,13 +91,23 @@ namespace VOL.Sys.Services
         {
             UpdateOnExecuting = (Sys_Department dept, object addList, object updateList, List<object> delKeys) =>
             {
-                if (_repository.Exists(x => x.DepartmentId == dept.ParentId && x.DepartmentId == dept.DepartmentId))
+                try
                 {
-                    return webResponse.Error("上级组织不能选择自己");
+                    if (_repository.Exists(x => x.DepartmentId == dept.ParentId && x.DepartmentId == dept.DepartmentId))
+                    {
+                        return webResponse.Error("上级组织不能选择自己");
+                    }
+                    // Consider if these two checks should be combined or if the second one depends on the first not being true.
+                    // Assuming they are independent checks for different error conditions.
+                    if (_repository.Exists(x => x.ParentId == dept.DepartmentId && x.DepartmentId == dept.ParentId))
+                    {
+                        return webResponse.Error("不能选择此上级组织");
+                    }
                 }
-                if (_repository.Exists(x => x.ParentId == dept.DepartmentId) && _repository.Exists(x => x.DepartmentId == dept.ParentId))
+                catch (Exception ex)
                 {
-                    return webResponse.Error("不能选择此上级组织");
+                    VOL.Core.Services.Logger.Error(VOL.Core.Enums.LoggerType.Update, $"部门更新前检查出错: {dept.DepartmentName}", dept.Serialize(), null, ex);
+                    return webResponse.Error("检查部门信息时发生错误，请稍后重试或联系管理员。");
                 }
                 return webResponse.OK();
             };

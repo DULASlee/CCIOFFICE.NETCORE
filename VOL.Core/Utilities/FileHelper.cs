@@ -94,19 +94,27 @@ namespace VOL.Core.Utilities
             //  Encoding code = Encoding.GetEncoding(); //Encoding.GetEncoding("gb2312");
             string temp = fullName.MapPath().ReplacePath();
             string str = "";
-            if (!File.Exists(temp))
+            string mappedPath = temp; // temp is already mappedPath.ReplacePath()
+            if (!File.Exists(mappedPath))
             {
                 return str;
             }
-            StreamReader sr = null;
             try
             {
-                sr = new StreamReader(temp);
-                str = sr.ReadToEnd(); // 读取文件
+                using (StreamReader sr = new StreamReader(mappedPath))
+                {
+                    str = sr.ReadToEnd(); // 读取文件
+                }
             }
-            catch { }
-            sr?.Close();
-            sr?.Dispose();
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as per application's error handling policy
+                // For a utility like this, re-throwing or logging is common.
+                // Avoid empty catch blocks.
+                Console.WriteLine($"Error reading file {mappedPath}: {ex.Message}"); // Or use a proper logger if available
+                // Depending on requirements, you might want to re-throw the exception or return an empty string.
+                // throw; // To propagate the error
+            }
             return str;
         }
 
@@ -164,11 +172,21 @@ namespace VOL.Core.Utilities
         /// <param name="strings">内容</param>
         public static void FileAdd(string Path, string strings)
         {
-            StreamWriter sw = File.AppendText(Path.ReplacePath());
-            sw.Write(strings);
-            sw.Flush();
-            sw.Close();
-            sw.Dispose();
+            try
+            {
+                using (StreamWriter sw = File.AppendText(Path.ReplacePath()))
+                {
+                    sw.Write(strings);
+                    // sw.Flush(); // Flush is often called by Close/Dispose, but explicit can be okay.
+                                 // For StreamWriter, Write usually writes to an internal buffer.
+                                 // Dispose will flush the buffer.
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error appending to file {Path}: {ex.Message}"); // Or use a proper logger
+                // throw; // To propagate the error
+            }
         }
 
 
@@ -230,8 +248,19 @@ namespace VOL.Core.Utilities
             FileInfo CreateFile = new FileInfo(Path.ReplacePath()); //创建文件 
             if (!CreateFile.Exists)
             {
-                FileStream FS = CreateFile.Create();
-                FS.Close();
+                try
+                {
+                    using (FileStream FS = CreateFile.Create())
+                    {
+                        // FileStream is created and immediately closed by using statement's Dispose.
+                        // No explicit FS.Close() needed.
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error creating file {Path}: {ex.Message}"); // Or use a proper logger
+                    // throw; // To propagate the error
+                }
             }
         }
         /// <summary>
@@ -290,7 +319,10 @@ namespace VOL.Core.Utilities
             }
             catch (Exception ee)
             {
-                throw new Exception(ee.ToString());
+                // Preserve the original exception details and stack trace
+                // Optionally log here as well if a logger is available
+                Console.WriteLine($"Error copying directory from {srcPath} to {aimPath}: {ee.Message}");
+                throw; // Re-throws the original exception
             }
         }
 
