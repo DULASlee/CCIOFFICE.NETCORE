@@ -18,6 +18,7 @@ using VOL.Entity.SystemModels;
 using VOL.Entity.IBaseInterface; // // For ITenantEntity
 using System.Linq.Expressions; // // For Expression
 using VOL.Core.ManageUser; // // For UserContext
+using Microsoft.EntityFrameworkCore.Diagnostics; // // Added for RelationalEventId and CommandExecutedEventData
 
 namespace VOL.Core.EFDbContext
 {
@@ -118,7 +119,51 @@ namespace VOL.Core.EFDbContext
             }
             //默认禁用实体跟踪
             optionsBuilder = optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-           // optionsBuilder.AddInterceptors(new SqlCommandInterceptor());
+
+            // Chinese Comment: 配置EF Core日志记录器以输出SQL命令和执行时间。
+            // (Configure EF Core logger to output SQL commands and execution times.)
+            optionsBuilder.LogTo(
+                (eventId, logLevel) =>
+                    // Chinese Comment: 仅记录命令执行相关的事件。
+                    // (Only log command execution related events.)
+                    logLevel >= LogLevel.Information && eventId.Id == RelationalEventId.CommandExecuted.Id,
+                eventData => {
+                    // Chinese Comment: 当命令执行完毕时，记录SQL、参数和执行时间。
+                    // (When a command is executed, log SQL, parameters, and execution time.)
+                    if (eventData is CommandExecutedEventData commandExecutedEventData)
+                    {
+                        var command = commandExecutedEventData.Command;
+                        var duration = commandExecutedEventData.Duration.TotalMilliseconds;
+                        string message = $"-- EF Core Command Executed -- {System.Environment.NewLine}" +
+                                         $"-- Execution Time: {duration} ms {System.Environment.NewLine}" +
+                                         $"{command.CommandText}";
+
+                        // Chinese Comment: 参数值通常包含在 CommandText 中，或者可以通过 command.Parameters 访问。
+                        // (Parameter values are often included in CommandText, or can be accessed via command.Parameters.)
+                        // For brevity, not iterating parameters here, but they are available in command.Parameters.
+
+                        if (duration > 500) // 定义慢查询阈值为500毫秒 (Define slow query threshold as 500ms)
+                        {
+                            // Chinese Comment: 执行时间超过500毫秒的慢查询，使用警告级别记录。
+                            // (Slow query with execution time > 500ms, log with Warning level.)
+                            // Note: This Console.WriteLine is for direct visibility. Ideally, integrate with VOL.Core.Services.Logger.
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine($"[SLOW QUERY WARNING] {message}");
+                            Console.ResetColor();
+                            // Example of using the main application logger (if accessible and appropriate here):
+                            // VOL.Core.Services.Logger.Log(VOL.Core.Enums.LogLevel.Warning, VOL.Core.Enums.LogEvent.SlowQuery, $"EF Core Slow Query ({duration}ms)", command.CommandText, null);
+                        }
+                        else
+                        {
+                            // Chinese Comment: 正常查询，使用信息级别记录。
+                            // (Normal query, log with Information level.)
+                            Console.WriteLine(message);
+                            // Example of using the main application logger:
+                            // VOL.Core.Services.Logger.Log(VOL.Core.Enums.LogLevel.Debug, VOL.Core.Enums.LogEvent.DbQuery, $"EF Core Query ({duration}ms)", command.CommandText, null);
+                        }
+                    }
+                });
+           // optionsBuilder.AddInterceptors(new SqlCommandInterceptor()); // 已通过LogTo实现更详细的日志记录 (Detailed logging implemented via LogTo)
             base.OnConfiguring(optionsBuilder);
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -182,6 +227,13 @@ namespace VOL.Core.EFDbContext
                     $"syslog_{DateTime.Now.ToString("yyyyMMddHHmmss")}.txt",
                     type?.Name + "--------" + ex.Message + ex.StackTrace + ex.Source);
             }
+
+            // Chinese Comment: 为 Sys_User 表的 Role_Id 和 UserName 添加复合索引，以优化按角色筛选并按用户名排序的查询。
+            // (Add a composite index to the Sys_User table for Role_Id and UserName to optimize queries filtered by role and sorted by username.)
+            modelBuilder.Entity<VOL.Entity.DomainModels.Sys_User>(entity =>
+            {
+                entity.HasIndex(e => new { e.Role_Id, e.UserName }, "IX_Sys_User_RoleId_UserName");
+            });
 
             // Chinese Comment: 为实现多租户数据隔离，对所有实现了 ITenantEntity 接口的实体应用全局查询过滤器。
             // (To achieve multi-tenant data isolation, a global query filter is applied to all entities implementing the ITenantEntity interface.)

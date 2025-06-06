@@ -106,6 +106,32 @@ namespace VOL.Sys.Services
 
                 UserContext.Current.LogOut(user.User_Id);
                 loginInfo.Password = string.Empty; // Clear password from input object
+
+                // Chinese Comment: 登录成功后，主动预热用户权限缓存。
+                // (After successful login, proactively pre-warm the user's permission cache.)
+                if (AppSetting.UseRedis && user != null) // 仅当配置了Redis时预热，且user不为null
+                {
+                    // UserContext.Current 在此阶段可能尚未完全初始化（取决于中间件和过滤器顺序），
+                    // 但GetPermissions方法内部会处理UserContext的获取。
+                    // 此处直接调用 UserContext.Current.GetPermissions 可能更直接，
+                    // 但为了确保 UserContext 实例是最新的，并且与当前请求相关联，
+                    // 通过 UserContext.Current 访问是标准做法。
+                    // 如果UserContext.Current依赖于已填充的HttpContext.User.Claims，确保它们已设置。
+                    // JwtHelper.IssueJwt 填充的是token，实际的ClaimsPrincipal可能在后续中间件中设置。
+                    // 为确保安全，我们依赖 GetPermissions 内部逻辑来正确获取或构建 UserContext。
+                    // 此处的 UserContext.Current.GetPermissions() 将会触发 UserContext 的实例化和 UserInfo 的加载（如果尚未加载）。
+                    var userContextInstance = UserContext.Current; // 获取当前请求的UserContext实例
+                    if (userContextInstance != null)
+                    {
+                        userContextInstance.GetPermissions(user.Role_Id);
+                        Logger.Log(LogLevel.Debug, LogEvent.LoginCacheWarmup, $"用户 {user.UserName} (RoleID: {user.Role_Id}) 的权限已预热到缓存。 (Permissions for user {user.UserName} (RoleID: {user.Role_Id}) have been pre-warmed to cache.)");
+                    }
+                    else
+                    {
+                        Logger.Log(LogLevel.Warning, LogEvent.LoginCacheWarmup, $"用户 {user.UserName} (RoleID: {user.Role_Id}) 的权限预热失败：无法获取UserContext实例。 (Failed to pre-warm permissions for user {user.UserName} (RoleID: {user.Role_Id}): UserContext instance is null.)");
+                    }
+                }
+
                 webResponse.OK(ResponseType.LoginSuccess);
                 // Record successful user login for audit and security monitoring.
                 Logger.Info(LoggerType.Login, $"登录成功: UserName={loginInfo.UserName}, UserId={user.User_Id}", loginInfo.Serialize(), webResponse.Message);
