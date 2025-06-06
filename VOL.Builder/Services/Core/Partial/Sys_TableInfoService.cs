@@ -596,6 +596,23 @@ namespace VOL.Builder.Services
         /// <returns>A message indicating success or failure.</returns>
         public string CreateVuePage(Sys_TableInfo sysTableInfo, string vuePath)
         {
+            // TODO: (安全审查) 对所有源自 Sys_TableColumn 或 Sys_TableInfo 并将嵌入到Vue模板 (<script>标签内或HTML属性中) 的字符串元数据值，
+            // 在替换到模板前，应调用 ContainsPotentiallyDangerousScript() 进行检查。
+            // 如果检测到危险脚本，应记录警告并阻止或清理该特定内容。
+            // (TODO: (Security Review) For all string metadata values originating from Sys_TableColumn or Sys_TableInfo
+            // that will be embedded into Vue templates (within <script> tags or HTML attributes),
+            // a check using ContainsPotentiallyDangerousScript() should be performed before template replacement.
+            // If dangerous script is detected, a warning should be logged and the specific content blocked or sanitized.)
+
+            // 重要安全提示 (Important Security Note):
+            // 当将任何数据（特别是用户可配置的元数据）嵌入到生成的Vue模板的HTML部分或JavaScript字符串时，
+            // 必须确保进行了适当的上下文编码/转义，以防止XSS攻击。
+            // 例如，用于HTML属性的值应进行HTML属性编码，用于JavaScript字符串的值应进行JavaScript字符串编码。
+            // Newtonsoft.Json.Serialize() 在序列化为JSON时通常能正确处理JS字符串转义。
+            // (When embedding any data (especially user-configurable metadata) into the HTML parts or JavaScript strings
+            // of generated Vue templates, it's crucial to ensure proper contextual encoding/escaping to prevent XSS attacks.
+            // For example, values for HTML attributes should be HTML attribute encoded, and values for JavaScript strings
+            // should be JavaScript string encoded. Newtonsoft.Json.Serialize() generally handles JS string escaping correctly when serializing to JSON.)
             try
             {
                 // Determine if generating for Vite, App, or standard Vue
@@ -1308,6 +1325,40 @@ namespace VOL.Builder.Services
                 VOL.Core.Services.Logger.Error(VOL.Core.Enums.LogLevel.Error, VOL.Core.Enums.LogEvent.Exception, $"ValidColumnString方法异常: TableName={tableInfo?.TableName}", tableInfo?.Serialize(), ex);
                 return webResponse.Error("验证表列信息时发生内部错误。");
             }
+        }
+
+        // 此辅助方法用于扫描字符串内容，检测是否存在潜在的危险JavaScript模式，
+        // 如 eval(), new Function(), setTimeout/setInterval 的字符串参数, 或 <script> 标签。
+        // 目的是防止在代码生成过程中将用户提供的、可能包含恶意脚本的元数据直接注入到客户端代码中。
+        // (This helper method is used to scan string content for potentially dangerous JavaScript patterns,
+        // such as eval(), new Function(), string arguments for setTimeout/setInterval, or <script> tags.
+        // The purpose is to prevent user-provided metadata, which might contain malicious scripts,
+        // from being directly injected into client-side code during code generation.)
+        private static bool ContainsPotentiallyDangerousScript(string scriptContent)
+        {
+            if (string.IsNullOrEmpty(scriptContent))
+            {
+                return false;
+            }
+            // Regex patterns for potentially dangerous JS
+            var patterns = new[]
+            {
+                @"eval\s*\(", // eval(...)
+                @"new\s+Function\s*\(", // new Function(...)
+                @"setTimeout\s*\(\s*['""]", // setTimeout('...') or setTimeout("...")
+                @"setInterval\s*\(\s*['""]", // setInterval('...') or setInterval("...")
+                @"<\s*script\s*>" // <script>
+                // Consider adding more patterns like on<event> attributes, javascript: urls etc. if metadata can go into HTML attributes
+            };
+
+            foreach (var pattern in patterns)
+            {
+                if (System.Text.RegularExpressions.Regex.IsMatch(scriptContent, pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 

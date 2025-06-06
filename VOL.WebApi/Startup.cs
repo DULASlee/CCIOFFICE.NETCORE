@@ -62,6 +62,8 @@ namespace VOL.WebApi
                 options.SizeLimit = 1024 * 1024 * 256; // Example: 256MB size limit
             });
             services.AddHttpContextAccessor();
+            // 注册字段级别权限处理器 (Register field-level permission handler)
+            services.AddSingleton<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, VOL.Core.Authorization.FieldLevel.FieldPermissionHandler>();
             services.AddMvc(options =>
             {
                 options.Filters.Add(typeof(ApiAuthorizeFilter));

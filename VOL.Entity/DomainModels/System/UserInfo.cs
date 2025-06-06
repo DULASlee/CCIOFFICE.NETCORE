@@ -30,5 +30,11 @@ namespace VOL.Entity.DomainModels
         public List<Guid> DeptIds { get; set; }
 
         public string Token { get; set; }
+
+        /// <summary>
+        /// 当前用户所属的租户ID。如果为null，可能表示超级管理员或非租户化用户。
+        /// (The Tenant ID to which the current user belongs. If null, may indicate a super administrator or non-tenant user.)
+        /// </summary>
+        public Guid? TenantId { get; set; }
     }
 }

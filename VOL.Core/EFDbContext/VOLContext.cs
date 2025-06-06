@@ -15,6 +15,9 @@ using VOL.Core.Enums;
 using VOL.Core.Extensions;
 using VOL.Core.Extensions.AutofacManager;
 using VOL.Entity.SystemModels;
+using VOL.Entity.IBaseInterface; // // For ITenantEntity
+using System.Linq.Expressions; // // For Expression
+using VOL.Core.ManageUser; // // For UserContext
 
 namespace VOL.Core.EFDbContext
 {
@@ -23,21 +26,27 @@ namespace VOL.Core.EFDbContext
         /// <summary>
         /// 数据库连接名称 
         /// </summary>
-        public string DataBaseName = null;
+        public string? DataBaseName = null; // // 标记为可空
+        private readonly UserContext? _userContext; // // 注入UserContext以便访问TenantId
+
         public VOLContext()
                 : base()
         {
+             // _userContext 在此构造函数中将为 null。
+             // 如果OnModelCreating依赖它，则需要确保它通过其他方式注入或可空处理。
+             // 通常，无参数构造函数用于EF设计时工具，可能不需要UserContext。
         }
         public VOLContext(string connction)
             : base()
         {
             DataBaseName = connction;
+            // _userContext 在此构造函数中也将为 null。
         }
 
-        public VOLContext(DbContextOptions<VOLContext> options)
+        public VOLContext(DbContextOptions<VOLContext> options, UserContext? userContext) // // 注入UserContext
             : base(options)
         {
-
+            _userContext = userContext;
         }
         public override void Dispose()
         {
@@ -174,6 +183,58 @@ namespace VOL.Core.EFDbContext
                     type?.Name + "--------" + ex.Message + ex.StackTrace + ex.Source);
             }
 
+            // Chinese Comment: 为实现多租户数据隔离，对所有实现了 ITenantEntity 接口的实体应用全局查询过滤器。
+            // (To achieve multi-tenant data isolation, a global query filter is applied to all entities implementing the ITenantEntity interface.)
+            if (_userContext?.UserInfo != null) // // 仅当UserContext和UserInfo可用时应用过滤器
+            {
+                foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+                {
+                    if (typeof(ITenantEntity).IsAssignableFrom(entityType.ClrType))
+                    {
+                        // Chinese Comment: 构建动态 Lambda 表达式以应用过滤器。
+                        // (Construct a dynamic Lambda expression to apply the filter.)
+                        var parameter = Expression.Parameter(entityType.ClrType, "e");
+                        var propertyAccess = Expression.MakeMemberAccess(parameter, entityType.ClrType.GetProperty(nameof(ITenantEntity.TenantId))!);
+
+                        // Chinese Comment: 获取当前用户的 TenantId。 UserInfo.TenantId 为 null 时不过滤 (例如超级管理员)。
+                        // (Get the current user's TenantId. Do not filter if UserInfo.TenantId is null (e.g., for a super administrator).)
+                        var currentTenantId = _userContext.UserInfo.TenantId;
+
+                        // Expression for: e.TenantId == currentTenantId
+                        // Ensure correct handling if e.TenantId itself is nullable and currentTenantId is null (for non-tenant entities if filter still applies)
+                        // Or if currentTenantId is null (super admin), then the filter should allow all.
+
+                        Expression filterExpression;
+                        if (currentTenantId.HasValue)
+                        {
+                            // e.TenantId == currentTenantId.Value
+                            filterExpression = Expression.Equal(propertyAccess, Expression.Constant(currentTenantId.Value, typeof(Guid)));
+                        }
+                        else
+                        {
+                            // If currentTenantId is null (e.g. super admin), effectively no tenant filter is applied for them.
+                            // This means they see all data. If specific non-tenant data should be seen, adjust this.
+                            // For this example, a null TenantId on the user means "see all tenants" for ITenantEntity.
+                            // A simpler way to achieve "see all if user TenantId is null" is:
+                            // builder.HasQueryFilter(e => !_userContext.UserInfo.TenantId.HasValue || e.TenantId == _userContext.UserInfo.TenantId);
+                            // The dynamic equivalent:
+                            filterExpression = Expression.Constant(true); // No filtering if user's TenantId is null
+                        }
+
+                        // For a more direct translation of the simplified logic:
+                        // Expression for: !_userContext.UserInfo.TenantId.HasValue
+                        var userTenantIdIsNull = Expression.Equal(Expression.Constant(currentTenantId, typeof(Guid?)), Expression.Constant(null, typeof(Guid?)));
+                        // Expression for: e.TenantId == _userContext.UserInfo.TenantId
+                        var tenantIdsMatch = Expression.Equal(propertyAccess, Expression.Constant(currentTenantId, typeof(Guid?)));
+                        // Combined: !_userContext.UserInfo.TenantId.HasValue || e.TenantId == _userContext.UserInfo.TenantId
+                        var combinedFilter = Expression.OrElse(userTenantIdIsNull, tenantIdsMatch);
+
+
+                        var lambda = Expression.Lambda(combinedFilter, parameter);
+                        modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
+                    }
+                }
+            }
         }
     }
 }

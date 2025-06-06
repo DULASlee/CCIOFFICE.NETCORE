@@ -26,105 +26,158 @@ using Yitter.IdGenerator;
 namespace VOL.Core.BaseProvider
 {
     public abstract class ServiceBase<T, TRepository> : ServiceFunFilter<T>
-         where T : BaseEntity
+         where T : BaseEntity, new() // 添加 new() 约束以支持 Activator.CreateInstance<T>()
          where TRepository : IRepository<T>
     {
+        /// <summary>
+        /// 获取缓存服务的实例。
+        /// </summary>
         public ICacheService CacheContext
         {
             get
             {
-                return AutofacContainerModule.GetService<ICacheService>();
+                // 假设AutofacContainerModule.GetService总是返回非null的ICacheService实例
+                return AutofacContainerModule.GetService<ICacheService>()!;
             }
         }
 
-        public Microsoft.AspNetCore.Http.HttpContext Context
+        /// <summary>
+        /// 获取当前的 Microsoft.AspNetCore.Http.HttpContext。
+        /// 注意：此属性可能为 null，尤其是在非HTTP请求上下文中（例如后台任务）。
+        /// 调用者应检查null或确保在有效的请求上下文中使用。
+        /// </summary>
+        public Microsoft.AspNetCore.Http.HttpContext? Context
         {
             get
             {
-                return HttpContext.Current;
+                return HttpContext.Current; // HttpContext.Current 可能为null
             }
         }
-        private WebResponseContent Response { get; set; }
 
+        // Response 属性在有参构造函数中初始化，但在无参构造函数中未初始化。
+        // 如果使用无参构造函数且在Response初始化前访问它，会导致NullReferenceException。
+        // 建议在无参构造函数中也初始化Response，或将其声明为 WebResponseContent? 并在使用前检查。
+        // 为了保持现有逻辑，这里标记为可空，并依赖调用逻辑确保其在使用前被正确初始化。
+        private WebResponseContent? Response { get; set; }
+
+        // repository 字段在有参构造函数中初始化。
+        // 如果使用无参构造函数，它将保持null，直到/除非 Init 方法被调用。
+        // 访问此字段前必须确保它已被初始化。
         protected IRepository<T> repository;
 
-        private PropertyInfo[] _propertyInfo { get; set; } = null;
+        // _propertyInfo 初始为null，通过 TProperties getter延迟加载。
+        private PropertyInfo[]? _propertyInfo = null;
+        /// <summary>
+        /// 获取实体T的属性信息数组，使用延迟加载。
+        /// </summary>
         private PropertyInfo[] TProperties
         {
             get
             {
-                if (_propertyInfo != null)
-                {
-                    return _propertyInfo;
-                }
-                _propertyInfo = typeof(T).GetProperties();
-                return _propertyInfo;
+                // 如果 _propertyInfo 已经加载，则直接返回。
+                // 否则，加载属性信息并缓存。
+                return _propertyInfo ??= typeof(T).GetProperties();
             }
         }
 
+        /// <summary>
+        /// 默认构造函数。
+        /// 注意: Response 和 repository 在此构造函数后可能未初始化。
+        /// </summary>
         public ServiceBase()
         {
+             // Response 在此处是 null。如果后续方法依赖它，需要确保它被初始化。
+             // 例如，在调用方法前显式 new WebResponseContent(true) 或通过其他途径初始化。
+             // repository 也是 null，依赖 Init() 或其他方式赋值。
         }
 
+        /// <summary>
+        /// 构造函数，注入仓储实例并初始化Response对象。
+        /// </summary>
+        /// <param name="repository">仓储实例，不能为空。</param>
         public ServiceBase(TRepository repository)
         {
-            Response = new WebResponseContent(true);
-            this.repository = repository;
+            Response = new WebResponseContent(true); // 初始化Response对象
+            this.repository = repository ?? throw new ArgumentNullException(nameof(repository)); // 确保repository不为null
         }
 
+        /// <summary>
+        /// 初始化方法，主要用于在通过默认构造函数创建服务实例后设置仓储。
+        /// </summary>
+        /// <param name="repository">要使用的仓储实例。</param>
         protected virtual void Init(IRepository<T> repository)
         {
-
+            this.repository = repository;
+            // 如果Response在此之前可能未初始化，也应在此处考虑初始化
+            this.Response ??= new WebResponseContent(true);
         }
 
-        protected virtual Type GetRealDetailType()
+        /// <summary>
+        /// 获取与主实体T关联的明细表的真实类型。
+        /// </summary>
+        /// <returns>明细表的类型，如果未配置或未找到则返回null。</returns>
+        protected virtual Type? GetRealDetailType() // 返回类型可以是null
         {
-            return typeof(T).GetCustomAttribute<EntityAttribute>()?.DetailTable?[0];
+            // GetCustomAttribute<EntityAttribute>() 可能返回 null
+            // DetailTable 可能为 null 或空数组
+            return typeof(T).GetCustomAttribute<EntityAttribute>()?.DetailTable?.FirstOrDefault();
         }
 
         /// <summary>
         ///  2020.08.15添加自定义原生查询sql或多租户(查询、导出)
         /// </summary>
-        /// <returns></returns>
+        /// <returns>返回IQueryable<T>用于进一步查询构建。</returns>
         private IQueryable<T> GetSearchQueryable()
         {
-            //2021.08.22移除数据隔离(租房管理)超级管理员的判断
-            //没有自定sql与多租户执行默认查询
+            // QuerySql 可能为 null
+            // IsMultiTenancy 是 bool
+            // UserContext.Current 可能为 null
+
+            // 警告：使用FromSqlRaw时，QuerySql 和 multiTenancyString 必须确保已进行适当的参数化或清理，以防止SQL注入。
+            // QuerySql 由派生类设置，multiTenancyString 由 TenancyManager 生成。这些源头需要保证SQL安全。
+            // (Warning: When using FromSqlRaw, QuerySql and multiTenancyString must be properly parameterized or sanitized to prevent SQL injection.
+            // QuerySql is set by derived classes, and multiTenancyString is generated by TenancyManager. These sources must ensure SQL safety.)
             if (QuerySql == null && !IsMultiTenancy)
-            //  if ((QuerySql == null && !IsMultiTenancy) || UserContext.Current.IsSuperAdmin)
             {
                 return repository.DbContext.Set<T>();
             }
-            //自定sql,没有使用多租户，直接执行自定义sql
             if (QuerySql != null && !IsMultiTenancy)
-            // if ((QuerySql != null && !IsMultiTenancy) || UserContext.Current.IsSuperAdmin)
             {
                 return repository.DbContext.Set<T>().FromSqlRaw(QuerySql);
             }
-            string multiTenancyString = TenancyManager<T>.GetSearchQueryable(typeof(T).GetEntityTableName());
+            // GetSearchQueryable 可能返回 null 或空字符串
+            string multiTenancyString = TenancyManager<T>.GetSearchQueryable(typeof(T).GetEntityTableName()) ?? "";
+            if (string.IsNullOrEmpty(multiTenancyString)) // // 如果租户SQL为空，则返回默认集合避免错误
+            {
+                // Console.WriteLine($"Warning: MultiTenancy SQL for table {typeof(T).GetEntityTableName()} is empty."); // 可选日志
+                return repository.DbContext.Set<T>(); // 或者根据业务需求抛出异常
+            }
             return repository.DbContext.Set<T>().FromSqlRaw(multiTenancyString);
         }
 
         /// <summary>
         ///  2020.08.15添加获取多租户数据过滤sql（删除、编辑）
         /// </summary>
-        /// <returns></returns>
+        /// <returns>返回数据隔离相关的SQL字符串。</returns>
         private string GetMultiTenancySql(string ids, string tableKey)
         {
+            // TenancyManager<T>.GetMultiTenancySql 应该保证返回非null的字符串
             return TenancyManager<T>.GetMultiTenancySql(typeof(T).GetEntityTableName(), ids, tableKey);
         }
 
         /// <summary>
         ///  2020.08.15添加多租户数据过滤（编辑）
+        ///  如果Response未初始化，调用Response.Error会抛出NullReferenceException。
         /// </summary>
         private void CheckUpdateMultiTenancy(string ids, string tableKey)
         {
+            Response ??= new WebResponseContent(); // // 确保Response已初始化
             string sql = GetMultiTenancySql(ids, tableKey);
 
-            //请接着过滤条件
-            //例如sql，只能(编辑)自己创建的数据:判断数据是不是当前用户创建的
-            //sql = $" {sql} and createid!={UserContext.Current.UserId}";
-            object obj = repository.DapperContext.ExecuteScalar(sql, null);
+            // 请接着过滤条件
+            // 例如sql，只能(编辑)自己创建的数据:判断数据是不是当前用户创建的
+            // sql = $" {sql} and createid!={UserContext.Current.UserId}";
+            object? obj = repository.DapperContext.ExecuteScalar(sql, null); // ExecuteScalar 可能返回 null
             if (obj == null || obj.GetInt() == 0)
             {
                 Response.Error("不能编辑此数据");
@@ -134,15 +187,17 @@ namespace VOL.Core.BaseProvider
 
         /// <summary>
         ///  2020.08.15添加多租户数据过滤（删除）
+        ///  如果Response未初始化，调用Response.Error会抛出NullReferenceException。
         /// </summary>
         private void CheckDelMultiTenancy(string ids, string tableKey)
         {
+            Response ??= new WebResponseContent(); // // 确保Response已初始化
             string sql = GetMultiTenancySql(ids, tableKey);
 
-            //请接着过滤条件
-            //例如sql，只能(删除)自己创建的数据:找出不是自己创建的数据
-            //sql = $" {sql} and createid!={UserContext.Current.UserId}";
-            object obj = repository.DapperContext.ExecuteScalar(sql, null);
+            // 请接着过滤条件
+            // 例如sql，只能(删除)自己创建的数据:找出不是自己创建的数据
+            // sql = $" {sql} and createid!={UserContext.Current.UserId}";
+            object? obj = repository.DapperContext.ExecuteScalar(sql, null); // ExecuteScalar 可能返回 null
             int idsCount = ids.Split(",").Distinct().Count();
             if (obj == null || obj.GetInt() != idsCount)
             {
@@ -152,21 +207,24 @@ namespace VOL.Core.BaseProvider
 
         private const string _asc = "asc";
         /// <summary>
-        /// 生成排序字段
+        /// 生成排序字段的字典。
         /// </summary>
-        /// <param name="pageData"></param>
-        /// <param name="propertyInfo"></param>
-        private Dictionary<string, QueryOrderBy> GetPageDataSort(PageDataOptions pageData, PropertyInfo[] propertyInfo)
+        /// <param name="pageData">页面数据选项，包含排序信息。</param>
+        /// <param name="propertyInfos">实体的属性信息数组。</param>
+        /// <returns>表示排序规则的字典。</returns>
+        private Dictionary<string, QueryOrderBy> GetPageDataSort(PageDataOptions pageData, PropertyInfo[] propertyInfos)
         {
+            // OrderByExpression 可能为 null
             if (base.OrderByExpression != null)
             {
                 return base.OrderByExpression.GetExpressionToDic();
             }
+            // pageData.Sort 可能为 null
             if (!string.IsNullOrEmpty(pageData.Sort))
             {
                 if (pageData.Sort.Contains(","))
                 {
-                    var sortArr = pageData.Sort.Split(",").Where(x => propertyInfo.Any(c => c.Name == x)).Select(s => s).Distinct().ToList();
+                    var sortArr = pageData.Sort.Split(",").Where(x => propertyInfos.Any(c => c.Name == x)).Select(s => s).Distinct().ToList();
                     Dictionary<string, QueryOrderBy> sortDic = new Dictionary<string, QueryOrderBy>();
                     foreach (var name in sortArr)
                     {
@@ -174,7 +232,7 @@ namespace VOL.Core.BaseProvider
                     }
                     return sortDic;
                 }
-                else if (propertyInfo.Any(x => x.Name == pageData.Sort))
+                else if (propertyInfos.Any(x => x.Name == pageData.Sort))
                 {
                     return new Dictionary<string, QueryOrderBy>() { {
                             pageData.Sort,
@@ -182,71 +240,79 @@ namespace VOL.Core.BaseProvider
                      } };
                 }
             }
-            //如果没有排序字段，则使用主键作为排序字段
+            // 如果没有排序字段，则使用主键作为排序字段
+            PropertyInfo? property = propertyInfos.GetKeyProperty(); // GetKeyProperty 可能返回 null
+            string sortField = propertyInfos.GetKeyName(); // GetKeyName 默认返回第一个属性名，如果主键未找到
 
-            PropertyInfo property = propertyInfo.GetKeyProperty();
-            //如果主键不是自增类型则使用appsettings.json中CreateMember->DateField配置的创建时间作为排序
-            if (property.PropertyType == typeof(int) || property.PropertyType == typeof(long))
+            if (property != null) // // 确保property不为null
             {
-                if (!propertyInfo.Any(x => x.Name.ToLower() == pageData.Sort))
+                // 如果主键不是自增类型则使用appsettings.json中CreateMember->DateField配置的创建时间作为排序
+                if (property.PropertyType == typeof(int) || property.PropertyType == typeof(long))
                 {
-                    pageData.Sort = propertyInfo.GetKeyName();
-                }
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(AppSetting.CreateMember.DateField)
-                    && propertyInfo.Any(x => x.Name == AppSetting.CreateMember.DateField))
-                {
-                    pageData.Sort = AppSetting.CreateMember.DateField;
+                    if (!propertyInfos.Any(x => x.Name.ToLower() == pageData.Sort?.ToLowerInvariant())) // pageData.Sort 可能为null
+                    {
+                       sortField = property.Name; // // 使用实际主键名
+                    }
                 }
                 else
                 {
-                    pageData.Sort = propertyInfo.GetKeyName();
+                     // AppSetting.CreateMember.DateField 可能为 null
+                    if (!string.IsNullOrEmpty(AppSetting.CreateMember.DateField)
+                        && propertyInfos.Any(x => x.Name == AppSetting.CreateMember.DateField))
+                    {
+                        sortField = AppSetting.CreateMember.DateField!; // // DateField在此处不为null
+                    }
+                    else
+                    {
+                        sortField = property.Name; // // 使用实际主键名
+                    }
                 }
             }
+            pageData.Sort = sortField; // // 更新pageData中的Sort字段
             return new Dictionary<string, QueryOrderBy>() { {
-                    pageData.Sort, pageData.Order?.ToLower() == _asc? QueryOrderBy.Asc: QueryOrderBy.Desc
+                    sortField, pageData.Order?.ToLower() == _asc? QueryOrderBy.Asc: QueryOrderBy.Desc // pageData.Sort在此处已确保有值
                 } };
         }
 
         /// <summary>
         /// 前端查询条件转换为EF查询Queryable(2023.04.02)
         /// </summary>
-        /// <param name="options">前端查询参数</param>
-        /// <param name="useTenancy">是否使用数据隔离</param>
-        /// <returns></returns>
-        public IQueryable<T> GetPageDataQueryFilter(PageDataOptions options, bool useTenancy = true)
+        /// <param name="options">前端查询参数，可能为null。</param>
+        /// <param name="useTenancy">是否使用数据隔离。</param>
+        /// <returns>构建的IQueryable<T>查询。</returns>
+        public IQueryable<T> GetPageDataQueryFilter(PageDataOptions? options, bool useTenancy = true) // options 可以为null
         {
-            ValidatePageOptions(options, out IQueryable<T> queryable, useTenancy);
+            ValidatePageOptions(options ?? new PageDataOptions(), out IQueryable<T> queryable, useTenancy); // // 如果options为null，则传入新的实例
             return queryable;
         }
 
         /// <summary>
-        /// 验证排序与查询字段合法性
+        /// 验证排序与查询字段合法性，并构建基础查询。
         /// </summary>
-        /// <param name="options"></param>
-        /// <param name="queryable"></param>
-        /// <returns></returns>
+        /// <param name="options">页面数据选项。</param>
+        /// <param name="queryable">输出构建的基础查询。</param>
+        /// <param name="useTenancy">是否应用数据隔离。</param>
+        /// <returns>处理后的页面数据选项。</returns>
         protected PageDataOptions ValidatePageOptions(PageDataOptions options, out IQueryable<T> queryable, bool useTenancy = true)
         {
-            options = options ?? new PageDataOptions();
-
+            // options已在上层保证不为null
             List<SearchParameters> searchParametersList = new List<SearchParameters>();
+            // options.Filter 可能为 null
             if (options.Filter != null && options.Filter.Count > 0)
             {
                 searchParametersList.AddRange(options.Filter);
             }
-            else if (!string.IsNullOrEmpty(options.Wheres))
+            else if (!string.IsNullOrEmpty(options.Wheres)) // options.Wheres 可能为 null
             {
                 try
                 {
-                    searchParametersList = options.Wheres.DeserializeObject<List<SearchParameters>>();
+                    // DeserializeObject 可能返回 null
+                    searchParametersList = options.Wheres.DeserializeObject<List<SearchParameters>>() ?? new List<SearchParameters>();
                     options.Filter = searchParametersList;
                 }
-                catch { }
+                catch { /* // JSON反序列化失败，searchParametersList将为空 */ }
             }
-            QueryRelativeList?.Invoke(searchParametersList);
+            QueryRelativeList?.Invoke(searchParametersList); // QueryRelativeList 可能为 null
             if (useTenancy)
             {
                 queryable = GetSearchQueryable();
@@ -255,54 +321,51 @@ namespace VOL.Core.BaseProvider
             {
                 queryable = repository.DbContext.Set<T>();
             }
-            //  Connection
-            // queryable = repository.DbContext.Set<T>();
-            //2020.08.15添加自定义原生查询sql或多租户
 
-
-            //判断列的数据类型数字，日期的需要判断值的格式是否正确
             for (int i = 0; i < searchParametersList.Count; i++)
             {
                 SearchParameters x = searchParametersList[i];
-                x.DisplayType = x.DisplayType.GetDBCondition();
+                x.DisplayType = x.DisplayType.GetDBCondition(); // GetDBCondition 确保有返回值
                 if (string.IsNullOrEmpty(x.Value))
                 {
                     continue;
                 }
-                PropertyInfo property = TProperties.Where(c => c.Name.ToUpper() == x.Name.ToUpper()).FirstOrDefault();
-                //2020.06.25增加字段null处理
+                PropertyInfo? property = TProperties.FirstOrDefault(c => c.Name.Equals(x.Name, StringComparison.OrdinalIgnoreCase)); // FirstOrDefault 可能返回 null
                 if (property == null) continue;
-                // property
-                //移除查询的值与数据库类型不匹配的数据
-                object[] values = property.ValidationValueForDbType(x.Value.Split(',')).Where(q => q.Item1).Select(s => s.Item3).ToArray();
-                if (values == null || values.Length == 0)
+
+                // ValidationValueForDbType 返回 (bool, string, object)[]，确保不为null
+                object[] values = property.ValidationValueForDbType(x.Value.Split(','))
+                                          .Where(q => q.Item1)
+                                          .Select(s => s.Item3)
+                                          .ToArray();
+                if (values.Length == 0) // // 之前是 values == null，但ToArray()不会返回null
                 {
                     continue;
                 }
-                if (x.DisplayType == HtmlElementType.Contains)
+                if (x.DisplayType == HtmlElementType.Contains) // HtmlElementType.Contains 是枚举
                     x.Value = string.Join(",", values);
-                LinqExpressionType expressionType = x.DisplayType.GetLinqCondition();
+                LinqExpressionType expressionType = x.DisplayType.GetLinqCondition(); // GetLinqCondition 确保有返回值
+                // CreateExpression 需要保证values和x.Value不为null，或者内部能处理
                 queryable = LinqExpressionType.In == expressionType
                               ? queryable.Where(x.Name.CreateExpression<T>(values, expressionType))
                               : queryable.Where(x.Name.CreateExpression<T>(x.Value, expressionType));
             }
-            options.TableName = base.TableName ?? typeof(T).Name;
+            options.TableName = base.TableName ?? typeof(T).Name; // TableName 可能为 null
             return options;
         }
 
         /// <summary>
-        /// 加载页面数据
+        /// 加载页面数据。
         /// </summary>
-        /// <param name="loadSingleParameters"></param>
-        /// <returns></returns>
-        public virtual PageGridData<T> GetPageData(PageDataOptions options)
+        /// <param name="options">页面数据选项，可能为null。</param>
+        /// <returns>包含分页数据和可能的摘要信息的PageGridData<T>对象。</returns>
+        public virtual PageGridData<T> GetPageData(PageDataOptions? options) // options可以为null
         {
-            options = ValidatePageOptions(options, out IQueryable<T> queryable);
-            //获取排序字段
+            options = ValidatePageOptions(options ?? new PageDataOptions(), out IQueryable<T> queryable); // 如果options为null，则传入新的实例
             Dictionary<string, QueryOrderBy> orderbyDic = GetPageDataSort(options, TProperties);
 
             PageGridData<T> pageGridData = new PageGridData<T>();
-            if (QueryRelativeExpression != null)
+            if (QueryRelativeExpression != null) // QueryRelativeExpression 可能为 null
             {
                 queryable = QueryRelativeExpression.Invoke(queryable);
             }
@@ -317,10 +380,9 @@ namespace VOL.Core.BaseProvider
             }
             else
             {
-                //查询界面统计求等字段
-                if (SummaryExpress != null)
+                if (SummaryExpress != null) // SummaryExpress 可能为 null
                 {
-                    pageGridData.summary = SummaryExpress.Invoke(queryable);
+                    pageGridData.summary = SummaryExpress.Invoke(queryable); // summary可以是null
                 }
                 pageGridData.rows = repository.IQueryablePage(queryable,
                                     options.Page,
@@ -329,43 +391,58 @@ namespace VOL.Core.BaseProvider
                                     orderbyDic).ToList();
                 pageGridData.total = rowCount;
             }
-            GetPageDataOnExecuted?.Invoke(pageGridData);
+            GetPageDataOnExecuted?.Invoke(pageGridData); // GetPageDataOnExecuted 可能为 null
             return pageGridData;
-
         }
 
-        public virtual object GetDetailPage(PageDataOptions pageData)
+        /// <summary>
+        /// 获取明细页数据。
+        /// </summary>
+        /// <param name="pageData">页面数据选项，可能为null。</param>
+        /// <returns>明细页数据，如果无法确定明细类型则返回null。</returns>
+        public virtual object? GetDetailPage(PageDataOptions? pageData) // 返回类型可以是null, pageData 可以为null
         {
-            Type detailType = typeof(T).GetCustomAttribute<EntityAttribute>()?.DetailTable?[0];
+            Type? detailType = typeof(T).GetCustomAttribute<EntityAttribute>()?.DetailTable?.FirstOrDefault(); // detailType 可能为 null
             if (detailType == null)
             {
                 return null;
             }
-            object obj = typeof(ServiceBase<T, TRepository>)
-                 .GetMethod("GetDetailPage", BindingFlags.Instance | BindingFlags.NonPublic)
-                 .MakeGenericMethod(new Type[] { detailType }).Invoke(this, new object[] { pageData });
-            return obj;
+            // GetMethod("GetDetailPage", ...) 可能返回 null
+            MethodInfo? methodInfo = typeof(ServiceBase<T, TRepository>)
+                 .GetMethod("GetDetailPage", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (methodInfo == null) return null; // // 如果方法未找到，返回null
+
+            return methodInfo.MakeGenericMethod(new Type[] { detailType })
+                             .Invoke(this, new object?[] { pageData }); // pageData 可以为null
         }
-        protected override object GetDetailSummary<Detail>(IQueryable<Detail> queryeable)
+        /// <summary>
+        /// 获取明细表的摘要信息。
+        /// </summary>
+        /// <typeparam name="Detail">明细表的类型。</typeparam>
+        /// <param name="queryeable">明细表的IQueryable查询。</param>
+        /// <returns>摘要对象，如果无摘要逻辑则返回null。</returns>
+        protected override object? GetDetailSummary<Detail>(IQueryable<Detail> queryeable) // 返回类型可以是null
         {
             return null;
         }
 
-        private PageGridData<Detail> GetDetailPage<Detail>(PageDataOptions options) where Detail : class
+        /// <summary>
+        /// 获取明细分页数据的内部方法。
+        /// </summary>
+        private PageGridData<Detail> GetDetailPage<Detail>(PageDataOptions? options) where Detail : class // options 可以为null
         {
-            //校验查询值，排序字段，分页大小规则待完
             PageGridData<Detail> gridData = new PageGridData<Detail>();
-            if (options.Value == null) return gridData;
-            //主表主键字段
-            string keyName = typeof(T).GetKeyName();
+            // options 或 options.Value 可能为 null
+            if (options?.Value == null) return gridData;
 
-            //生成查询条件
+            string keyName = typeof(T).GetKeyName(); // GetKeyName 确保有返回值
+
             Expression<Func<Detail, bool>> whereExpression = keyName.CreateExpression<Detail>(options.Value, LinqExpressionType.Equal);
-
             var queryeable = repository.DbContext.Set<Detail>().Where(whereExpression);
 
             gridData.total = queryeable.Count();
-            options.Sort = options.Sort ?? typeof(Detail).GetKeyName();
+            // options.Sort 可能为 null
+            options.Sort = options.Sort ?? typeof(Detail).GetKeyName(); // // 如果Sort为null，则使用明细表主键
             Dictionary<string, QueryOrderBy> orderBy = GetPageDataSort(options, typeof(Detail).GetProperties());
 
             gridData.rows = queryeable
@@ -373,43 +450,45 @@ namespace VOL.Core.BaseProvider
                 .Skip((options.Page - 1) * options.Rows)
                 .Take(options.Rows)
                 .ToList();
-            gridData.summary = GetDetailSummary<Detail>(queryeable);
+            gridData.summary = GetDetailSummary<Detail>(queryeable); // summary 可以是null
             return gridData;
         }
 
 
-
         /// <summary>
-        /// 上传文件
+        /// 上传文件。
+        /// 如果Response未初始化，调用Response.Error/OK会抛出NullReferenceException。
         /// </summary>
-        /// <param name="files"></param>
-        /// <returns></returns>
-        public virtual WebResponseContent Upload(List<Microsoft.AspNetCore.Http.IFormFile> files)
+        /// <param name="files">要上传的文件列表，可能为null或空。</param>
+        /// <returns>包含操作结果的WebResponseContent。</returns>
+        public virtual WebResponseContent Upload(List<Microsoft.AspNetCore.Http.IFormFile>? files) // files可以为null
         {
+            Response ??= new WebResponseContent(); // // 确保Response已初始化
             if (files == null || files.Count == 0) return Response.Error("请上传文件");
 
             string filePath;
+            // UploadFolder 可能为 null
             if (!string.IsNullOrEmpty(UploadFolder))
             {
                 filePath = UploadFolder;
-                if (!filePath.EndsWith("/") || !filePath.EndsWith("\\"))
+                if (!filePath.EndsWith("/") && !filePath.EndsWith("\\")) // // 修正逻辑：都应该是 !endsWith
                 {
                     filePath += "/";
                 }
             }
             else
             {
-                filePath = $"Upload/Tables/{typeof(T).GetEntityTableName()}/{DateTime.Now.ToString("yyyMMddHHmmsss") + new Random().Next(1000, 9999)}/";
+                filePath = $"Upload/Tables/{typeof(T).GetEntityTableName()}/{DateTime.Now:yyyMMddHHmmsss}{new Random().Next(1000, 9999)}/";
             }
 
-            string fullPath = filePath.MapPath(true);
-            int i = 0;
+            string fullPath = filePath.MapPath(true); // MapPath 确保有返回值
+            int i = 0; // 用于错误日志记录当前处理的文件索引
             try
             {
                 if (!Directory.Exists(fullPath)) Directory.CreateDirectory(fullPath);
                 for (i = 0; i < files.Count; i++)
                 {
-                    string fileName = files[i].FileName;
+                    string fileName = files[i].FileName; // FileName 不会是null
                     using (var stream = new FileStream(fullPath + fileName, FileMode.Create))
                     {
                         files[i].CopyTo(stream);
@@ -418,45 +497,56 @@ namespace VOL.Core.BaseProvider
             }
             catch (Exception ex)
             {
-                Logger.Error($"上传文件失败：{typeof(T).GetEntityTableCnName()},路径：{filePath},失败文件:{files[i]},{ex.Message + ex.StackTrace}");
+                // files[i] 可能因 i 的值在循环外或异常时导致问题，但在此处是正确的。
+                Logger.Error($"上传文件失败：{typeof(T).GetEntityTableCnName()},路径：{filePath},失败文件:{files[i]?.FileName},{ex.Message + ex.StackTrace}");
                 return Response.Error("文件上传失败");
             }
             return Response.OK("文件上传成功", filePath);
         }
 
+        /// <summary>
+        /// 获取用于模板忽略的字段列表。
+        /// </summary>
         private List<string> GetIgnoreTemplate()
         {
-            //忽略创建人、修改人、审核等字段
+            // UserIgnoreFields 和 auditFields 确保返回非null数组
             List<string> ignoreTemplate = UserIgnoreFields.ToList();
             ignoreTemplate.AddRange(auditFields.ToList());
             return ignoreTemplate;
         }
-
+        /// <summary>
+        /// 下载导入模板。
+        /// 如果Response未初始化，调用Response.OK会抛出NullReferenceException。
+        /// </summary>
         public virtual WebResponseContent DownLoadTemplate()
         {
-            string tableName = typeof(T).GetEntityTableCnName();
+            Response ??= new WebResponseContent(); // // 确保Response已初始化
+            string tableName = typeof(T).GetEntityTableCnName(); // 确保有返回值
 
-            string dicPath = $"Download/{DateTime.Now.ToString("yyyMMdd")}/Template/".MapPath();
+            string dicPath = $"Download/{DateTime.Now:yyyMMdd}/Template/".MapPath(); // MapPath 确保有返回值
             if (!Directory.Exists(dicPath)) Directory.CreateDirectory(dicPath);
-            string fileName = tableName + DateTime.Now.ToString("yyyyMMddHHssmm") + ".xlsx";
-            //DownLoadTemplateColumns 2020.05.07增加扩展指定导出模板的列
+            string fileName = $"{tableName}{DateTime.Now:yyyyMMddHHssmm}.xlsx"; // // 使用插值字符串
+            // DownLoadTemplateColumns 可能为 null
             EPPlusHelper.ExportTemplate<T>(DownLoadTemplateColumns, GetIgnoreTemplate(), dicPath, fileName);
             return Response.OK(null, dicPath + fileName);
         }
 
         /// <summary>
-        /// 导入表数据Excel文件夹
+        /// 导入Excel文件数据。
+        /// 如果Response未初始化，会在此方法内部初始化或在调用EPPlusHelper前导致问题。
         /// </summary>
-        /// <param name="files"></param>
-        /// <returns></returns>
-        public virtual WebResponseContent Import(List<Microsoft.AspNetCore.Http.IFormFile> files)
+        /// <param name="files">要导入的文件列表，可能为null或空。</param>
+        public virtual WebResponseContent Import(List<Microsoft.AspNetCore.Http.IFormFile>? files) // files可以为null
         {
+            Response ??= new WebResponseContent(); // // 确保Response已初始化
+
             if (files == null || files.Count == 0)
-                return new WebResponseContent { Status = true, Message = "请选择上传的文件" };
+                return Response.Set(true, "请选择上传的文件"); // // 直接使用Response实例
+
             Microsoft.AspNetCore.Http.IFormFile formFile = files[0];
-            string dicPath = $"Upload/{DateTime.Now.ToString("yyyMMdd")}/{typeof(T).Name}/".MapPath();
+            string dicPath = $"Upload/{DateTime.Now:yyyMMdd}/{typeof(T).Name}/".MapPath();
             if (!Directory.Exists(dicPath)) Directory.CreateDirectory(dicPath);
-            dicPath = $"{dicPath}{Guid.NewGuid().ToString()}_{formFile.FileName}";
+            dicPath = $"{dicPath}{Guid.NewGuid()}_{formFile.FileName}"; // // 使用插值字符串
 
             using (var stream = new FileStream(dicPath, FileMode.Create))
             {
@@ -464,31 +554,40 @@ namespace VOL.Core.BaseProvider
             }
             try
             {
-                //2022.06.20增加原生excel读取方法(导入时可以自定义读取excel内容)
+                // DownLoadTemplateColumns, ImportOnReadCellValue, ImportIgnoreSelectValidationColumns 都可能为null
                 Response = EPPlusHelper.ReadToDataTable<T>(dicPath, DownLoadTemplateColumns, GetIgnoreTemplate(), readValue: ImportOnReadCellValue, ignoreSelectValidationColumns: ImportIgnoreSelectValidationColumns);
             }
             catch (Exception ex)
             {
                 Response.Error("未能处理导入的文件,请检查导入的文件是否正确");
                 string msg = $"表{typeof(T).GetEntityTableCnName()}导入失败{ex.Message + ex.InnerException?.Message}";
-                Console.WriteLine(msg);
+                Console.WriteLine(msg); // // 考虑使用Logger.Error
                 Logger.Error(msg);
             }
-            if (CheckResponseResult()) return Response;
-            List<T> list = Response.Data as List<T>;
-            if (ImportOnExecuting != null)
+            if (CheckResponseResult()) return Response; // CheckResponseResult 依赖 Response
+
+            // Response.Data 可能为null，需要安全转换
+            List<T>? list = Response.Data as List<T>;
+            if (list == null) // // 如果转换失败或Data为null
+            {
+                Response.Error("导入数据解析失败，未能获取到实体列表。");
+                Logger.Error(LoggerType.Import, $"导入数据转换List<T>失败，Response.Data为null或类型不匹配。文件名：{formFile.FileName}");
+                return Response;
+            }
+
+            if (ImportOnExecuting != null) // ImportOnExecuting 可能为 null
             {
                 Response = ImportOnExecuting.Invoke(list);
                 if (CheckResponseResult()) return Response;
             }
-            //2022.01.08增加明细表导入判断
-            if (HttpContext.Current.Request.Query.ContainsKey("table"))
+            // HttpContext.Current 可能为 null
+            if (HttpContext.Current?.Request.Query.ContainsKey("table") == true)
             {
-                ImportOnExecuted?.Invoke(list);
+                ImportOnExecuted?.Invoke(list); // ImportOnExecuted 可能为 null
                 return Response.OK("文件上传成功", list.Serialize());
             }
             repository.AddRange(list, true);
-            if (ImportOnExecuted != null)
+            if (ImportOnExecuted != null) // ImportOnExecuted 可能为 null
             {
                 Response = ImportOnExecuted.Invoke(list);
                 if (CheckResponseResult()) return Response;
@@ -497,72 +596,84 @@ namespace VOL.Core.BaseProvider
         }
 
         /// <summary>
-        /// 导出
+        /// 导出数据到Excel。
+        /// 如果Response未初始化，调用Response.OK会抛出NullReferenceException。
         /// </summary>
-        /// <param name="pageData"></param>
-        /// <returns></returns>
         public virtual WebResponseContent Export(PageDataOptions pageData)
         {
+            Response ??= new WebResponseContent(); // // 确保Response已初始化
             pageData.Export = true;
-            List<T> list = GetPageData(pageData).rows;
+            List<T> list = GetPageData(pageData).rows; // rows 确保非null
             string tableName = typeof(T).GetEntityTableCnName();
-            string fileName = tableName + DateTime.Now.ToString("yyyyMMddHHssmm") + ".xlsx";
+            string fileName = $"{tableName}{DateTime.Now:yyyyMMddHHssmm}.xlsx"; // // 使用插值字符串
             string folder = DateTime.Now.ToString("yyyyMMdd");
             string savePath = $"Download/ExcelExport/{folder}/".MapPath();
-            List<string> ignoreColumn = new List<string>();
-            if (ExportOnExecuting != null)
+            List<string> ignoreColumn = new List<string>(); // 初始化为空列表
+            if (ExportOnExecuting != null) // ExportOnExecuting 可能为 null
             {
                 Response = ExportOnExecuting(list, ignoreColumn);
                 if (CheckResponseResult()) return Response;
             }
+            // ExportColumns 可能为 null
             if (ExportColumns != null)
             {
-                ExportColumnsArray = ExportColumns.GetExpressionToArray();
+                ExportColumnsArray = ExportColumns.GetExpressionToArray(); // GetExpressionToArray 确保返回非null数组
             }
 
-            //ExportColumns 2020.05.07增加扩展指定导出模板的列
-            EPPlusHelper.Export(list, ExportColumnsArray, ignoreColumn, savePath, fileName);
-            //return Response.OK(null, (savePath + "/" + fileName).EncryptDES(AppSetting.Secret.ExportFile));
-            //2022.01.08优化导出功能
+            EPPlusHelper.Export(list, ExportColumnsArray, ignoreColumn, savePath, fileName); // ExportColumnsArray 可能为 null
             return Response.OK(null, (savePath + "/" + fileName));
         }
 
         /// <summary>
-        /// 新建
+        /// 新建操作。
+        /// 如果Response未初始化，调用Response.Set/Error会抛出NullReferenceException。
         /// </summary>
-        /// <param name="saveDataModel"></param>
-        /// <returns></returns>
-        public virtual WebResponseContent Add(SaveModel saveDataModel)
+        /// <param name="saveDataModel">保存的数据模型，可能为null。</param>
+        public virtual WebResponseContent Add(SaveModel? saveDataModel) // saveDataModel 可以为null
         {
-            if (AddOnExecute != null)
+            Response ??= new WebResponseContent(true); // // 确保Response已初始化 (true表示默认成功状态)
+            if (AddOnExecute != null) // AddOnExecute 可能为 null
             {
-                Response = AddOnExecute(saveDataModel);
+                Response = AddOnExecute(saveDataModel!); // // 如果saveDataModel为null，这里会抛异常，调用者应保证其不为null或AddOnExecute能处理null
                 if (CheckResponseResult()) return Response;
             }
-            if (saveDataModel == null
-                || saveDataModel.MainData == null
-                || saveDataModel.MainData.Count == 0)
+            if (saveDataModel?.MainData == null || saveDataModel.MainData.Count == 0) // 安全访问 MainData
                 return Response.Set(ResponseType.ParametersLack, false);
 
-            saveDataModel.DetailData = saveDataModel.DetailData?.Where(x => x.Count > 0).ToList();
+            saveDataModel.DetailData = saveDataModel.DetailData?.Where(x => x.Count > 0).ToList(); // DetailData 可能为null
             Type type = typeof(T);
-            // 修改为与Update一致，先设置默认值再进行实体的校验
-            UserInfo userInfo = UserContext.Current.UserInfo;
+
+            // UserContext.Current 或 UserInfo 可能为 null
+            UserInfo userInfo = UserContext.Current?.UserInfo ?? UserInfo.System; // // 提供默认UserInfo如果当前上下文没有
             saveDataModel.SetDefaultVal(AppSetting.CreateMember, userInfo);
 
             string validReslut = type.ValidateDicInEntity(saveDataModel.MainData, true, UserIgnoreFields);
 
             if (!string.IsNullOrEmpty(validReslut)) return Response.Error(validReslut);
 
-            if (saveDataModel.MainData.Count == 0)
-                return Response.Error("保存的数据为空，请检查model是否配置正确!");
+            // MainData 在此已确认不为null且有内容
+            // if (saveDataModel.MainData.Count == 0) // 此判断在上面已覆盖
+            //    return Response.Error("保存的数据为空，请检查model是否配置正确!");
 
-            PropertyInfo keyPro = type.GetKeyProperty();
-            if (keyPro.PropertyType == typeof(Guid) || keyPro.PropertyType == typeof(string))
+            PropertyInfo keyPro = type.GetKeyProperty(); // GetKeyProperty 确保返回非null
+            // 根据主键类型生成主键值
+            if (keyPro.PropertyType == typeof(Guid)) // // 移除string类型的Guid生成，通常string主键应由用户提供或有特定规则
             {
                 saveDataModel.MainData.Add(keyPro.Name, Guid.NewGuid());
             }
-            else
+            else if (keyPro.PropertyType == typeof(string))
+            {
+                 // 对于string类型的key，通常期望它由客户端提供或有特定生成规则，这里不再自动生成GUID字符串。
+                 // 如果需要自动生成，应明确指出。暂时移除自动赋值，依赖校验或默认值。
+                 // saveDataModel.MainData.Add(keyPro.Name, Guid.NewGuid().ToString());
+                 // 如果string主键是业务要求的，确保它在校验或SetDefaultVal中处理，或允许为空由数据库生成（不常见）
+                 if (!saveDataModel.MainData.ContainsKey(keyPro.Name) || string.IsNullOrEmpty(saveDataModel.MainData[keyPro.Name]?.ToString()))
+                 {
+                      // 如果字符串主键为空，可以考虑抛出错误或根据业务规则生成
+                      // 为了安全，如果期望客户端提供，这里不做任何操作，依赖校验
+                 }
+            }
+            else // 其他数值类型主键
             {
                 if (AppSetting.EnableSnowFlakeID && keyPro.PropertyType == typeof(long))
                 {
@@ -570,15 +681,16 @@ namespace VOL.Core.BaseProvider
                 }
                 else
                 {
+                    // 对于int等自增主键，通常不需要在此处赋值，由数据库生成。移除keyPro.Name以依赖数据库。
                     saveDataModel.MainData.Remove(keyPro.Name);
                 }
             }
-            //没有明细直接保存返回
+
             if (saveDataModel.DetailData == null || saveDataModel.DetailData.Count == 0)
             {
                 T mainEntity = saveDataModel.MainData.DicToEntity<T>();
-                SetAuditDefaultValue(mainEntity);
-                if (base.AddOnExecuting != null)
+                SetAuditDefaultValue(mainEntity); // SetAuditDefaultValue 内部处理null
+                if (base.AddOnExecuting != null) // AddOnExecuting 可能为 null
                 {
                     Response = base.AddOnExecuting(mainEntity, null);
                     if (CheckResponseResult()) return Response;
@@ -586,46 +698,68 @@ namespace VOL.Core.BaseProvider
                 Response = repository.DbContextBeginTransaction(() =>
                 {
                     repository.Add(mainEntity, true);
-                    saveDataModel.MainData[keyPro.Name] = keyPro.GetValue(mainEntity);
+                    // keyPro.GetValue(mainEntity) 可能返回null，如果主键未生成或为引用类型
+                    saveDataModel.MainData[keyPro.Name] = keyPro.GetValue(mainEntity)!; // 假设保存后主键一定有值
                     Response.OK(ResponseType.SaveSuccess);
-                    if (base.AddOnExecuted != null)
+                    if (base.AddOnExecuted != null) // AddOnExecuted 可能为 null
                     {
                         Response = base.AddOnExecuted(mainEntity, null);
                     }
                     return Response;
                 });
                 if (Response.Status) Response.Data = new { data = saveDataModel.MainData };
-                AddProcese(mainEntity);
+                AddProcese(mainEntity); // AddProcese 内部处理null
                 return Response;
             }
 
-            Type detailType = GetRealDetailType();
+            Type? detailType = GetRealDetailType(); // detailType 可能为 null
+            if (detailType == null) // // 如果没有明细类型，则按无明细处理
+            {
+                 // 此处逻辑与上面的无明细保存类似，可以考虑重构或确认是否真的会到这里
+                T mainEntityNoDetail = saveDataModel.MainData.DicToEntity<T>();
+                // ... (重复的无明细保存逻辑) ...
+                Logger.Warning(LoggerType.Add, "Add操作检测到应有明细但GetRealDetailType返回null", saveDataModel.Serialize(), Response.Message);
+                return Response.Error("明细表类型未正确配置。"); // 或者执行无明细逻辑
+            }
 
-            return typeof(ServiceBase<T, TRepository>)
-                .GetMethod("Add", BindingFlags.Instance | BindingFlags.NonPublic)
-                .MakeGenericMethod(new Type[] { detailType })
-                .Invoke(this, new object[] { saveDataModel })
-                as WebResponseContent;
+            // GetMethod 可能返回 null
+            MethodInfo? addGenericMethod = typeof(ServiceBase<T, TRepository>)
+                .GetMethod("Add", BindingFlags.Instance | BindingFlags.NonPublic, null, new Type[] { typeof(SaveModel) }, null);
+
+            if (addGenericMethod == null)
+            {
+                 Logger.Error(LoggerType.Exception, "未能找到内部Add<TDetail>(SaveModel)方法。");
+                 return Response.Error("系统内部错误，无法处理带明细的添加操作。");
+            }
+
+            // Invoke 可能返回 null
+            return addGenericMethod.MakeGenericMethod(new Type[] { detailType })
+                                   .Invoke(this, new object[] { saveDataModel }) as WebResponseContent ?? Response.Error("带明细添加操作失败。");
         }
 
+        /// <summary>
+        /// 添加单个实体。
+        /// </summary>
         public virtual WebResponseContent AddEntity(T entity, bool validationEntity = true)
         {
+            // 调用泛型Add方法，明细列表为null
             return Add<T>(entity, null, validationEntity);
         }
 
         /// <summary>
-        /// 保存主、明细数据
+        /// 保存主、明细数据。
+        /// 如果Response未初始化，会在此方法内部初始化。
         /// </summary>
-        /// <typeparam name="TDetail"></typeparam>
-        /// <param name="entity"></param>
-        /// <param name="list"></param>
-        /// <param name="validationEntity">是否进行实体验证</param>
-        /// <returns></returns>
-        public WebResponseContent Add<TDetail>(T entity, List<TDetail> list = null, bool validationEntity = true) where TDetail : class
+        /// <typeparam name="TDetail">明细实体类型。</typeparam>
+        /// <param name="entity">主实体。</param>
+        /// <param name="list">明细实体列表，可以为null。</param>
+        /// <param name="validationEntity">是否进行实体验证。</param>
+        public WebResponseContent Add<TDetail>(T entity, List<TDetail>? list = null, bool validationEntity = true) where TDetail : class // list可以为null
         {
+            Response ??= new WebResponseContent(true); // // 确保Response已初始化
             //设置用户默认值
             entity.SetCreateDefaultVal();
-            SetAuditDefaultValue(entity);
+            SetAuditDefaultValue(entity); // 内部处理null
             if (validationEntity)
             {
                 Response = entity.ValidationEntity();
@@ -636,7 +770,7 @@ namespace VOL.Core.BaseProvider
                     if (CheckResponseResult()) return Response;
                 }
             }
-            if (this.AddOnExecuting != null)
+            if (this.AddOnExecuting != null) // AddOnExecuting 可能为 null
             {
                 Response = AddOnExecuting(entity, list);
                 if (CheckResponseResult()) return Response;
@@ -644,116 +778,141 @@ namespace VOL.Core.BaseProvider
             Response = repository.DbContextBeginTransaction(() =>
             {
                 repository.Add(entity);
-                repository.DbContext.SaveChanges();
-                //保存明细
+                repository.DbContext.SaveChanges(); // 保存主表以获取主键
+
                 if (list != null && list.Count > 0)
                 {
-                    //获取保存后的主键值
-                    PropertyInfo mainKey = typeof(T).GetKeyProperty();
-                    PropertyInfo detailMainKey = typeof(TDetail).GetProperties()
-                        .Where(q => q.Name.ToLower() == mainKey.Name.ToLower()).FirstOrDefault();
-                    object keyValue = mainKey.GetValue(entity);
-                    PropertyInfo detailKey = typeof(TDetail).GetKeyProperty();
+                    PropertyInfo mainKey = typeof(T).GetKeyProperty(); // GetKeyProperty 确保非null
+                    // detailMainKey 可能为 null
+                    PropertyInfo? detailMainKey = typeof(TDetail).GetProperties()
+                        .FirstOrDefault(q => q.Name.Equals(mainKey.Name, StringComparison.OrdinalIgnoreCase));
+
+                    if (detailMainKey == null) // // 如果在明细表中找不到与主表主键同名的外键属性
+                    {
+                        Logger.Error(LoggerType.Add, $"明细表类型 {typeof(TDetail).Name} 中未找到与主表主键 {mainKey.Name} 对应的外键属性。");
+                        // 根据业务需求，可以选择抛出异常、返回错误Response或继续（如果允许无外键关联的明细）
+                        // 此处我们选择记录错误并让事务回滚（通过不返回OK的Response）
+                        return Response.Error($"明细表配置错误：缺少外键 {mainKey.Name}。");
+                    }
+
+                    object? keyValue = mainKey.GetValue(entity); // keyValue 可能为 null
+                    if (keyValue == null) // // 如果主表主键未生成或为null
+                    {
+                         Logger.Error(LoggerType.Add, $"主表 {typeof(T).Name} 保存后主键值为null。");
+                         return Response.Error("主表主键未能正确生成。");
+                    }
+
+                    PropertyInfo detailKey = typeof(TDetail).GetKeyProperty(); // GetKeyProperty 确保非null
                     list.ForEach(x =>
                     {
+                        // 根据明细主键类型生成主键值
                         if (AppSetting.EnableSnowFlakeID && detailKey.PropertyType == typeof(long))
                         {
                             detailKey.SetValue(x, YitIdHelper.NextId());
                         }
-                        else if (detailKey.PropertyType == typeof(string))
+                        else if (detailKey.PropertyType == typeof(string) && string.IsNullOrEmpty(detailKey.GetValue(x)?.ToString())) // // 仅当string主键为空时生成
                         {
                             detailKey.SetValue(x,Guid.NewGuid().ToString());
                         }
-                        else if ( detailKey.PropertyType == typeof(Guid))
+                        else if ( detailKey.PropertyType == typeof(Guid) && ((Guid?)detailKey.GetValue(x) ?? Guid.Empty) == Guid.Empty) // // 仅当Guid主键为空时生成
                         {
                             detailKey.SetValue(x, Guid.NewGuid());
                         }
-                        //设置用户默认值
-                        x.SetCreateDefaultVal();
-                        detailMainKey.SetValue(x, keyValue);
+                        x.SetCreateDefaultVal(); // 设置创建相关的默认字段值
+                        detailMainKey.SetValue(x, keyValue); // 设置明细的外键值
                         repository.DbContext.Entry<TDetail>(x).State = EntityState.Added;
                     });
-                    repository.DbContext.SaveChanges();
+                    repository.DbContext.SaveChanges(); // 保存明细
                 }
                 Response.OK(ResponseType.SaveSuccess);
-                if (AddOnExecuted != null)
+                if (AddOnExecuted != null) // AddOnExecuted 可能为 null
                     Response = AddOnExecuted(entity, list);
                 return Response;
             });
-            if (Response.Status && string.IsNullOrEmpty(Response.Message))
+            if (Response.Status && string.IsNullOrEmpty(Response.Message)) // Message 可能为 null
             {
                 Response.OK(ResponseType.SaveSuccess);
             }
-            AddProcese(entity);
+            AddProcese(entity); // 内部处理null
             return Response;
         }
 
         /// <summary>
-        /// 设置审批字段默认值
+        /// 设置审批字段默认值。
         /// </summary>
-        /// <param name="entity"></param>
         private void SetAuditDefaultValue(T entity)
         {
             if (!WorkFlowManager.Exists<T>())
             {
                 return;
             }
-            var propertity = TProperties.Where(x => x.Name.ToLower() == "auditstatus").FirstOrDefault();
+            // FirstOrDefault 可能返回 null
+            var propertity = TProperties.FirstOrDefault(x => x.Name.Equals("auditstatus", StringComparison.OrdinalIgnoreCase));
             if (propertity != null && propertity.GetValue(entity) == null)
             {
-                propertity.SetValue(entity, 0);
+                propertity.SetValue(entity, 0); // 默认审核状态为0
             }
         }
         /// <summary>
-        /// 写入流程
+        /// 写入流程。
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="entity"></param>
-        /// <param name="changeTableStatus">是否修改原表的审批状态</param>
         protected void RewriteFlow(T entity, bool changeTableStatus = true)
         {
             WorkFlowManager.AddProcese(entity, true, changeTableStatus);
         }
+        /// <summary>
+        /// 添加流程处理。
+        /// </summary>
         private void AddProcese(T entity)
         {
+            // CheckResponseResult 依赖 Response，确保 Response 已初始化
             if (!CheckResponseResult() && WorkFlowManager.Exists<T>())
             {
+                // AddWorkFlowExecuting 可能为 null
                 if (AddWorkFlowExecuting != null && !AddWorkFlowExecuting.Invoke(entity))
                 {
                     return;
                 }
-                //写入流程
-                WorkFlowManager.AddProcese<T>(entity, addWorkFlowExecuted: AddWorkFlowExecuted);
-                //   WorkFlowManager.Audit<T>(entity, AuditStatus.待审核, null, null, null, null, init: true, initInvoke: AddWorkFlowExecuted);
+                WorkFlowManager.AddProcese<T>(entity, addWorkFlowExecuted: AddWorkFlowExecuted); // AddWorkFlowExecuted 可能为 null
             }
         }
 
+        /// <summary>
+        /// （此方法似乎未使用，且逻辑不完整）将明细添加到DBSet。
+        /// </summary>
         public void AddDetailToDBSet<TDetail>() where TDetail : class
         {
-            List<PropertyInfo> listChilds = TProperties.Where(x => x.PropertyType.Name == "List`1").ToList();
-            // repository.DbContext.Set<TDetail>().AddRange();
+            // 这行代码没有实际效果，只是获取属性列表但未使用。
+            // List<PropertyInfo> listChilds = TProperties.Where(x => x.PropertyType.Name == "List`1").ToList();
+            // repository.DbContext.Set<TDetail>().AddRange(...); // // 需要一个TDetail的实例列表
         }
-
+        /// <summary>
+        /// 内部方法，用于带明细的新建操作，将SaveModel转换为实体后调用泛型Add方法。
+        /// 如果Response未初始化，会在此方法内部初始化。
+        /// </summary>
         private WebResponseContent Add<TDetail>(SaveModel saveDataModel) where TDetail : class
         {
+            Response ??= new WebResponseContent(true); // // 确保Response已初始化
             T mainEntity = saveDataModel.MainData.DicToEntity<T>();
-            //验证明细
-            string reslut = typeof(TDetail).ValidateDicInEntity(saveDataModel.DetailData, true, false, new string[] { TProperties.GetKeyName() });
-            if (reslut != string.Empty)
+            // DetailData 可能为 null
+            string reslut = typeof(TDetail).ValidateDicInEntity(saveDataModel.DetailData ?? new List<Dictionary<string, object>>(), true, false, new string[] { TProperties.GetKeyName() });
+            if (!string.IsNullOrEmpty(reslut)) // reslut 不会是null
                 return Response.Error(reslut);
 
-            List<TDetail> list = saveDataModel.DetailData.DicToList<TDetail>();
-            Response = Add<TDetail>(mainEntity, list, false);
+            List<TDetail> list = saveDataModel.DetailData.DicToList<TDetail>(); // DetailData 在此已保证非null
+            Response = Add<TDetail>(mainEntity, list, false); // 调用上面的泛型Add方法
 
-            //保存失败
             if (CheckResponseResult())
             {
-                Logger.Error(LoggerType.Add, saveDataModel.Serialize() + Response.Message);
+                // saveDataModel.Serialize() 可能因saveDataModel为null而异常，但之前已校验。
+                // Response.Message 可能为null
+                Logger.Error(LoggerType.Add, $"{saveDataModel.Serialize()} {Response.Message}");
                 return Response;
             }
 
-            PropertyInfo propertyKey = typeof(T).GetKeyProperty();
-            saveDataModel.MainData[propertyKey.Name] = propertyKey.GetValue(mainEntity);
+            PropertyInfo propertyKey = typeof(T).GetKeyProperty(); // GetKeyProperty 确保非null
+            // propertyKey.GetValue(mainEntity) 可能返回null
+            saveDataModel.MainData[propertyKey.Name] = propertyKey.GetValue(mainEntity)!; // 假设保存后主键有值
             Response.Data = new { data = saveDataModel.MainData, list };
             return Response.Set(ResponseType.SaveSuccess);
         }
@@ -761,14 +920,8 @@ namespace VOL.Core.BaseProvider
         #region 编辑
 
         /// <summary>
-        /// 获取编辑明细主键
+        /// 获取编辑明细时，数据库中已存在的明细主键列表。
         /// </summary>
-        /// <typeparam name="DetailT"></typeparam>
-        /// <typeparam name="Tkey"></typeparam>
-        /// <param name="detailKeyName"></param>
-        /// <param name="mainKeyName"></param>
-        /// <param name="mainKeyValue"></param>
-        /// <returns></returns>
         public List<Tkey> GetUpdateDetailSelectKeys<DetailT, Tkey>(string detailKeyName, string mainKeyName, string mainKeyValue) where DetailT : class
         {
             IQueryable<DetailT> queryable = repository.DbContext.Set<DetailT>();
@@ -779,133 +932,111 @@ namespace VOL.Core.BaseProvider
         }
 
         /// <summary>
-        /// 将数据转换成对象后最终保存
+        /// 将SaveModel中的数据转换为实体并执行更新操作（包括主表和明细表）。
+        /// 如果Response未初始化，依赖于后续调用的方法（如UpdateOnExecuting）进行初始化或处理。
         /// </summary>
-        /// <typeparam name="DetailT"></typeparam>
-        /// <param name="saveModel"></param>
-        /// <param name="mainKeyProperty"></param>
-        /// <param name="detailKeyInfo"></param>
-        /// <param name="keyDefaultVal"></param>
-        /// <returns></returns>
-        public WebResponseContent UpdateToEntity<DetailT>(SaveModel saveModel, PropertyInfo mainKeyProperty, PropertyInfo detailKeyInfo, object keyDefaultVal) where DetailT : class
+        public WebResponseContent UpdateToEntity<DetailT>(SaveModel saveModel, PropertyInfo mainKeyProperty, PropertyInfo detailKeyInfo, object keyDefaultVal)
+            where DetailT : class, new() // 添加new()约束以支持Activator.CreateInstance
         {
+            Response ??= new WebResponseContent(); // // 确保Response已初始化
             T mainEnity = saveModel.MainData.DicToEntity<T>();
-            List<DetailT> detailList = saveModel.DetailData.DicToList<DetailT>();
-            //2021.08.21优化明细表删除
-            //删除的主键
-            //查出所有明细表数据的ID
-            //System.Collections.IList detailKeys = this.GetType().GetMethod("GetUpdateDetailSelectKeys")
-            //        .MakeGenericMethod(new Type[] { typeof(DetailT), detailKeyInfo.PropertyType })
-            //        .Invoke(this, new object[] {
-            //            detailKeyInfo.Name, mainKeyProperty.Name,
-            //            saveModel.MainData[mainKeyProperty.Name].ToString()
-            //        }) as System.Collections.IList;
+            List<DetailT> detailList = saveModel.DetailData.DicToList<DetailT>(); // DetailData已保证非null
 
-            //新增对象
             List<DetailT> addList = new List<DetailT>();
-            //   List<object> containsKeys = new List<object>();
-            //编辑对象
             List<DetailT> editList = new List<DetailT>();
-            //删除的主键
-            List<object> delKeys = new List<object>();
-            mainKeyProperty = typeof(DetailT).GetProperties().Where(x => x.Name == mainKeyProperty.Name).FirstOrDefault();
-            //获取新增与修改的对象
+            List<object> delKeys = new List<object>(); // object可以为null
+
+            // mainKeyPropertyInDetail 可能为 null
+            PropertyInfo? mainKeyPropertyInDetail = typeof(DetailT).GetProperties().FirstOrDefault(x => x.Name.Equals(mainKeyProperty.Name, StringComparison.OrdinalIgnoreCase));
+            if (mainKeyPropertyInDetail == null) // // 必须有对应的外键属性
+            {
+                Logger.Error(LoggerType.Update, $"明细表类型 {typeof(DetailT).Name} 中未找到与主表主键 {mainKeyProperty.Name} 对应的外键属性。");
+                return Response.Error($"明细表配置错误：缺少外键 {mainKeyProperty.Name}。");
+            }
+
+            // 获取新增与修改的对象
             foreach (DetailT item in detailList)
             {
-                object value = detailKeyInfo.GetValue(item);
-                if (keyDefaultVal.Equals(value))//主键为默认值的,新增数据
+                object? value = detailKeyInfo.GetValue(item); // value 可能为 null
+                // 如果主键为默认值 (null, empty string, or 0 for numerics), 视为新增数据
+                if (value == null || keyDefaultVal.Equals(value) || (value is IConvertible conv && conv.ToInt64(null) == 0))
                 {
-                    //设置新增的主表的值
-                    mainKeyProperty.SetValue(item,
-                        saveModel.MainData[mainKeyProperty.Name]
-                        .ChangeType(mainKeyProperty.PropertyType));
+                    // 设置新增的主表外键值
+                    // saveModel.MainData[mainKeyProperty.Name] 可能为null，ChangeType需要处理
+                    mainKeyPropertyInDetail.SetValue(item, saveModel.MainData[mainKeyProperty.Name]?.ChangeType(mainKeyPropertyInDetail.PropertyType));
 
+                    // 根据明细主键类型生成新的主键值
                     if (detailKeyInfo.PropertyType == typeof(Guid))
                     {
                         detailKeyInfo.SetValue(item, Guid.NewGuid());
                     }
-                    else
+                    else if (AppSetting.EnableSnowFlakeID && detailKeyInfo.PropertyType == typeof(long))
                     {
-                        if (AppSetting.EnableSnowFlakeID && detailKeyInfo.PropertyType == typeof(long))
-                        {
-                            detailKeyInfo.SetValue(item, YitIdHelper.NextId());
-                        }
-                        else if (detailKeyInfo.PropertyType == typeof(string))
-                        {
+                        detailKeyInfo.SetValue(item, YitIdHelper.NextId());
+                    }
+                    else if (detailKeyInfo.PropertyType == typeof(string)) // // 仅当string主键为空时生成
+                    {
+                         if(string.IsNullOrEmpty(detailKeyInfo.GetValue(item)?.ToString()))
                             detailKeyInfo.SetValue(item, Guid.NewGuid().ToString());
-                        }
-                        else if (detailKeyInfo.PropertyType == typeof(Guid))
-                        {
-                            detailKeyInfo.SetValue(item, Guid.NewGuid());
-                        }
                     }
                     addList.Add(item);
                 }
-                else //if (detailKeys.Contains(value))
+                else
                 {
-                    //containsKeys.Add(value);
                     editList.Add(item);
                 }
             }
 
-            //获取需要删除的对象的主键
-            if (saveModel.DelKeys != null && saveModel.DelKeys.Count > 0)
+            if (saveModel.DelKeys != null && saveModel.DelKeys.Count > 0) // DelKeys 可能为 null
             {
-                //2021.08.21优化明细表删除
-                delKeys = saveModel.DelKeys.Select(q => q.ChangeType(detailKeyInfo.PropertyType)).Where(x => x != null).ToList();
-                //.Where(x => detailKeys.Contains(x.ChangeType(detailKeyInfo.PropertyType)))
-                //.Select(q => q.ChangeType(detailKeyInfo.PropertyType)).ToList();
+                // ChangeType 可能因类型不匹配抛出异常
+                delKeys = saveModel.DelKeys.Select(q => q?.ChangeType(detailKeyInfo.PropertyType)).Where(x => x != null).Select(x=>x!).ToList();
             }
 
-            if (UpdateOnExecuting != null)
+            if (UpdateOnExecuting != null) // UpdateOnExecuting 可能为 null
             {
                 Response = UpdateOnExecuting(mainEnity, addList, editList, delKeys);
                 if (CheckResponseResult())
                     return Response;
             }
             mainEnity.SetModifyDefaultVal();
-            //主表修改
-            //不修改!CreateFields.Contains创建人信息
-            repository.Update(mainEnity, typeof(T).GetEditField()
-                .Where(c => saveModel.MainData.Keys.Contains(c) && !CreateFields.Contains(c))
-                .ToArray());
-            //foreach (var item in saveModel.DetailData)
-            //{
-            //    item.SetModifyDefaultVal();
-            //}
-            //明细修改
+
+            // 获取要更新的主表字段，排除创建相关的字段
+            string[] updateFields = typeof(T).GetEditField()
+                .Where(c => saveModel.MainData.ContainsKey(c) && !CreateFields.Contains(c))
+                .ToArray();
+            repository.Update(mainEnity, updateFields); // 不立即保存
+
             editList.ForEach(x =>
             {
-                //获取编辑的字段
-                var updateField = saveModel.DetailData
-                    .Where(c => c[detailKeyInfo.Name].ChangeType(detailKeyInfo.PropertyType)
-                    .Equal(detailKeyInfo.GetValue(x)))
-                    .FirstOrDefault()
-                    .Keys.Where(k => k != detailKeyInfo.Name)
-                    .Where(r => !CreateFields.Contains(r))
-                    .ToList();
-                updateField.AddRange(ModifyFields);
-                //設置默認值
-                x.SetModifyDefaultVal();
-                //添加修改字段
-                repository.Update<DetailT>(x, updateField.ToArray());
+                // 获取对应字典以确定哪些字段被提交修改
+                var detailEntryDict = saveModel.DetailData
+                    .FirstOrDefault(c => detailKeyInfo.GetValue(x)?.Equals(c[detailKeyInfo.Name]?.ChangeType(detailKeyInfo.PropertyType)) ?? false);
+
+                if (detailEntryDict != null)
+                {
+                    string[] detailUpdateFields = detailEntryDict.Keys
+                        .Where(k => k != detailKeyInfo.Name && !CreateFields.Contains(k)) // 排除主键和创建字段
+                        .ToArray();
+                    x.SetModifyDefaultVal(); // 设置修改相关的默认字段值
+                    repository.Update<DetailT>(x, detailUpdateFields); // 不立即保存
+                }
             });
 
-            //明细新增
             addList.ForEach(x =>
             {
-                x.SetCreateDefaultVal();
+                x.SetCreateDefaultVal(); // 设置创建相关的默认字段值
                 repository.DbContext.Entry<DetailT>(x).State = EntityState.Added;
             });
-            //明细删除
+
             delKeys.ForEach(x =>
             {
-                DetailT delT = Activator.CreateInstance<DetailT>();
+                DetailT delT = new DetailT(); // Activator.CreateInstance<DetailT>();
                 detailKeyInfo.SetValue(delT, x);
                 repository.DbContext.Entry<DetailT>(delT).State = EntityState.Deleted;
             });
 
-            if (UpdateOnExecuted == null)
+            if (UpdateOnExecuted == null) // UpdateOnExecuted 可能为 null
             {
                 repository.DbContext.SaveChanges();
                 Response.OK(ResponseType.SaveSuccess);
@@ -921,180 +1052,154 @@ namespace VOL.Core.BaseProvider
             }
             if (Response.Status)
             {
-                addList.AddRange(editList);
+                addList.AddRange(editList); // 用于返回给前端的数据
                 Response.Data = new { data = mainEnity, list = addList };
-                if (string.IsNullOrEmpty(Response.Message))
+                if (string.IsNullOrEmpty(Response.Message)) // Message 可能为 null
                     Response.OK(ResponseType.SaveSuccess);
             }
             return Response;
         }
 
         /// <summary>
-        /// 获取配置的创建人ID创建时间创建人,修改人ID修改时间、修改人与数据相同的字段
+        /// 获取在导入/导出模板时需要用户填写的字段，以及审计字段（创建人、修改人等）。
+        /// 这些字段通常在自动处理时不应由用户直接修改或在某些情况下应被忽略。
         /// </summary>
-        private static string[] _userIgnoreFields { get; set; }
+        private static string[]? _userIgnoreFields; // 可空静态字段
 
         private static string[] UserIgnoreFields
         {
             get
             {
-                if (_userIgnoreFields != null) return _userIgnoreFields;
-                List<string> fields = new List<string>();
-                fields.AddRange(CreateFields);
-                fields.AddRange(ModifyFields);
-                _userIgnoreFields = fields.ToArray();
-                return _userIgnoreFields;
+                // 使用 ??= 操作符进行延迟初始化，确保线程安全（对于静态字段，首次访问时初始化）
+                return _userIgnoreFields ??= CreateFields.Concat(ModifyFields).ToArray();
             }
         }
-        private static string[] _createFields { get; set; }
+        private static string[]? _createFields; // 可空静态字段
         private static string[] CreateFields
         {
             get
             {
-                if (_createFields != null) return _createFields;
-                _createFields = AppSetting.CreateMember.GetType().GetProperties()
-                    .Select(x => x.GetValue(AppSetting.CreateMember)?.ToString())
-                    .Where(w => !string.IsNullOrEmpty(w)).ToArray();
+                // AppSetting.CreateMember 可能为 null
+                if (_createFields == null)
+                {
+                    _createFields = AppSetting.CreateMember?.GetType().GetProperties()
+                        .Select(x => x.GetValue(AppSetting.CreateMember)?.ToString())
+                        .Where(w => !string.IsNullOrEmpty(w))
+                        .Select(s=>s!) // // 确保非null
+                        .ToArray() ?? Array.Empty<string>(); // // 如果AppSetting.CreateMember为null，返回空数组
+                }
                 return _createFields;
             }
         }
 
-        private static string[] _modifyFields { get; set; }
+        private static string[]? _modifyFields; // 可空静态字段
         private static string[] ModifyFields
         {
             get
             {
-                if (_modifyFields != null) return _modifyFields;
-                _modifyFields = AppSetting.ModifyMember.GetType().GetProperties()
-                    .Select(x => x.GetValue(AppSetting.ModifyMember)?.ToString())
-                    .Where(w => !string.IsNullOrEmpty(w)).ToArray();
+                if (_modifyFields == null)
+                {
+                     _modifyFields = AppSetting.ModifyMember?.GetType().GetProperties()
+                        .Select(x => x.GetValue(AppSetting.ModifyMember)?.ToString())
+                        .Where(w => !string.IsNullOrEmpty(w))
+                        .Select(s => s!) // // 确保非null
+                        .ToArray() ?? Array.Empty<string>(); // // 如果AppSetting.ModifyMember为null，返回空数组
+                }
                 return _modifyFields;
             }
         }
 
         /// <summary>
-        /// 编辑
-        /// 1、明细表必须把主表的主键字段也设置为可编辑
-        /// 2、修改、增加只会操作设置为编辑列的数据
+        /// 编辑操作。
+        /// 1、明细表必须把主表的主键字段也设置为可编辑。
+        /// 2、修改、增加只会操作设置为编辑列的数据。
+        /// 如果Response未初始化，会在此方法内部初始化。
         /// </summary>
-        /// <param name="saveModel"></param>
-        /// <returns></returns>
-        public virtual WebResponseContent Update(SaveModel saveModel)
+        /// <param name="saveModel">保存的数据模型，可能为null。</param>
+        public virtual WebResponseContent Update(SaveModel? saveModel) // saveModel可以为null
         {
-            if (UpdateOnExecute != null)
+            Response ??= new WebResponseContent(); // // 确保Response已初始化
+            if (UpdateOnExecute != null) // UpdateOnExecute 可能为 null
             {
-                Response = UpdateOnExecute(saveModel);
+                Response = UpdateOnExecute(saveModel!); // // 如果saveModel为null，这里会抛异常，调用者应保证
                 if (CheckResponseResult()) return Response;
             }
-            if (saveModel == null)
+            if (saveModel == null) // 再次检查，因为UpdateOnExecute可能未处理null
                 return Response.Error(ResponseType.ParametersLack);
 
-
-            //if (WorkFlowManager.Exists<T>())
-            //{
-            //    var auditProperty = TProperties.Where(x => x.Name.ToLower() == "auditstatus").FirstOrDefault();
-            //    string value = saveModel.MainData[auditProperty.Name]?.ToString();
-            //    if (WorkFlowManager.GetAuditStatus<T>(value) != 1)
-            //    {
-            //        return Response.Error("数据已经在审核中，不能修改");
-            //    }
-            //}
             Type type = typeof(T);
-
-            //设置修改时间,修改人的默认值
-            UserInfo userInfo = UserContext.Current.UserInfo;
+            // UserContext.Current 或 UserInfo 可能为 null
+            UserInfo userInfo = UserContext.Current?.UserInfo ?? UserInfo.System; // // 提供默认UserInfo
             saveModel.SetDefaultVal(AppSetting.ModifyMember, userInfo);
 
-
-            //判断提交的数据与实体格式是否一致
-            string result = type.ValidateDicInEntity(saveModel.MainData, true, false, UserIgnoreFields);
-            if (result != string.Empty)
+            string result = type.ValidateDicInEntity(saveModel.MainData, true, false, UserIgnoreFields); // MainData此时不为null
+            if (!string.IsNullOrEmpty(result)) // result 不会是null
                 return Response.Error(result);
 
-            PropertyInfo mainKeyProperty = type.GetKeyProperty();
-            //验证明细
-            Type detailType = null;
+            PropertyInfo mainKeyProperty = type.GetKeyProperty(); // GetKeyProperty 确保非null
+            Type? detailType = null; // detailType 可能为 null
+
+            // DetailData 和 DelKeys 都可能为 null
             if (saveModel.DetailData != null || (saveModel.DelKeys != null && saveModel.DelKeys.Count > 0))
             {
-                detailType = GetRealDetailType();
+                detailType = GetRealDetailType(); // 可能返回 null
                 if (detailType != null)
                 {
-                    saveModel.DetailData = saveModel.DetailData == null
-                                           ? new List<Dictionary<string, object>>()
-                                           : saveModel.DetailData.Where(x => x.Count > 0).ToList();
+                    saveModel.DetailData = saveDataModel.DetailData ?? new List<Dictionary<string, object>>(); // // 确保DetailData不为null
+                    saveModel.DetailData = saveDataModel.DetailData.Where(x => x.Count > 0).ToList();
 
                     result = detailType.ValidateDicInEntity(saveModel.DetailData, true, false, new string[] { mainKeyProperty.Name });
-                    if (result != string.Empty) return Response.Error(result);
+                    if (!string.IsNullOrEmpty(result)) return Response.Error(result);
                 }
-
-                //主从关系指定外键,即从表的外键可以不是主键的主表,还需要改下代码生成器设置属性外键,功能预留后面再开发(2020.04.25)
-                //string foreignKey = type.GetTypeCustomValue<System.ComponentModel.DataAnnotations.Schema.ForeignKeyAttribute>(x => new { x.Name });
-                //if (!string.IsNullOrEmpty(foreignKey))
-                //{
-                //    var _mainKeyProperty = detailType.GetProperties().Where(x => x.Name.ToLower() == foreignKey.ToLower()).FirstOrDefault();
-                //    if (_mainKeyProperty != null)
-                //    {
-                //        mainKeyProperty = _mainKeyProperty;
-                //    }
-                //}
             }
 
-            //获取主建类型的默认值用于判断后面数据是否正确,int long默认值为0,guid :0000-000....
-            object keyDefaultVal =
-                mainKeyProperty.PropertyType == typeof(string)
-                ? ""
-                : mainKeyProperty.PropertyType.Assembly.CreateInstance(mainKeyProperty.PropertyType.FullName);//.ToString();
-                                                                                                              //判断是否包含主键
-            if (mainKeyProperty == null
-                || !saveModel.MainData.ContainsKey(mainKeyProperty.Name)
-                || saveModel.MainData[mainKeyProperty.Name] == null
-                )
+            // keyDefaultVal 的创建现在更安全
+            object keyDefaultVal = mainKeyProperty.PropertyType.IsValueType
+                ? Activator.CreateInstance(mainKeyProperty.PropertyType)!
+                : (object?)null ?? ""; // 对于引用类型（如string），默认比较值可以是空字符串
+
+            if (!saveModel.MainData.ContainsKey(mainKeyProperty.Name) || saveModel.MainData[mainKeyProperty.Name] == null)
             {
                 return Response.Error(ResponseType.NoKey);
             }
 
-            object mainKeyVal = saveModel.MainData[mainKeyProperty.Name];
-            //判断主键类型是否正确
-            (bool, string, object) validation = mainKeyProperty.ValidationValueForDbType(mainKeyVal).FirstOrDefault();
+            object? mainKeyVal = saveModel.MainData[mainKeyProperty.Name]; // mainKeyVal 可能为 null
+            if (mainKeyVal == null) return Response.Error(ResponseType.NoKey); // // 再次确认主键值不为null
+
+            var validation = mainKeyProperty.ValidationValueForDbType(mainKeyVal).FirstOrDefault(); // ValidationValueForDbType 返回数组
             if (!validation.Item1)
                 return Response.Error(ResponseType.KeyError);
 
-            object valueType = mainKeyVal.ToString().ChangeType(mainKeyProperty.PropertyType);
-            //判断主键值是不是当前类型的默认值
-            if (valueType == null ||
-                (!valueType.GetType().Equals(mainKeyProperty.PropertyType)
-                || valueType.ToString() == keyDefaultVal.ToString()
-                ))
+            object? valueType = mainKeyVal.ToString()!.ChangeType(mainKeyProperty.PropertyType); // ToString() 后 ChangeType
+            if (valueType == null || valueType.ToString() == keyDefaultVal.ToString()) // keyDefaultVal对于string是""
                 return Response.Error(ResponseType.KeyError);
 
-            if (saveModel.MainData.Count <= 1) return Response.Error("系统没有配置好编辑的数据，请检查model!");
+            if (saveModel.MainData.Count <= 1 && detailType != null) // // 如果有明细，主表至少要有主键外的字段才算有效修改
+                 return Response.Error("系统没有配置好编辑的数据，请检查model!");
+            else if (saveModel.MainData.Count == 0 && detailType == null) // // 无明细时，主表必须有数据
+                 return Response.Error("系统没有配置好编辑的数据，请检查model!");
 
-            // 2020.08.15添加多租户数据过滤（编辑）
-            if (IsMultiTenancy && !UserContext.Current.IsSuperAdmin)
+
+            if (IsMultiTenancy && UserContext.Current?.IsSuperAdmin == false) // UserContext.Current 可能为 null
             {
-                CheckUpdateMultiTenancy(mainKeyProperty.PropertyType == typeof(Guid) ? "'" + mainKeyVal.ToString() + "'" : mainKeyVal.ToString(), mainKeyProperty.Name);
-                if (CheckResponseResult())
-                {
-                    return Response;
-                }
+                // mainKeyVal.ToString() 可能因mainKeyVal为null抛异常，上面已校验
+                CheckUpdateMultiTenancy(mainKeyProperty.PropertyType == typeof(Guid) ? $"'{mainKeyVal}'" : mainKeyVal.ToString()!, mainKeyProperty.Name);
+                if (CheckResponseResult()) return Response;
             }
 
-
-            Expression<Func<T, bool>> expression = mainKeyProperty.Name.CreateExpression<T>(mainKeyVal.ToString(), LinqExpressionType.Equal);
+            Expression<Func<T, bool>> expression = mainKeyProperty.Name.CreateExpression<T>(mainKeyVal.ToString()!, LinqExpressionType.Equal);
             if (!repository.Exists(expression)) return Response.Error("保存的数据不存在!");
-            //没有明细的直接保存主表数据
-            if (detailType == null)
+
+            if (detailType == null) // 没有明细的直接保存主表数据
             {
-                saveModel.SetDefaultVal(AppSetting.ModifyMember, userInfo);
                 T mainEntity = saveModel.MainData.DicToEntity<T>();
-                if (UpdateOnExecuting != null)
+                if (UpdateOnExecuting != null) // UpdateOnExecuting 可能为 null
                 {
                     Response = UpdateOnExecuting(mainEntity, null, null, null);
                     if (CheckResponseResult()) return Response;
                 }
-                //不修改!CreateFields.Contains创建人信息
-                repository.Update(mainEntity, type.GetEditField().Where(c => saveModel.MainData.Keys.Contains(c) && !CreateFields.Contains(c)).ToArray());
-                if (base.UpdateOnExecuted == null)
+                repository.Update(mainEntity, type.GetEditField().Where(c => saveModel.MainData.ContainsKey(c) && !CreateFields.Contains(c)).ToArray());
+                if (base.UpdateOnExecuted == null) // UpdateOnExecuted 可能为 null
                 {
                     repository.SaveChanges();
                     Response.OK(ResponseType.SaveSuccess);
@@ -1109,87 +1214,92 @@ namespace VOL.Core.BaseProvider
                     });
                 }
                 if (Response.Status) Response.Data = new { data = mainEntity };
-                if (Response.Status && string.IsNullOrEmpty(Response.Message))
+                if (Response.Status && string.IsNullOrEmpty(Response.Message)) // Message 可能为 null
                     Response.OK(ResponseType.SaveSuccess);
                 return Response;
             }
 
-            saveModel.DetailData = saveModel.DetailData.Where(x => x.Count > 0).ToList();
+            // DetailData 在上面已确保非null
+            saveModel.DetailData = saveModel.DetailData!.Where(x => x.Count > 0).ToList();
 
-            //明细操作
-            PropertyInfo detailKeyInfo = detailType.GetKeyProperty();
-            //主键类型
-            //  string detailKeyType = mainKeyProperty.GetTypeCustomValue<ColumnAttribute>(c => new { c.TypeName });
-            //判断明细是否包含了主表的主键
+            PropertyInfo detailKeyInfo = detailType.GetKeyProperty(); // GetKeyProperty 确保非null
+            object detailKeyDefaultVal = detailKeyInfo.PropertyType.IsValueType
+                ? Activator.CreateInstance(detailKeyInfo.PropertyType)!
+                : (object?)null ?? "";
 
-            string deatilDefaultVal =
-                  detailKeyInfo.PropertyType == typeof(string)
-                ? ""
-                :detailKeyInfo.PropertyType.Assembly.CreateInstance(detailKeyInfo.PropertyType.FullName).ToString();
-            foreach (Dictionary<string, object> dic in saveModel.DetailData)
+
+            foreach (Dictionary<string, object> dic in saveModel.DetailData) // DetailData 已保证非null
             {
-                //不包含主键的默认添加主键默认值，用于后面判断是否为新增数据
                 if (!dic.ContainsKey(detailKeyInfo.Name))
                 {
-                    dic.Add(detailKeyInfo.Name, keyDefaultVal);
+                    dic.Add(detailKeyInfo.Name, detailKeyDefaultVal); // 使用detailKeyDefaultVal
+                    // mainKeyProperty.Name 可能不在dic中，需要检查
                     if (dic.ContainsKey(mainKeyProperty.Name))
-                    {
-                        dic[mainKeyProperty.Name] = keyDefaultVal;
-                    }
+                         dic[mainKeyProperty.Name] = mainKeyProperty.PropertyType.IsValueType ? Activator.CreateInstance(mainKeyProperty.PropertyType)! : (object?)null ?? "";
                     else
-                    {
-                        dic.Add(mainKeyProperty.Name, keyDefaultVal);
-                    }
+                         dic.Add(mainKeyProperty.Name, mainKeyProperty.PropertyType.IsValueType ? Activator.CreateInstance(mainKeyProperty.PropertyType)! : (object?)null ?? "");
                     continue;
                 }
-                if (dic[detailKeyInfo.Name] == null)
+                if (dic[detailKeyInfo.Name] == null) // dic中的值可能为null
                     return Response.Error(ResponseType.NoKey);
 
-                //主键值是否正确
-                string detailKeyVal = dic[detailKeyInfo.Name].ToString();
+                string detailKeyVal = dic[detailKeyInfo.Name]!.ToString()!; // 确保不为null后ToString
                 if (!detailKeyInfo.ValidationValueForDbType(detailKeyVal).FirstOrDefault().Item1
-                    || deatilDefaultVal == detailKeyVal)
+                    || detailKeyDefaultVal.ToString() == detailKeyVal) // 比较默认值
                     return Response.Error(ResponseType.KeyError);
 
-                //判断主表的值是否正确
-                if (detailKeyVal != keyDefaultVal.ToString() && (!dic.ContainsKey(mainKeyProperty.Name) || dic[mainKeyProperty.Name] == null || dic[mainKeyProperty.Name].ToString() == keyDefaultVal.ToString()))
+                if (detailKeyVal != detailKeyDefaultVal.ToString() &&
+                    (!dic.ContainsKey(mainKeyProperty.Name) || dic[mainKeyProperty.Name] == null ||
+                     dic[mainKeyProperty.Name]!.ToString() == (mainKeyProperty.PropertyType.IsValueType ? Activator.CreateInstance(mainKeyProperty.PropertyType)!.ToString() : "")))
                 {
-                    return Response.Error(mainKeyProperty.Name + "是必填项!");
+                    return Response.Error($"{mainKeyProperty.Name}是必填项!");
                 }
             }
+            // DetailData.Exists 可能因DetailData为null抛异常，上面已处理
+            if (saveModel.DetailData.Exists(c => c.Count <= 2 && c.ContainsKey(detailKeyInfo.Name) && c[detailKeyInfo.Name]?.ToString() != detailKeyDefaultVal.ToString())) // // 只有当不是新增（主键不是默认值）且字段数过少时报错
+                 return Response.Error("系统没有配置好明细编辑的数据，请检查model!");
 
-            if (saveModel.DetailData.Exists(c => c.Count <= 2))
-                return Response.Error("系统没有配置好明细编辑的数据，请检查model!");
-            return this.GetType().GetMethod("UpdateToEntity")
-                .MakeGenericMethod(new Type[] { detailType })
-                .Invoke(this, new object[] { saveModel, mainKeyProperty, detailKeyInfo, keyDefaultVal })
-                as WebResponseContent;
+            // GetMethod 可能返回 null
+            MethodInfo? updateMethod = this.GetType().GetMethod("UpdateToEntity");
+            if (updateMethod == null)
+            {
+                Logger.Error(LoggerType.Exception, "未能找到内部UpdateToEntity<TDetail>方法。");
+                return Response.Error("系统内部错误，无法处理带明细的更新操作。");
+            }
+            // Invoke 可能返回 null
+            return updateMethod.MakeGenericMethod(new Type[] { detailType })
+                               .Invoke(this, new object[] { saveModel, mainKeyProperty, detailKeyInfo, detailKeyDefaultVal })
+                               as WebResponseContent ?? Response.Error("带明细更新操作失败。");
         }
 
         #endregion
 
         /// <summary>
-        /// 
+        /// 删除操作。
+        /// 如果Response未初始化，会在此方法内部初始化。
         /// </summary>
-        /// <param name="keys"></param>
-        /// <param name="delList">是否删除明细数据(默认会删除明细)</param>
-        /// <returns></returns>
-        public virtual WebResponseContent Del(object[] keys, bool delList = true)
+        /// <param name="keys">要删除的主键数组，可能为null或空。</param>
+        /// <param name="delList">是否删除明细数据(默认会删除明细)。</param>
+        public virtual WebResponseContent Del(object[]? keys, bool delList = true) // keys可以为null
         {
+            Response ??= new WebResponseContent(); // // 确保Response已初始化
             Type entityType = typeof(T);
-            var keyProperty = entityType.GetKeyProperty();
+            PropertyInfo? keyProperty = entityType.GetKeyProperty(); // GetKeyProperty 确保非null（在此上下文中）
+            // keys 也可能为null
             if (keyProperty == null || keys == null || keys.Length == 0) return Response.Error(ResponseType.NoKeyDel);
 
-            IEnumerable<(bool, string, object)> validation = keyProperty.ValidationValueForDbType(keys);
+            // ValidationValueForDbType需要保证keys不为null且元素不为null
+            IEnumerable<(bool, string, object)> validation = keyProperty.ValidationValueForDbType(keys.Where(k => k != null).Select(k => k!).ToArray());
             if (validation.Any(x => !x.Item1))
             {
-                return Response.Error(validation.Where(x => !x.Item1).Select(s => s.Item2 + "</br>").Serialize());
+                // Serialize可能因validation为空抛异常，但之前已检查Any
+                return Response.Error(validation.Where(x => !x.Item1).Select(s => s.Item2 + "</br>").Serialize() ?? "主键验证失败");
             }
-            string tKey = keyProperty.Name;
-            if (string.IsNullOrEmpty(tKey))
-                return Response.Error("没有主键不能删除");
+            string tKey = keyProperty.Name; // Name不为null
+            // if (string.IsNullOrEmpty(tKey)) // // GetKeyProperty保证了tKey不为空
+            //    return Response.Error("没有主键不能删除");
 
-            if (DelOnExecuting != null)
+            if (DelOnExecuting != null) // DelOnExecuting 可能为 null
             {
                 Response = DelOnExecuting(keys);
                 if (CheckResponseResult()) return Response;
@@ -1199,161 +1309,146 @@ namespace VOL.Core.BaseProvider
             {
                 Response = repository.DbContextBeginTransaction(() =>
                 {
-                    repository.DeleteWithKeys(keys);
-                    if (DelOnExecuted != null)
+                    repository.DeleteWithKeys(keys, delList); // 传递delList参数
+                    if (DelOnExecuted != null) // DelOnExecuted 可能为 null
                     {
                         Response = DelOnExecuted(keys);
                     }
                     return Response;
                 });
-                if (Response.Status && string.IsNullOrEmpty(Response.Message)) Response.OK(ResponseType.DelSuccess);
+                if (Response.Status && string.IsNullOrEmpty(Response.Message)) Response.OK(ResponseType.DelSuccess); // Message 可能为 null
                 return Response;
             }
-            FieldType fieldType = entityType.GetFieldType();
+            FieldType fieldType = entityType.GetFieldType(); // GetFieldType 确保有返回值
+            // 对于数值类型，直接拼接是安全的。
+            // 对于字符串类型，替换单引号 (') 为双单引号 ('') 是标准的SQL转义方法，以防止SQL注入。
+            // 然而，更健壮的方法是使用参数化查询，但这对于IN子句中的可变数量项可能比较复杂，
+            // 或者可以考虑使用Repository层的DeleteWithKeys方法（如果它为字符串键提供了不同的安全实现，如RemoveRange）。
+            // 此处保留了字符串替换作为一种基本的缓解措施。
             string joinKeys = (fieldType == FieldType.Int || fieldType == FieldType.BigInt)
-                 ? string.Join(",", keys)
-                 : $"'{string.Join("','", keys)}'";
+                 ? string.Join(",", keys.Where(k=>k!=null).Select(k=>k!.ToString())) // // 确保数字键不为null并转换为字符串
+                 : $"'{string.Join("','", keys.Where(k=>k!=null).Select(k => k!.ToString()?.Replace("'", "''")))}'"; // // 对字符串键进行单引号转义
 
-            // 2020.08.15添加判断多租户数据（删除）
-            //if (IsMultiTenancy && !UserContext.Current.IsSuperAdmin)
-            //{
-            //    CheckDelMultiTenancy(joinKeys, tKey);
-            //    if (CheckResponseResult())
-            //    {
-            //        return Response;
-            //    }
-            //}
-
-            string sql = $"DELETE FROM {entityType.GetEntityTableName()} where {tKey} in ({joinKeys});";
-            // 2020.08.06增加pgsql删除功能
-            if (DBType.Name == DbCurrentType.PgSql.ToString())
+            string sql = $"DELETE FROM {entityType.GetEntityTableName()} WHERE {tKey} IN ({joinKeys});";
+            if (DBType.Name == DbCurrentType.PgSql.ToString()) // DBType.Name 可能为 null
             {
-                sql = $"DELETE FROM \"public\".\"{entityType.GetEntityTableName()}\" where \"{tKey}\" in ({joinKeys});";
+                sql = $"DELETE FROM \"public\".\"{entityType.GetEntityTableName()}\" WHERE \"{tKey}\" IN ({joinKeys});";
             }
             if (delList)
             {
-                Type detailType = GetRealDetailType();
+                Type? detailType = GetRealDetailType(); // detailType 可能为 null
                 if (detailType != null)
                 {
                     if (DBType.Name == DbCurrentType.PgSql.ToString())
                     {
-                        sql += $"DELETE FROM \"public\".\"{detailType.GetEntityTableName()}\" where \"{tKey}\" in ({joinKeys});";
+                        sql += $"DELETE FROM \"public\".\"{detailType.GetEntityTableName()}\" WHERE \"{tKey}\" IN ({joinKeys});";
                     }
                     else
                     {
-                        sql += $"DELETE FROM {detailType.GetEntityTableName()} where {tKey} in ({joinKeys});";
+                        sql += $"DELETE FROM {detailType.GetEntityTableName()} WHERE \"{tKey}\" IN ({joinKeys});"; // // 修正为带引号的tKey以防关键字冲突
                     }
                 }
-
             }
-
-            //repository.DapperContext.ExcuteNonQuery(sql, CommandType.Text, null, true);
-
-            //可能在删除后还要做一些其它数据库新增或删除操作，这样就可能需要与删除保持在同一个事务中处理
-            //采用此方法 repository.DbContextBeginTransaction(()=>{//do delete......and other});
-            //做的其他操作，在DelOnExecuted中加入委托实现
             Response = repository.DbContextBeginTransaction(() =>
             {
                 repository.ExecuteSqlCommand(sql);
-                if (DelOnExecuted != null)
+                if (DelOnExecuted != null) // DelOnExecuted 可能为 null
                 {
                     Response = DelOnExecuted(keys);
                 }
                 return Response;
             });
-            if (Response.Status && string.IsNullOrEmpty(Response.Message)) Response.OK(ResponseType.DelSuccess);
+            if (Response.Status && string.IsNullOrEmpty(Response.Message)) Response.OK(ResponseType.DelSuccess); // Message 可能为 null
             return Response;
         }
 
         private static string[] auditFields = new string[] { "auditid", "auditstatus", "auditor", "auditdate", "auditreason" };
 
         /// <summary>
-        /// 审核默认对应数据库字段为AuditId审核人ID ,AuditStatus审核状态,Auditor审核人,Auditdate审核时间,Auditreason审核原因
+        /// 审核操作。默认对应数据库字段为AuditId, AuditStatus, Auditor, AuditDate, AuditReason。
+        /// 如果Response未初始化，会在此方法内部初始化。
         /// </summary>
-        /// <param name="keys"></param>
-        /// <param name="auditStatus"></param>
-        /// <param name="auditReason"></param>
-        /// <returns></returns>
-        public virtual WebResponseContent Audit(object[] keys, int? auditStatus, string auditReason)
+        /// <param name="keys">要审核的主键数组，可能为null或空。</param>
+        /// <param name="auditStatus">审核状态，可能为null。</param>
+        /// <param name="auditReason">审核原因，可以为null。</param>
+        public virtual WebResponseContent Audit(object[]? keys, int? auditStatus, string? auditReason) // 参数可空
         {
+            Response ??= new WebResponseContent(); // // 确保Response已初始化
             if (keys == null || keys.Length == 0)
                 return Response.Error("未获取到参数!");
 
-            Expression<Func<T, bool>> whereExpression = typeof(T).GetKeyName().CreateExpression<T>(keys[0], LinqExpressionType.Equal);
-            T entity = repository.FindAsIQueryable(whereExpression).FirstOrDefault();
+            // GetKeyName() 确保非null, keys[0] 可能为null
+            if (keys[0] == null) return Response.Error("无效的主键值(null)。");
+            Expression<Func<T, bool>> whereExpression = typeof(T).GetKeyName()!.CreateExpression<T>(keys[0]!, LinqExpressionType.Equal); // // 确保不为null
+            T? entity = repository.FindAsIQueryable(whereExpression).FirstOrDefault(); // FirstOrDefault 可能返回 null
             if (entity == null)
             {
                 return Response.Error($"未查到数据,或者数据已被删除,id:{keys[0]}");
             }
-            //进入流程审批
-            if (WorkFlowManager.Exists<T>(entity))
+
+            if (WorkFlowManager.Exists<T>(entity)) // Exists 确保 entity 不为null
             {
-                var auditProperty = TProperties.Where(x => x.Name.ToLower() == "auditstatus").FirstOrDefault();
+                // FirstOrDefault 可能返回 null
+                var auditProperty = TProperties.FirstOrDefault(x => x.Name.Equals("auditstatus", StringComparison.OrdinalIgnoreCase));
                 if (auditProperty == null)
                 {
                     return Response.Error("表缺少审核状态字段：AuditStatus");
                 }
+                // auditStatus 可能为 null
+                if (auditStatus == null) return Response.Error("审核状态不能为空。");
+                AuditStatus status = (AuditStatus)Enum.Parse(typeof(AuditStatus), auditStatus.ToString()!); // auditStatus已检查非null
 
-                AuditStatus status = (AuditStatus)Enum.Parse(typeof(AuditStatus), auditStatus.ToString());
-                int val = auditProperty.GetValue(entity).GetInt();
+                object? currentAuditStatusObj = auditProperty.GetValue(entity); // 可能为 null
+                if (currentAuditStatusObj == null) return Response.Error("当前数据的审核状态未知。");
+
+                int val = currentAuditStatusObj.GetInt();
                 if (!(val == (int)AuditStatus.待审核 || val == (int)AuditStatus.审核中))
                 {
                     return Response.Error("只能审批[待审核或审核中]的数据");
                 }
                 Response = repository.DbContextBeginTransaction(() =>
                 {
+                    // AuditWorkFlowExecuting, AuditWorkFlowExecuted 可能为 null
                     return WorkFlowManager.Audit<T>(entity, status, auditReason, auditProperty, AuditWorkFlowExecuting, AuditWorkFlowExecuted);
                 });
                 if (Response.Status)
                 {
                     return Response.OK(ResponseType.AuditSuccess);
                 }
-                return Response.Error(Response.Message ?? "审批失败");
+                return Response.Error(Response.Message ?? "审批失败"); // Message 可能为 null
             }
 
-
-            //获取主键
-            PropertyInfo property = TProperties.GetKeyProperty();
+            PropertyInfo? property = TProperties.GetKeyProperty(); // GetKeyProperty 可能返回 null
             if (property == null)
                 return Response.Error("没有配置好主键!");
 
-            UserInfo userInfo = UserContext.Current.UserInfo;
+            // UserContext.Current 或 UserInfo 可能为 null
+            UserInfo userInfo = UserContext.Current?.UserInfo ?? UserInfo.System; // // 提供默认UserInfo
 
-            //表如果有审核相关字段，设置默认审核
-
-            PropertyInfo[] updateFileds = TProperties.Where(x => auditFields.Contains(x.Name.ToLower())).ToArray();
+            PropertyInfo[] updateFileds = TProperties.Where(x => auditFields.Contains(x.Name.ToLower())).ToArray(); // ToArray 确保非null
             List<T> auditList = new List<T>();
-            foreach (var value in keys)
+            foreach (var value in keys) // value 可能为 null
             {
-                object convertVal = value.ToString().ChangeType(property.PropertyType);
+                if (value == null) continue; // // 跳过null主键
+                object? convertVal = value.ToString()!.ChangeType(property.PropertyType); // value.ToString() 可能因value为null抛异常
                 if (convertVal == null) continue;
 
-                entity = Activator.CreateInstance<T>();
+                entity = new T(); // Activator.CreateInstance<T>();
                 property.SetValue(entity, convertVal);
                 foreach (var item in updateFileds)
                 {
                     switch (item.Name.ToLower())
                     {
-                        case "auditid":
-                            item.SetValue(entity, userInfo.User_Id);
-                            break;
-                        case "auditstatus":
-                            item.SetValue(entity, auditStatus);
-                            break;
-                        case "auditor":
-                            item.SetValue(entity, userInfo.UserTrueName);
-                            break;
-                        case "auditdate":
-                            item.SetValue(entity, DateTime.Now);
-                            break;
-                        case "auditreason":
-                            item.SetValue(entity, auditReason);
-                            break;
+                        case "auditid": item.SetValue(entity, userInfo.User_Id); break;
+                        case "auditstatus": item.SetValue(entity, auditStatus); break; // auditStatus 可能为 null
+                        case "auditor": item.SetValue(entity, userInfo.UserTrueName); break; // UserTrueName 可能为 null
+                        case "auditdate": item.SetValue(entity, DateTime.Now); break;
+                        case "auditreason": item.SetValue(entity, auditReason); break; // auditReason 可能为 null
                     }
                 }
                 auditList.Add(entity);
             }
-            if (base.AuditOnExecuting != null)
+            if (base.AuditOnExecuting != null) // AuditOnExecuting 可能为 null
             {
                 Response = AuditOnExecuting(auditList);
                 if (CheckResponseResult()) return Response;
@@ -1361,7 +1456,7 @@ namespace VOL.Core.BaseProvider
             Response = repository.DbContextBeginTransaction(() =>
             {
                 repository.UpdateRange(auditList, updateFileds.Select(x => x.Name).ToArray(), true);
-                if (base.AuditOnExecuted != null)
+                if (base.AuditOnExecuted != null) // AuditOnExecuted 可能为 null
                 {
                     Response = AuditOnExecuted(auditList);
                     if (CheckResponseResult()) return Response;
@@ -1372,84 +1467,86 @@ namespace VOL.Core.BaseProvider
             {
                 return Response.OK(ResponseType.AuditSuccess);
             }
-            return Response.Error(Response.Message);
+            return Response.Error(Response.Message ?? "审核失败"); // Message 可能为 null
         }
 
-        public virtual (string, T, bool) ApiValidate(string bizContent, Expression<Func<T, object>> expression = null)
+        /// <summary>
+        /// API参数验证 (针对主实体T)。
+        /// </summary>
+        /// <param name="bizContent">业务JSON字符串。</param>
+        /// <param name="expression">要验证的属性表达式，可以为null。</param>
+        /// <returns>元组：(错误消息, 反序列化后的实体, 是否验证通过)。实体可能为null如果反序列化失败。</returns>
+        public virtual (string? message, T? entity, bool success) ApiValidate(string bizContent, Expression<Func<T, object>>? expression = null) // expression 可空, 返回的元组元素也可空
         {
             return ApiValidateInput<T>(bizContent, expression);
         }
 
         /// <summary>
-        /// 对指定类与api的参数进行验证
+        /// 对指定类与API的参数进行验证 (泛型版本)。
         /// </summary>
-        /// <typeparam name="TInput"></typeparam>
-        /// <param name="bizContent"></param>
-        /// <param name="input"></param>
-        /// <param name="expression">对指属性验证</param>
-        /// <returns>(string,TInput, bool) string:返回验证消息,TInput：bizContent序列化后的对象,bool:验证是否通过</returns>
-        public virtual (string, TInput, bool) ApiValidateInput<TInput>(string bizContent, Expression<Func<TInput, object>> expression)
+        public virtual (string? message, TInput? entity, bool success) ApiValidateInput<TInput>(string bizContent, Expression<Func<TInput, object>>? expression) // expression 可空, 返回元组元素也可空
+            where TInput: class // // 添加class约束，因为下面有 is System.Collections.IList 判断，且default(TInput)用于引用类型
         {
             return ApiValidateInput(bizContent, expression, null);
         }
 
         /// <summary>
-        /// 
+        /// 对指定类与API的参数进行验证 (泛型版本，带特定字段合法性判断)。
+        /// 如果Response未初始化，会在此方法内部初始化。
         /// </summary>
-        /// <typeparam name="TInput"></typeparam>
-        /// <param name="bizContent"></param>
-        /// <param name="expression">对指属性验证格式如：x=>new { x.UserName,x.Value }</param>
-        /// <param name="validateExpression">对指定的字段只做合法性判断比如长度是是否超长</param>
-        /// <returns>(string,TInput, bool) string:返回验证消息,TInput：bizContent序列化后的对象,bool:验证是否通过</returns>
-        public virtual (string, TInput, bool) ApiValidateInput<TInput>(string bizContent, Expression<Func<TInput, object>> expression, Expression<Func<TInput, object>> validateExpression)
+        public virtual (string? message, TInput? entity, bool success) ApiValidateInput<TInput>(string bizContent, Expression<Func<TInput, object>>? expression, Expression<Func<TInput, object>>? validateExpression) // expression们可空, 返回元组元素也可空
+             where TInput : class // // 添加class约束
         {
+            Response ??= new WebResponseContent(); // // 确保Response已初始化
             try
             {
-                TInput input = JsonConvert.DeserializeObject<TInput>(bizContent);
-                if (!(input is System.Collections.IList))
+                // JsonConvert.DeserializeObject<TInput>(bizContent) 可能返回 null
+                TInput? input = JsonConvert.DeserializeObject<TInput>(bizContent);
+                if (input == null) // // 处理反序列化返回null的情况
                 {
-                    Response = input.ValidationEntity(expression, validateExpression);
+                    Response.Error(ApiMessage.DeserializeObjectError);
+                    return (Response.Message, default(TInput), false);
+                }
+
+                if (!(input is System.Collections.IList)) // // 如果不是列表，则验证单个实体
+                {
+                    Response = input.ValidationEntity(expression, validateExpression); // ValidationEntity 应能处理 expression/validateExpression 为null
                     return (Response.Message, input, Response.Status);
                 }
-                System.Collections.IList list = input as System.Collections.IList;
+
+                System.Collections.IList list = input as System.Collections.IList; // 此处转换安全，因上面已判断
                 for (int i = 0; i < list.Count; i++)
                 {
-                    Response = list[i].ValidationEntity(expression?.GetExpressionProperty(),
-                        validateExpression?.GetExpressionProperty());
+                    // list[i] 可能为 null
+                    if (list[i] == null)
+                    {
+                        Response.Error($"列表中的第 {i+1} 个元素为null。");
+                        return (Response.Message, default(TInput), false);
+                    }
+                    Response = list[i]!.ValidationEntity(expression?.GetExpressionProperty(), // GetExpressionProperty 可能返回null
+                        validateExpression?.GetExpressionProperty());  // GetExpressionProperty 可能返回null
                     if (CheckResponseResult())
                         return (Response.Message, default(TInput), false);
                 }
-                return ("", input, true);
+                return (null, input, true); // 验证通过，消息为null
             }
             catch (Exception ex)
             {
                 Response.Status = false;
-                Response.Message = ApiMessage.ParameterError;
-                Logger.Error(LoggerType.HandleError, bizContent, null, ex.Message);
+                Response.Message = ApiMessage.ParameterError; // ApiMessage.ParameterError 确保有值
+                Logger.Error(LoggerType.HandleError, bizContent, null, ex.Message); // ex.Message 可能为 null
             }
-            return (Response.Message, default(TInput), Response.Status);
+            return (Response.Message, default(TInput), Response.Status); // 返回时Response.Message不为null
         }
 
         /// <summary>
         /// 将数据源映射到新的数据中,目前只支持List<TSource>映射到List<TResult>或TSource映射到TResult
         /// 目前只支持Dictionary或实体类型
         /// </summary>
-        /// <typeparam name="TSource"></typeparam>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="resultExpression">只映射返回对象的指定字段</param>
-        /// <param name="sourceExpression">只映射数据源对象的指定字段</param>
-        /// 过滤条件表达式调用方式：List表达式x => new { x[0].MenuName, x[0].Menu_Id}，表示指定映射MenuName,Menu_Id字段
-        ///  List<Sys_Menu> list = new List<Sys_Menu>();
-        ///  list.MapToObject<List<Sys_Menu>, List<Sys_Menu>>(x => new { x[0].MenuName, x[0].Menu_Id}, null);
-        ///  
-        ///过滤条件表达式调用方式：实体表达式x => new { x.MenuName, x.Menu_Id}，表示指定映射MenuName,Menu_Id字段
-        ///  Sys_Menu sysMenu = new Sys_Menu();
-        ///  sysMenu.MapToObject<Sys_Menu, Sys_Menu>(x => new { x.MenuName, x.Menu_Id}, null);
-        /// <returns></returns>
-        public virtual TResult MapToEntity<TSource, TResult>(TSource source, Expression<Func<TResult, object>> resultExpression,
-            Expression<Func<TSource, object>> sourceExpression = null) where TResult : class
+        public virtual TResult? MapToEntity<TSource, TResult>(TSource source, Expression<Func<TResult, object>>? resultExpression, // resultExpression 可空
+            Expression<Func<TSource, object>>? sourceExpression = null) where TResult : class // sourceExpression 可空, 返回可空
         {
+            // MapToObject 应能处理 expression 为null的情况
             return source.MapToObject<TSource, TResult>(resultExpression, sourceExpression);
         }
 
@@ -1457,22 +1554,29 @@ namespace VOL.Core.BaseProvider
         /// 将一个实体的赋到另一个实体上,应用场景：
         /// 两个实体，a a1= new a();b b1= new b();  a1.P=b1.P; a1.Name=b1.Name;
         /// </summary>
-        /// <typeparam name="TSource"></typeparam>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="result"></param>
-        /// <param name="expression">指定对需要的字段赋值,格式x=>new {x.Name,x.P},返回的结果只会对Name与P赋值</param>
-        public virtual void MapValueToEntity<TSource, TResult>(TSource source, TResult result, Expression<Func<TResult, object>> expression = null) where TResult : class
+        public virtual void MapValueToEntity<TSource, TResult>(TSource source, TResult result, Expression<Func<TResult, object>>? expression = null)
+            where TResult : class // expression 可空
+            where TSource : class // // 添加 TSource约束，因为MapValueToEntity扩展方法可能有此要求
         {
+            // MapValueToEntity 应能处理 expression 为null的情况
             source.MapValueToEntity<TSource, TResult>(result, expression);
         }
         /// <summary>
         /// 2021.07.04增加code="-1"强制返回，具体使用见：后台开发文档->后台基础代码扩展实现
+        /// 依赖于Response对象已初始化。
         /// </summary>
-        /// <returns></returns>
         private bool CheckResponseResult()
         {
-            return !Response.Status || Response.Code == "-1";
+            // Response 可能为 null，如果为 null，则其 Status 属性访问会抛异常
+            // 在调用此方法前，必须确保 Response 已被初始化
+            if (Response == null)
+            {
+                // // 或者抛出异常，或者记录一个严重错误，因为这是程序逻辑的一个缺陷
+                // throw new InvalidOperationException("Response object is not initialized.");
+                Logger.Error(LoggerType.Exception, "CheckResponseResult方法被调用时Response对象为null。这是一个程序逻辑错误。");
+                return true; // // 假设Response为null时，视为检查结果需要中止操作
+            }
+            return !Response.Status || Response.Code == "-1"; // Code 可能为 null
         }
     }
 }

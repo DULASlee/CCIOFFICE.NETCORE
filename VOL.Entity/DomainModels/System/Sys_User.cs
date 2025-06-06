@@ -51,7 +51,7 @@ namespace VOL.Entity.DomainModels
        [MaxLength(500)]
        [Column(TypeName="nvarchar(500)")]
        [Editable(true)]
-       public string HeadImageUrl { get; set; }
+       public string? HeadImageUrl { get; set; }
 
        /// <summary>
        ///不用
@@ -67,7 +67,7 @@ namespace VOL.Entity.DomainModels
        [MaxLength(150)]
        [Column(TypeName="nvarchar(150)")]
        [Editable(true)]
-       public string DeptName { get; set; }
+       public string? DeptName { get; set; }
 
        /// <summary>
        ///角色
@@ -85,7 +85,7 @@ namespace VOL.Entity.DomainModels
        [MaxLength(200)]
        [Column(TypeName="nvarchar(200)")]
        [Editable(true)]
-       public string RoleName { get; set; }
+       public string? RoleName { get; set; }
 
        /// <summary>
        ///Token
@@ -94,7 +94,7 @@ namespace VOL.Entity.DomainModels
        [MaxLength(500)]
        [Column(TypeName="nvarchar(500)")]
        [Editable(true)]
-       public string Token { get; set; }
+       public string? Token { get; set; }
 
        /// <summary>
        ///类型
@@ -111,7 +111,7 @@ namespace VOL.Entity.DomainModels
        [MaxLength(2000)]
        [Column(TypeName="nvarchar(2000)")]
        [Editable(true)]
-       public string DeptIds { get; set; }
+       public string? DeptIds { get; set; }
 
        /// <summary>
        ///姓名
@@ -130,7 +130,8 @@ namespace VOL.Entity.DomainModels
        [MaxLength(200)]
        [JsonIgnore]
        [Column(TypeName="nvarchar(200)")]
-       public string UserPwd { get; set; }
+       [Required(AllowEmptyStrings=false)] // 密码通常是必须的
+       public string UserPwd { get; set; } = null!; // 初始化为null!以满足非空要求，假定它在逻辑上总是被设置
 
        /// <summary>
        ///注册时间
@@ -152,7 +153,7 @@ namespace VOL.Entity.DomainModels
        [Display(Name ="手机号")]
        [MaxLength(11)]
        [Column(TypeName="nvarchar(11)")]
-       public string PhoneNo { get; set; }
+       public string? PhoneNo { get; set; }
 
        /// <summary>
        ///
@@ -160,7 +161,7 @@ namespace VOL.Entity.DomainModels
        [Display(Name ="Tel")]
        [MaxLength(20)]
        [Column(TypeName="nvarchar(20)")]
-       public string Tel { get; set; }
+       public string? Tel { get; set; }
 
        /// <summary>
        ///
@@ -175,7 +176,7 @@ namespace VOL.Entity.DomainModels
        [Display(Name ="创建人")]
        [MaxLength(200)]
        [Column(TypeName="nvarchar(200)")]
-       public string Creator { get; set; }
+       public string? Creator { get; set; }
 
        /// <summary>
        ///是否可用
@@ -199,7 +200,7 @@ namespace VOL.Entity.DomainModels
        [Display(Name ="修改人")]
        [MaxLength(200)]
        [Column(TypeName="nvarchar(200)")]
-       public string Modifier { get; set; }
+       public string? Modifier { get; set; }
 
        /// <summary>
        ///修改时间
@@ -221,7 +222,7 @@ namespace VOL.Entity.DomainModels
        [Display(Name ="审核人")]
        [MaxLength(200)]
        [Column(TypeName="nvarchar(200)")]
-       public string Auditor { get; set; }
+       public string? Auditor { get; set; }
 
        /// <summary>
        ///审核时间
@@ -251,7 +252,7 @@ namespace VOL.Entity.DomainModels
        [MaxLength(200)]
        [Column(TypeName="nvarchar(200)")]
        [Editable(true)]
-       public string Address { get; set; }
+       public string? Address { get; set; }
 
        /// <summary>
        ///电话
@@ -260,7 +261,7 @@ namespace VOL.Entity.DomainModels
        [MaxLength(100)]
        [Column(TypeName="nvarchar(100)")]
        [Editable(true)]
-       public string Mobile { get; set; }
+       public string? Mobile { get; set; }
 
        /// <summary>
        ///Email
@@ -269,7 +270,7 @@ namespace VOL.Entity.DomainModels
        [MaxLength(100)]
        [Column(TypeName="nvarchar(100)")]
        [Editable(true)]
-       public string Email { get; set; }
+       public string? Email { get; set; }
 
        /// <summary>
        ///备注
@@ -278,7 +279,7 @@ namespace VOL.Entity.DomainModels
        [MaxLength(200)]
        [Column(TypeName="nvarchar(200)")]
        [Editable(true)]
-       public string Remark { get; set; }
+       public string? Remark { get; set; }
 
        /// <summary>
        ///排序号
