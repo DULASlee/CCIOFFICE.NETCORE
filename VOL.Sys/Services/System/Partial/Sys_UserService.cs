@@ -80,6 +80,7 @@ namespace VOL.Sys.Services
                 UserContext.Current.LogOut(user.User_Id);
                 loginInfo.Password = string.Empty; // Clear password from input object
                 webResponse.OK(ResponseType.LoginSuccess);
+                // Record successful user login for audit and security monitoring.
                 Logger.Info(LoggerType.Login, $"登录成功: UserName={loginInfo.UserName}, UserId={user.User_Id}", loginInfo.Serialize(), webResponse.Message);
             }
             catch (Exception ex)
@@ -155,6 +156,7 @@ namespace VOL.Sys.Services
                 await repository.SaveChangesAsync(); // Explicitly save changes
 
                 webResponse.OK(null, newToken);
+                // Audit successful token replacement for user.
                 Logger.Info(LoggerType.ReplaceToeken, $"Token替换成功: UserId={userId}, UserTrueName={userInfo.UserTrueName}", null, webResponse.Message);
             }
             catch (Exception ex)
@@ -228,6 +230,7 @@ namespace VOL.Sys.Services
                 await repository.SaveChangesAsync(); // Explicitly save changes
 
                 webResponse.OK("密码修改成功");
+                // Record successful password modification by user for security auditing.
                 Logger.Info(LoggerType.ApiModifyPwd, $"密码修改成功: UserId={userId}", new { userId }, webResponse.Message);
             }
             catch (Exception ex)
@@ -269,6 +272,7 @@ namespace VOL.Sys.Services
                     Logger.Warning(LoggerType.Select, $"获取当前用户信息失败: 用户未找到. UserId={userId}", new { userId }, null);
                     return webResponse.Error("当前用户信息未找到。");
                 }
+                // Record successful retrieval of user's own information.
                 Logger.Info(LoggerType.Select, $"获取当前用户信息成功: UserId={userId}", new { userId }, null);
                 return webResponse.OK(null, data);
             }
@@ -623,6 +627,7 @@ namespace VOL.Sys.Services
                 if (deptsToAdd.Any() || deptsToUpdate.Any())
                 {
                     repository.SaveChanges();
+                    // Audit changes to user's department assignments.
                     Logger.Info(LoggerType.Update, $"保存用户部门成功: UserId={userId}", new { userId, deptIds = deptIds.Serialize(), added = deptsToAdd.Count, updated = deptsToUpdate.Count }, null);
                 }
             }

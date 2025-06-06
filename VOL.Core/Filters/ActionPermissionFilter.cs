@@ -109,7 +109,9 @@ namespace VOL.Core.Filters
                 }
                 if (!actionAuth)
                 {
-                    // Changed from Logger.Info to Logger.Warning
+                    // Log authorization failures as warnings for security auditing and monitoring.
+                    // These are not system errors but indicate potential unauthorized access attempts or misconfigured permissions.
+                    // Using LogLevel.Warning (via Logger.Warning) helps differentiate these from regular informational logs or critical system errors.
                     Logger.Warning(LogEvent.Authorzie, $"没有权限操作,用户ID:{_userContext.UserId}({_userContext.UserTrueName}),角色ID:{_userContext.RoleId}({_userContext.UserInfo.RoleName}),操作权限:{ActionPermission.TableName}:{ActionPermission.TableAction}");
                     return ResponseContent.Error(ResponseType.NoPermissions);
                 }

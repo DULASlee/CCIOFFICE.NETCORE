@@ -57,7 +57,9 @@ namespace VOL.WebApi
             services.AddSession();
             services.AddMemoryCache(options =>
             {
-                options.SizeLimit = 1024 * 1024 * 256; // 256MB size limit
+                // Configure a global size limit for the memory cache to prevent unbounded growth.
+                // Each cache entry should specify its size (e.g., using .SetSize(1)) for this limit to be effective.
+                options.SizeLimit = 1024 * 1024 * 256; // Example: 256MB size limit
             });
             services.AddHttpContextAccessor();
             services.AddMvc(options =>

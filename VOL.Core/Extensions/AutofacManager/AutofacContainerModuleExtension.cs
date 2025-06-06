@@ -19,6 +19,8 @@ using VOL.Core.DBManager;
 using VOL.Core.EFDbContext;
 using VOL.Core.Enums;
 using VOL.Core.Extensions.AutofacManager;
+using Autofac.Extras.DynamicProxy; // For interceptors
+using VOL.Core.AOP; // For ServiceExceptionInterceptor
 //using VOL.Core.KafkaManager.IService;
 //using VOL.Core.KafkaManager.Service;
 using VOL.Core.ManageUser;
@@ -36,6 +38,10 @@ namespace VOL.Core.Extensions
             //services.AddMemoryCache();
             //初始化配置文件
             AppSetting.Init(services, configuration);
+
+            // Register the ServiceExceptionInterceptor
+            builder.RegisterType<ServiceExceptionInterceptor>().InstancePerLifetimeScope();
+
             Type baseType = typeof(IDependency);
             var compilationLibrary = DependencyContext.Default
                 .RuntimeLibraries
@@ -59,7 +65,14 @@ namespace VOL.Core.Extensions
             builder.RegisterAssemblyTypes(assemblyList.ToArray())
              .Where(type => baseType.IsAssignableFrom(type) && !type.IsAbstract)
              .AsSelf().AsImplementedInterfaces()
-             .InstancePerLifetimeScope();
+             .InstancePerLifetimeScope()
+             .EnableInterfaceInterceptors() // Enable interface interception for services implementing IDependency
+             .InterceptedBy(typeof(ServiceExceptionInterceptor)); // Specify the interceptor
+
+            // For interception to work, services must be resolved via their interfaces (e.g., IMyService, not MyService concrete class)
+            // and the methods to be intercepted must be virtual if class interception is used, or part of an interface for interface interception.
+            // Here, we are using interface interception.
+
             builder.RegisterType<UserContext>().InstancePerLifetimeScope();
             builder.RegisterType<ActionObserver>().InstancePerLifetimeScope();
             //model校验结果

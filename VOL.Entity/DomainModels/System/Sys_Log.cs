@@ -144,12 +144,23 @@ namespace VOL.Entity.DomainModels
        public DateTime? EndDate { get; set; }
 
        /// <summary>
-       /// Log Level
+       /// Gets or sets the severity level of the log entry.
+       /// This stores the string representation of the <see cref="VOL.Core.Enums.LogLevel"/> enum.
+       /// (e.g., "Information", "Warning", "Error").
        /// </summary>
        [Display(Name ="Log Level")]
        [MaxLength(20)]
        [Column(TypeName="varchar(20)")]
        public string LogLevel { get; set; }
+
+       /// <summary>
+       /// Gets or sets the Trace ID for correlating requests across logs.
+       /// Typically populated using HttpContext.TraceIdentifier.
+       /// </summary>
+       [Display(Name ="Trace ID")]
+       [MaxLength(50)]
+       [Column(TypeName="varchar(50)")]
+       public string TraceId { get; set; }
        
     }
 }

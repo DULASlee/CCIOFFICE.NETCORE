@@ -56,8 +56,11 @@ namespace VOL.Core.Enums
         Update, // Often used for update operations
         Select, // Often used for select/query operations
         Insert, // Often used for insert operations
-        Delete  // Often used for delete operations
-        // Consider if the existing 'Error' and 'Exception' are sufficient or if more specific error events are needed.
-        // The list seems quite extensive already.
+        Delete,  // Often used for delete operations
+
+        // New events for specific exception handling
+        BizExceptionLog,        // For handled business exceptions
+        SysExceptionLog,        // For handled system/infrastructure exceptions
+        UnhandledExceptionLog   // For unhandled exceptions caught by global handler (can also use existing 'Exception')
     }
 }
