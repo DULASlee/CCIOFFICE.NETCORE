@@ -14,11 +14,11 @@ namespace VOL.Core.Utilities
         /// <summary>
         /// 通过迭代器读取平面文件行内容(必须是带有\r\n换行的文件,百万行以上的内容读取效率存在问题,适用于100M左右文件，行100W内，超出的会有卡顿)
         /// </summary>
-        /// <param name="fullPath">文件全路径</param>
-        /// <param name="page">分页页数</param>
-        /// <param name="pageSize">分页大小</param>
-        /// <param name="seekEnd"> 是否最后一行向前读取,默认从前向后读取</param>
-        /// <returns></returns>
+        /// <param name="fullPath">文件全路径 : System.String</param>
+        /// <param name="page">分页页数 : System.Int32</param>
+        /// <param name="pageSize">分页大小 : System.Int32</param>
+        /// <param name="seekEnd"> 是否最后一行向前读取,默认从前向后读取 : System.Boolean</param>
+        /// <returns>读取到的文件行内容 : System.Collections.Generic.IEnumerable<System.String></returns>
         public static IEnumerable<string> ReadPageLine(string fullPath, int page, int pageSize, bool seekEnd = false)
         {
             if (page <= 0)
@@ -69,26 +69,53 @@ namespace VOL.Core.Utilities
             }
             enumerator.Dispose();
         }
+
+        /// <summary>
+        /// 检查文件是否存在
+        /// </summary>
+        /// <param name="path">文件路径 : System.String</param>
+        /// <returns>如果文件存在则返回true，否则返回false : System.Boolean</returns>
         public static bool FileExists(string path)
         {
             return File.Exists(path.ReplacePath());
         }
 
+        /// <summary>
+        /// 获取当前应用程序的下载路径
+        /// </summary>
+        /// <returns>下载路径 : System.String</returns>
         public static string GetCurrentDownLoadPath()
         {
             return ("Download\\").MapPath();
         }
 
+        /// <summary>
+        /// 检查目录是否存在
+        /// </summary>
+        /// <param name="path">目录路径 : System.String</param>
+        /// <returns>如果目录存在则返回true，否则返回false : System.Boolean</returns>
         public static bool DirectoryExists(string path)
         {
             return Directory.Exists(path.ReplacePath());
         }
 
-
+        /// <summary>
+        /// 读取文件内容
+        /// </summary>
+        /// <param name="fullpath">文件所在目录的完整路径 : System.String</param>
+        /// <param name="filename">文件名 : System.String</param>
+        /// <param name="suffix">文件后缀名 : System.String</param>
+        /// <returns>文件内容 : System.String</returns>
         public static string Read_File(string fullpath, string filename, string suffix)
         {
             return ReadFile((fullpath + "\\" + filename + suffix).MapPath());
         }
+
+        /// <summary>
+        /// 读取文件内容
+        /// </summary>
+        /// <param name="fullName">文件的完整路径 : System.String</param>
+        /// <returns>文件内容 : System.String</returns>
         public static string ReadFile(string fullName)
         {
             //  Encoding code = Encoding.GetEncoding(); //Encoding.GetEncoding("gb2312");
@@ -113,10 +140,10 @@ namespace VOL.Core.Utilities
 
 
         /// <summary>
-        /// 取后缀名
+        /// 获取文件名的后缀部分
         /// </summary>
-        /// <param name="filename">文件名</param>
-        /// <returns>.gif|.html格式</returns>
+        /// <param name="filename">文件名 : System.String</param>
+        /// <returns>文件后缀名 (例如: .txt, .jpg) : System.String</returns>
         public static string GetPostfixStr(string filename)
         {
             int start = filename.LastIndexOf(".");
@@ -127,12 +154,12 @@ namespace VOL.Core.Utilities
 
 
         /// <summary>
-        /// 
+        /// 将内容写入文件
         /// </summary>
-        /// <param name="path">路径 </param>
-        /// <param name="fileName">文件名</param>
-        /// <param name="content">写入的内容</param>
-        /// <param name="appendToLast">是否将内容添加到未尾,默认不添加</param>
+        /// <param name="path">文件保存的路径 : System.String</param>
+        /// <param name="fileName">文件名 : System.String</param>
+        /// <param name="content">要写入文件的内容 : System.String</param>
+        /// <param name="appendToLast">是否将内容追加到文件末尾，默认为false（覆盖文件） : System.Boolean</param>
         public static void WriteFile(string path, string fileName, string content, bool appendToLast = false)
         {
             path = path.ReplacePath();
@@ -158,10 +185,10 @@ namespace VOL.Core.Utilities
 
 
         /// <summary>
-        /// 追加文件
+        /// 向文件中追加内容
         /// </summary>
-        /// <param name="Path">文件路径</param>
-        /// <param name="strings">内容</param>
+        /// <param name="Path">文件路径 : System.String</param>
+        /// <param name="strings">要追加的内容 : System.String</param>
         public static void FileAdd(string Path, string strings)
         {
             StreamWriter sw = File.AppendText(Path.ReplacePath());
@@ -173,10 +200,10 @@ namespace VOL.Core.Utilities
 
 
         /// <summary>
-        /// 拷贝文件
+        /// 复制文件
         /// </summary>
-        /// <param name="OrignFile">原始文件</param>
-        /// <param name="NewFile">新文件路径</param>
+        /// <param name="OrignFile">原始文件路径 : System.String</param>
+        /// <param name="NewFile">目标文件路径 : System.String</param>
         public static void FileCoppy(string OrignFile, string NewFile)
         {
             File.Copy(OrignFile.ReplacePath(), NewFile.ReplacePath(), true);
@@ -186,7 +213,7 @@ namespace VOL.Core.Utilities
         /// <summary>
         /// 删除文件
         /// </summary>
-        /// <param name="Path">路径</param>
+        /// <param name="Path">文件路径 : System.String</param>
         public static void FileDel(string Path)
         {
             File.Delete(Path.ReplacePath());
@@ -195,18 +222,18 @@ namespace VOL.Core.Utilities
         /// <summary>
         /// 移动文件
         /// </summary>
-        /// <param name="OrignFile">原始路径</param>
-        /// <param name="NewFile">新路径</param>
+        /// <param name="OrignFile">原始文件路径 : System.String</param>
+        /// <param name="NewFile">目标文件路径 : System.String</param>
         public static void FileMove(string OrignFile, string NewFile)
         {
             File.Move(OrignFile.ReplacePath(), NewFile.ReplacePath());
         }
 
         /// <summary>
-        /// 在当前目录下创建目录
+        /// 在指定目录下创建新目录
         /// </summary>
-        /// <param name="OrignFolder">当前目录</param>
-        /// <param name="NewFloder">新目录</param>
+        /// <param name="OrignFolder">原始目录路径 (将在此目录下创建新目录) : System.String</param>
+        /// <param name="NewFloder">新目录的名称 : System.String</param>
         public static void FolderCreate(string OrignFolder, string NewFloder)
         {
             Directory.SetCurrentDirectory(OrignFolder.ReplacePath());
@@ -216,7 +243,7 @@ namespace VOL.Core.Utilities
         /// <summary>
         /// 创建文件夹
         /// </summary>
-        /// <param name="Path"></param>
+        /// <param name="Path">要创建的文件夹路径 : System.String</param>
         public static void FolderCreate(string Path)
         {
             // 判断目标目录是否存在如果不存在则新建之
@@ -224,7 +251,10 @@ namespace VOL.Core.Utilities
                 Directory.CreateDirectory(Path.ReplacePath());
         }
 
-
+        /// <summary>
+        /// 创建文件
+        /// </summary>
+        /// <param name="Path">要创建的文件路径 : System.String</param>
         public static void FileCreate(string Path)
         {
             FileInfo CreateFile = new FileInfo(Path.ReplacePath()); //创建文件 
@@ -234,11 +264,11 @@ namespace VOL.Core.Utilities
                 FS.Close();
             }
         }
+
         /// <summary>
         /// 递归删除文件夹目录及文件
         /// </summary>
-        /// <param name="dir"></param>  
-        /// <returns></returns>
+        /// <param name="dir">要删除的目录路径 : System.String</param>
         public static void DeleteFolder(string dir)
         {
             dir = dir.ReplacePath();
@@ -257,10 +287,10 @@ namespace VOL.Core.Utilities
 
 
         /// <summary>
-        /// 指定文件夹下面的所有内容copy到目标文件夹下面
+        /// 将指定文件夹下的所有内容复制到目标文件夹
         /// </summary>
-        /// <param name="srcPath">原始路径</param>
-        /// <param name="aimPath">目标文件夹</param>
+        /// <param name="srcPath">源文件夹路径 : System.String</param>
+        /// <param name="aimPath">目标文件夹路径 : System.String</param>
         public static void CopyDir(string srcPath, string aimPath)
         {
             try
@@ -295,10 +325,10 @@ namespace VOL.Core.Utilities
         }
 
         /// <summary>
-        /// 获取文件夹大小
+        /// 获取文件夹的大小
         /// </summary>
-        /// <param name="dirPath">文件夹路径</param>
-        /// <returns></returns>
+        /// <param name="dirPath">文件夹路径 : System.String</param>
+        /// <returns>文件夹的大小（字节数） : System.Int64</returns>
         public static long GetDirectoryLength(string dirPath)
         {
             dirPath = dirPath.ReplacePath();
@@ -322,10 +352,10 @@ namespace VOL.Core.Utilities
         }
 
         /// <summary>
-        /// 获取指定文件详细属性
+        /// 获取指定文件的详细属性
         /// </summary>
-        /// <param name="filePath">文件详细路径</param>
-        /// <returns></returns>
+        /// <param name="filePath">文件的完整路径 : System.String</param>
+        /// <returns>包含文件属性的描述字符串 : System.String</returns>
         public static string GetFileAttibe(string filePath)
         {
             string str = "";
