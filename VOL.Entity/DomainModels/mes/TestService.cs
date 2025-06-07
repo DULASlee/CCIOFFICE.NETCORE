@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class TestService:BaseEntity
     {
         /// <summary>
-       ///
+       /// 记录ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="Id")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid Id { get; set; }
 
        /// <summary>
-       ///DbName
+       /// 相关的数据库名称或标识
        /// </summary>
        [Display(Name ="DbName")]
        [MaxLength(100)]
@@ -38,7 +38,7 @@ namespace VOL.Entity.DomainModels
        public string DbName { get; set; }
 
        /// <summary>
-       ///DbContent
+       /// 相关的内容或描述，可能与数据库操作或测试相关
        /// </summary>
        [Display(Name ="DbContent")]
        [MaxLength(100)]
@@ -47,7 +47,7 @@ namespace VOL.Entity.DomainModels
        public string DbContent { get; set; }
 
        /// <summary>
-       ///CreateDate
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="CreateDate")]
        [Column(TypeName="datetime")]
@@ -55,7 +55,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///
+       /// 创建者ID
        /// </summary>
        [Display(Name ="CreateID")]
        [Column(TypeName="int")]
@@ -63,7 +63,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///Creator
+       /// 创建人名称
        /// </summary>
        [Display(Name ="Creator")]
        [MaxLength(30)]
@@ -72,7 +72,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///
+       /// 修改人名称
        /// </summary>
        [Display(Name ="Modifier")]
        [MaxLength(30)]
@@ -81,7 +81,7 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="ModifyDate")]
        [Column(TypeName="datetime")]
@@ -89,7 +89,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? ModifyDate { get; set; }
 
        /// <summary>
-       ///
+       /// 修改者ID
        /// </summary>
        [Display(Name ="ModifyID")]
        [Column(TypeName="int")]

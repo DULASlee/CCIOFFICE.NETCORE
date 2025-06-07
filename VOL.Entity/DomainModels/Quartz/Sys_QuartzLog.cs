@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class Sys_QuartzLog:BaseEntity
     {
         /// <summary>
-       ///
+       /// 日志ID
        /// </summary>
        [Key]
        [Display(Name ="LogId")]
@@ -27,7 +27,7 @@ namespace VOL.Entity.DomainModels
        public Guid LogId { get; set; }
 
        /// <summary>
-       ///任务id
+       /// 任务ID (外键，关联Sys_QuartzOptions的Id)
        /// </summary>
        [Display(Name ="任务id")]
        [Column(TypeName="uniqueidentifier")]
@@ -35,7 +35,7 @@ namespace VOL.Entity.DomainModels
        public Guid? Id { get; set; }
 
        /// <summary>
-       ///任务名称
+       /// 任务名称
        /// </summary>
        [Display(Name ="任务名称")]
        [MaxLength(500)]
@@ -44,7 +44,7 @@ namespace VOL.Entity.DomainModels
        public string TaskName { get; set; }
 
        /// <summary>
-       ///耗时(秒)
+       /// 任务执行耗时 (单位: 秒)
        /// </summary>
        [Display(Name ="耗时(秒)")]
        [Column(TypeName="int")]
@@ -52,7 +52,7 @@ namespace VOL.Entity.DomainModels
        public int? ElapsedTime { get; set; }
 
        /// <summary>
-       ///开始时间
+       /// 任务开始执行时间
        /// </summary>
        [Display(Name ="开始时间")]
        [Column(TypeName="datetime")]
@@ -60,7 +60,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? StratDate { get; set; }
 
        /// <summary>
-       ///结束时间
+       /// 任务执行结束时间
        /// </summary>
        [Display(Name ="结束时间")]
        [Column(TypeName="datetime")]
@@ -68,7 +68,11 @@ namespace VOL.Entity.DomainModels
        public DateTime? EndDate { get; set; }
 
        /// <summary>
-       ///是否成功
+       /// 任务执行结果状态
+       /// 可能的值：
+       /// 1: 成功 (Success)
+       /// 0: 失败 (Failure)
+       /// 其他值: 未知 (Unknown)
        /// </summary>
        [Display(Name ="是否成功")]
        [Column(TypeName="int")]
@@ -76,7 +80,7 @@ namespace VOL.Entity.DomainModels
        public int? Result { get; set; }
 
        /// <summary>
-       ///返回内容
+       /// 任务执行返回的具体内容或消息
        /// </summary>
        [Display(Name ="返回内容")]
        [Column(TypeName="nvarchar(max)")]
@@ -84,14 +88,14 @@ namespace VOL.Entity.DomainModels
        public string ResponseContent { get; set; }
 
        /// <summary>
-       ///异常信息
+       /// 任务执行过程中的异常信息 (如果发生错误)
        /// </summary>
        [Display(Name ="异常信息")]
        [Column(TypeName="nvarchar(max)")]
        public string ErrorMsg { get; set; }
 
        /// <summary>
-       ///
+       /// 创建者ID
        /// </summary>
        [Display(Name ="CreateID")]
        [Column(TypeName="int")]
@@ -99,7 +103,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///
+       /// 创建者名称
        /// </summary>
        [Display(Name ="Creator")]
        [MaxLength(30)]
@@ -108,7 +112,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///
+       /// 创建时间
        /// </summary>
        [Display(Name ="CreateDate")]
        [Column(TypeName="datetime")]
@@ -116,7 +120,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///
+       /// 修改者ID
        /// </summary>
        [Display(Name ="ModifyID")]
        [Column(TypeName="int")]
@@ -124,7 +128,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///
+       /// 修改者名称
        /// </summary>
        [Display(Name ="Modifier")]
        [MaxLength(30)]
@@ -133,7 +137,7 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///
+       /// 修改时间
        /// </summary>
        [Display(Name ="ModifyDate")]
        [Column(TypeName="datetime")]

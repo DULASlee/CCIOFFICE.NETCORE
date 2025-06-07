@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class MES_Customer:BaseEntity
     {
         /// <summary>
-       ///客户ID
+       /// 客户ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="客户ID")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid CustomerID { get; set; }
 
        /// <summary>
-       ///客户名称
+       /// 客户的公司或个人名称
        /// </summary>
        [Display(Name ="客户名称")]
        [MaxLength(100)]
@@ -38,7 +38,7 @@ namespace VOL.Entity.DomainModels
        public string CustomerName { get; set; }
 
        /// <summary>
-       ///联系人
+       /// 主要联系人姓名
        /// </summary>
        [Display(Name ="联系人")]
        [MaxLength(100)]
@@ -47,7 +47,7 @@ namespace VOL.Entity.DomainModels
        public string ContactPerson { get; set; }
 
        /// <summary>
-       ///联系电话
+       /// 联系人的电话号码
        /// </summary>
        [Display(Name ="联系电话")]
        [MaxLength(100)]
@@ -56,7 +56,7 @@ namespace VOL.Entity.DomainModels
        public string ContactPhone { get; set; }
 
        /// <summary>
-       ///邮箱地址
+       /// 联系人的电子邮箱地址
        /// </summary>
        [Display(Name ="邮箱地址")]
        [MaxLength(100)]
@@ -65,7 +65,7 @@ namespace VOL.Entity.DomainModels
        public string Email { get; set; }
 
        /// <summary>
-       ///联系地址
+       /// 客户的通讯或邮寄地址
        /// </summary>
        [Display(Name ="联系地址")]
        [MaxLength(100)]
@@ -74,7 +74,7 @@ namespace VOL.Entity.DomainModels
        public string Address { get; set; }
 
        /// <summary>
-       ///客户类型
+       /// 客户类型 (例如: 个人, 企业, 经销商等，具体值需参照业务定义)
        /// </summary>
        [Display(Name ="客户类型")]
        [MaxLength(100)]
@@ -83,7 +83,7 @@ namespace VOL.Entity.DomainModels
        public string CustomerType { get; set; }
 
        /// <summary>
-       ///信用评级
+       /// 客户的信用评级 (例如: AAA, AA, A, B, C等，具体值需参照业务定义)
        /// </summary>
        [Display(Name ="信用评级")]
        [MaxLength(100)]
@@ -92,7 +92,7 @@ namespace VOL.Entity.DomainModels
        public string CreditRating { get; set; }
 
        /// <summary>
-       ///业务范围
+       /// 客户的主要业务范围或行业领域
        /// </summary>
        [Display(Name ="业务范围")]
        [MaxLength(100)]
@@ -101,7 +101,7 @@ namespace VOL.Entity.DomainModels
        public string BusinessScope { get; set; }
 
        /// <summary>
-       ///备注信息
+       /// 其他备注信息
        /// </summary>
        [Display(Name ="备注信息")]
        [MaxLength(100)]
@@ -110,7 +110,7 @@ namespace VOL.Entity.DomainModels
        public string Remarks { get; set; }
 
        /// <summary>
-       ///创建人ID
+       /// 创建者ID
        /// </summary>
        [Display(Name ="创建人ID")]
        [Column(TypeName="int")]
@@ -118,7 +118,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(100)]
@@ -127,7 +127,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -135,7 +135,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///修改人ID
+       /// 修改者ID
        /// </summary>
        [Display(Name ="修改人ID")]
        [Column(TypeName="int")]
@@ -143,7 +143,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(100)]
@@ -152,7 +152,7 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]

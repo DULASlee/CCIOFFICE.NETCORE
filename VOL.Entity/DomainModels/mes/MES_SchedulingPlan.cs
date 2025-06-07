@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class MES_SchedulingPlan:BaseEntity
     {
         /// <summary>
-       ///排班计划ID
+       /// 排班计划ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="排班计划ID")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid SchedulePlanID { get; set; }
 
        /// <summary>
-       ///排班计划名称
+       /// 排班计划的名称
        /// </summary>
        [Display(Name ="排班计划名称")]
        [MaxLength(100)]
@@ -38,7 +38,7 @@ namespace VOL.Entity.DomainModels
        public string PlanName { get; set; }
 
        /// <summary>
-       ///产线名称
+       /// 应用此排班计划的生产线名称 (可能关联MES_ProductionLine.LineName)
        /// </summary>
        [Display(Name ="产线名称")]
        [MaxLength(100)]
@@ -48,7 +48,7 @@ namespace VOL.Entity.DomainModels
        public string ProductionLine { get; set; }
 
        /// <summary>
-       ///班组名称
+       /// 应用此排班计划的班组名称 (可能关联班组表)
        /// </summary>
        [Display(Name ="班组名称")]
        [MaxLength(100)]
@@ -58,7 +58,7 @@ namespace VOL.Entity.DomainModels
        public string TeamName { get; set; }
 
        /// <summary>
-       ///开始时间
+       /// 排班计划的开始生效时间
        /// </summary>
        [Display(Name ="开始时间")]
        [Column(TypeName="datetime")]
@@ -67,7 +67,7 @@ namespace VOL.Entity.DomainModels
        public DateTime StartDate { get; set; }
 
        /// <summary>
-       ///结束时间
+       /// 排班计划的结束生效时间
        /// </summary>
        [Display(Name ="结束时间")]
        [Column(TypeName="datetime")]
@@ -76,7 +76,7 @@ namespace VOL.Entity.DomainModels
        public DateTime EndDate { get; set; }
 
        /// <summary>
-       ///创建人ID
+       /// 创建者ID
        /// </summary>
        [Display(Name ="创建人ID")]
        [Column(TypeName="int")]
@@ -84,7 +84,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(100)]
@@ -93,7 +93,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -101,7 +101,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///修改人ID
+       /// 修改者ID
        /// </summary>
        [Display(Name ="修改人ID")]
        [Column(TypeName="int")]
@@ -109,7 +109,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(100)]
@@ -118,7 +118,7 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]

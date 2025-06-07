@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class Sys_WorkFlowStep:BaseEntity
     {
         /// <summary>
-       ///
+       /// 工作流步骤ID
        /// </summary>
        [Key]
        [Display(Name ="WorkStepFlow_Id")]
@@ -26,7 +26,7 @@ namespace VOL.Entity.DomainModels
        public Guid WorkStepFlow_Id { get; set; }
 
        /// <summary>
-       ///流程主表id
+       /// 所属工作流程ID (外键，关联Sys_WorkFlow.WorkFlow_Id)
        /// </summary>
        [Display(Name ="流程主表id")]
        [Column(TypeName="uniqueidentifier")]
@@ -34,7 +34,7 @@ namespace VOL.Entity.DomainModels
        public Guid? WorkFlow_Id { get; set; }
 
        /// <summary>
-       ///流程节点Id
+       /// 流程设计器中的步骤ID
        /// </summary>
        [Display(Name ="流程节点Id")]
        [MaxLength(100)]
@@ -43,7 +43,7 @@ namespace VOL.Entity.DomainModels
        public string StepId { get; set; }
 
        /// <summary>
-       ///节点名称
+       /// 审批节点的名称
        /// </summary>
        [Display(Name ="节点名称")]
        [MaxLength(200)]
@@ -52,7 +52,9 @@ namespace VOL.Entity.DomainModels
        public string StepName { get; set; }
 
        /// <summary>
-       ///节点类型(1=按用户审批,2=按角色审批)
+       /// 节点类型
+       /// 1: 按用户审批
+       /// 2: 按角色审批
        /// </summary>
        [Display(Name ="节点类型(1=按用户审批,2=按角色审批)")]
        [Column(TypeName="int")]
@@ -60,7 +62,7 @@ namespace VOL.Entity.DomainModels
        public int? StepType { get; set; }
 
        /// <summary>
-       ///审批用户id或角色id
+       /// 审批用户ID或角色ID (根据StepType决定)
        /// </summary>
        [Display(Name ="审批用户id或角色id")]
        [MaxLength(500)]
@@ -69,7 +71,7 @@ namespace VOL.Entity.DomainModels
        public string StepValue { get; set; }
 
        /// <summary>
-       ///备注
+       /// 备注信息
        /// </summary>
        [Display(Name ="备注")]
        [MaxLength(500)]
@@ -78,7 +80,7 @@ namespace VOL.Entity.DomainModels
        public string Remark { get; set; }
 
        /// <summary>
-       ///审批顺序
+       /// 审批节点的顺序号
        /// </summary>
        [Display(Name ="审批顺序")]
        [Column(TypeName="int")]
@@ -86,7 +88,7 @@ namespace VOL.Entity.DomainModels
        public int? OrderId { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -94,14 +96,14 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///
+       /// 创建者ID
        /// </summary>
        [Display(Name ="CreateID")]
        [Column(TypeName="int")]
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(30)]
@@ -109,14 +111,17 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///
+       /// 是否启用此步骤
+       /// 可能的值:
+       /// 1: 启用 (Enabled)
+       /// 0: 禁用 (Disabled)
        /// </summary>
        [Display(Name ="Enable")]
        [Column(TypeName="tinyint")]
        public byte? Enable { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(30)]
@@ -124,21 +129,21 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]
        public DateTime? ModifyDate { get; set; }
 
        /// <summary>
-       ///
+       /// 修改者ID
        /// </summary>
        [Display(Name ="ModifyID")]
        [Column(TypeName="int")]
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///下一个审批节点
+       /// 下一个审批节点的ID (或ID列表，逗号分隔)
        /// </summary>
        [Display(Name ="下一个审批节点")]
        [MaxLength(500)]
@@ -147,7 +152,7 @@ namespace VOL.Entity.DomainModels
        public string NextStepIds { get; set; }
 
        /// <summary>
-       ///父级节点
+       /// 父级节点的ID (或ID列表，用于并行或分支流程)
        /// </summary>
        [Display(Name ="父级节点")]
        [MaxLength(2000)]
@@ -156,7 +161,11 @@ namespace VOL.Entity.DomainModels
        public string ParentId { get; set; }
 
        /// <summary>
-       ///审核未通过(返回上一节点,流程重新开始,流程结束)
+       /// 审核未通过时的处理方式
+       /// 可能的值 (具体需参照业务定义):
+       /// 1: 返回上一节点 (Return to previous node)
+       /// 2: 流程重新开始 (Restart workflow)
+       /// 3: 流程结束 (End workflow)
        /// </summary>
        [Display(Name ="审核未通过(返回上一节点,流程重新开始,流程结束)")]
        [Column(TypeName="int")]
@@ -164,7 +173,11 @@ namespace VOL.Entity.DomainModels
        public int? AuditRefuse { get; set; }
 
        /// <summary>
-       ///驳回(返回上一节点,流程重新开始,流程结束)
+       /// 驳回时的处理方式
+       /// 可能的值 (具体需参照业务定义):
+       /// 1: 返回上一节点 (Return to previous node)
+       /// 2: 流程重新开始 (Restart workflow)
+       /// 3: 流程结束 (End workflow)
        /// </summary>
        [Display(Name ="驳回(返回上一节点,流程重新开始,流程结束)")]
        [Column(TypeName="int")]
@@ -172,7 +185,10 @@ namespace VOL.Entity.DomainModels
        public int? AuditBack { get; set; }
 
        /// <summary>
-       ///审批方式(启用会签)
+       /// 审批方式
+       /// 可能的值:
+       /// 0: 单人审批 (Single approval)
+       /// 1: 会签 (启用会签) (Countersign enabled)
        /// </summary>
        [Display(Name ="审批方式(启用会签)")]
        [Column(TypeName="int")]
@@ -180,7 +196,10 @@ namespace VOL.Entity.DomainModels
        public int? AuditMethod { get; set; }
 
        /// <summary>
-       ///审核后发送邮件通知
+       /// 审核后是否发送邮件通知
+       /// 可能的值:
+       /// 1: 是 (Yes)
+       /// 0: 否 (No)
        /// </summary>
        [Display(Name ="审核后发送邮件通知")]
        [Column(TypeName="int")]
@@ -188,7 +207,7 @@ namespace VOL.Entity.DomainModels
        public int? SendMail { get; set; }
 
        /// <summary>
-       ///审核条件
+       /// 进入此节点的审核条件 (通常为表达式或JSON配置)
        /// </summary>
        [Display(Name ="审核条件")]
        [MaxLength(4000)]
@@ -197,7 +216,11 @@ namespace VOL.Entity.DomainModels
        public string Filters { get; set; }
 
        /// <summary>
-       ///节点属性(start、node、end))
+       /// 节点属性类型
+       /// 可能的值:
+       /// "start": 开始节点
+       /// "node": 普通审批节点
+       /// "end": 结束节点
        /// </summary>
        [Display(Name ="节点属性(start、node、end))")]
        [MaxLength(50)]
@@ -206,7 +229,7 @@ namespace VOL.Entity.DomainModels
        public string StepAttrType { get; set; }
 
        /// <summary>
-       ///权重(相同条件权重大的优先匹配)
+       /// 权重，用于相同条件的多个后续步骤选择，权重大的优先
        /// </summary>
        [Display(Name ="权重(相同条件权重大的优先匹配)")]
        [Column(TypeName="int")]

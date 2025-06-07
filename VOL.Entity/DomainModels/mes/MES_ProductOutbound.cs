@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class MES_ProductOutbound:BaseEntity
     {
         /// <summary>
-       ///出库ID
+       /// 产品出库记录ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="出库ID")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid OutboundID { get; set; }
 
        /// <summary>
-       ///单据号
+       /// 出库操作关联的单据编号 (例如: 销售订单号, 领料单号)
        /// </summary>
        [Display(Name ="单据号")]
        [MaxLength(100)]
@@ -37,7 +37,7 @@ namespace VOL.Entity.DomainModels
        public string DocumentNo { get; set; }
 
        /// <summary>
-       ///物料名称
+       /// 出库物料的名称
        /// </summary>
        [Display(Name ="物料名称")]
        [MaxLength(100)]
@@ -46,7 +46,7 @@ namespace VOL.Entity.DomainModels
        public string MaterialName { get; set; }
 
        /// <summary>
-       ///物料编号
+       /// 出库物料的编号 (外键, 关联MES_Material.MaterialCode)
        /// </summary>
        [Display(Name ="物料编号")]
        [MaxLength(100)]
@@ -55,7 +55,7 @@ namespace VOL.Entity.DomainModels
        public string MaterialCode { get; set; }
 
        /// <summary>
-       ///规格型号
+       /// 出库物料的规格型号
        /// </summary>
        [Display(Name ="规格型号")]
        [MaxLength(100)]
@@ -64,7 +64,7 @@ namespace VOL.Entity.DomainModels
        public string SpecificationModel { get; set; }
 
        /// <summary>
-       ///仓库ID
+       /// 物料出库的源仓库ID (外键, 可能关联仓库表)
        /// </summary>
        [Display(Name ="仓库ID")]
        [MaxLength(36)]
@@ -73,7 +73,7 @@ namespace VOL.Entity.DomainModels
        public Guid? WarehouseID { get; set; }
 
        /// <summary>
-       ///货位ID
+       /// 物料出库的源货位ID (外键, 关联MES_LocationManagement.LocationID)
        /// </summary>
        [Display(Name ="货位ID")]
        [MaxLength(36)]
@@ -82,7 +82,7 @@ namespace VOL.Entity.DomainModels
        public Guid? LocationID { get; set; }
 
        /// <summary>
-       ///出库数量
+       /// 本次出库的数量
        /// </summary>
        [Display(Name ="出库数量")]
        [Column(TypeName="int")]
@@ -91,7 +91,7 @@ namespace VOL.Entity.DomainModels
        public int OutboundQuantity { get; set; }
 
        /// <summary>
-       ///出库单位
+       /// 出库数量的单位 (例如: 个, 件, Kg)
        /// </summary>
        [Display(Name ="出库单位")]
        [MaxLength(100)]
@@ -100,7 +100,7 @@ namespace VOL.Entity.DomainModels
        public string OutboundUnit { get; set; }
 
        /// <summary>
-       ///出库日期
+       /// 物料实际出库的日期
        /// </summary>
        [Display(Name ="出库日期")]
        [Column(TypeName="datetime")]
@@ -108,7 +108,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? OutboundDate { get; set; }
 
        /// <summary>
-       ///出库操作员
+       /// 执行出库操作的人员姓名或ID
        /// </summary>
        [Display(Name ="出库操作员")]
        [MaxLength(100)]
@@ -117,7 +117,7 @@ namespace VOL.Entity.DomainModels
        public string OutboundOperator { get; set; }
 
        /// <summary>
-       ///出库原因
+       /// 本次出库的原因 (例如: 销售出库, 领料出库, 盘亏出库等，具体值参照业务定义)
        /// </summary>
        [Display(Name ="出库原因")]
        [MaxLength(100)]
@@ -126,7 +126,7 @@ namespace VOL.Entity.DomainModels
        public string OutboundReason { get; set; }
 
        /// <summary>
-       ///创建人ID
+       /// 创建者ID
        /// </summary>
        [Display(Name ="创建人ID")]
        [Column(TypeName="int")]
@@ -134,7 +134,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(100)]
@@ -143,7 +143,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -151,7 +151,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///修改人ID
+       /// 修改者ID
        /// </summary>
        [Display(Name ="修改人ID")]
        [Column(TypeName="int")]
@@ -159,7 +159,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(100)]
@@ -168,7 +168,7 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]

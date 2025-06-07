@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class MES_Bom_Detail:BaseEntity
     {
         /// <summary>
-       ///ID
+       /// BOM明细ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="ID")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid DomDetailId { get; set; }
 
        /// <summary>
-       ///BomId
+       /// 所属BOM主表ID (外键, 关联MES_Bom_Main.BomId)
        /// </summary>
        [Display(Name ="BomId")]
        [MaxLength(36)]
@@ -37,7 +37,7 @@ namespace VOL.Entity.DomainModels
        public Guid? BomId { get; set; }
 
        /// <summary>
-       ///序号
+       /// 在BOM中的序号
        /// </summary>
        [Display(Name ="序号")]
        [Column(TypeName="int")]
@@ -46,7 +46,7 @@ namespace VOL.Entity.DomainModels
        public int Sequence { get; set; }
 
        /// <summary>
-       ///子件物料编码
+       /// 子件(组件或原材料)的物料编码
        /// </summary>
        [Display(Name ="子件物料编码")]
        [MaxLength(200)]
@@ -55,7 +55,7 @@ namespace VOL.Entity.DomainModels
        public string MaterialCode { get; set; }
 
        /// <summary>
-       ///子件物料名称
+       /// 子件(组件或原材料)的物料名称
        /// </summary>
        [Display(Name ="子件物料名称")]
        [MaxLength(300)]
@@ -64,7 +64,7 @@ namespace VOL.Entity.DomainModels
        public string MaterialName { get; set; }
 
        /// <summary>
-       ///规格型号
+       /// 子件的规格型号
        /// </summary>
        [Display(Name ="规格型号")]
        [MaxLength(200)]
@@ -73,7 +73,7 @@ namespace VOL.Entity.DomainModels
        public string Spec { get; set; }
 
        /// <summary>
-       ///单台用量
+       /// 生产一个父件所需的子件数量 (单台用量)
        /// </summary>
        [Display(Name ="单台用量")]
        [DisplayFormat(DataFormatString="24,3")]
@@ -83,7 +83,7 @@ namespace VOL.Entity.DomainModels
        public decimal UsageQty { get; set; }
 
        /// <summary>
-       ///消耗方式
+       /// 子件的消耗方式 (例如: 领料, 线边库等，具体值需参照业务定义)
        /// </summary>
        [Display(Name ="消耗方式")]
        [MaxLength(100)]
@@ -93,7 +93,7 @@ namespace VOL.Entity.DomainModels
        public string ConsumeModel { get; set; }
 
        /// <summary>
-       ///投料仓库
+       /// 子件投料的仓库编码或名称
        /// </summary>
        [Display(Name ="投料仓库")]
        [MaxLength(100)]
@@ -102,7 +102,7 @@ namespace VOL.Entity.DomainModels
        public string Warehouse { get; set; }
 
        /// <summary>
-       ///供应商
+       /// 子件的供应商编码或名称
        /// </summary>
        [Display(Name ="供应商")]
        [MaxLength(50)]
@@ -111,7 +111,7 @@ namespace VOL.Entity.DomainModels
        public string SupplierCode { get; set; }
 
        /// <summary>
-       ///齐套比例
+       /// 齐套比例 (用于物料配套检查)
        /// </summary>
        [Display(Name ="齐套比例")]
        [DisplayFormat(DataFormatString="24,3")]
@@ -120,7 +120,10 @@ namespace VOL.Entity.DomainModels
        public decimal? KitScale { get; set; }
 
        /// <summary>
-       ///启用状态
+       /// 启用状态
+       /// 可能的值:
+       /// 1: 启用 (Enabled)
+       /// 0: 禁用 (Disabled)
        /// </summary>
        [Display(Name ="启用状态")]
        [Column(TypeName="int")]
@@ -128,7 +131,8 @@ namespace VOL.Entity.DomainModels
        public int? Enable { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建者ID
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [Column(TypeName="int")]
@@ -145,7 +149,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -153,7 +157,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///更新人
+       /// 修改者ID
        /// </summary>
        [Display(Name ="更新人")]
        [Column(TypeName="int")]
@@ -161,7 +165,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///更新人名称
+       /// 修改人名称
        /// </summary>
        [Display(Name ="更新人名称")]
        [MaxLength(50)]
@@ -170,7 +174,7 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///更新时间
+       /// 记录更新时间
        /// </summary>
        [Display(Name ="更新时间")]
        [Column(TypeName="datetime")]

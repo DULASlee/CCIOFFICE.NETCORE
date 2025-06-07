@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class MES_LocationManagement:BaseEntity
     {
         /// <summary>
-       ///货位ID
+       /// 货位ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="货位ID")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid LocationID { get; set; }
 
        /// <summary>
-       ///所属仓库ID
+       /// 货位所属的仓库ID (外键, 可能关联仓库表)
        /// </summary>
        [Display(Name ="所属仓库ID")]
        [MaxLength(36)]
@@ -37,7 +37,7 @@ namespace VOL.Entity.DomainModels
        public Guid? WarehouseID { get; set; }
 
        /// <summary>
-       ///货位编码
+       /// 货位的唯一编码
        /// </summary>
        [Display(Name ="货位编码")]
        [MaxLength(100)]
@@ -47,7 +47,7 @@ namespace VOL.Entity.DomainModels
        public string LocationCode { get; set; }
 
        /// <summary>
-       ///货位名称
+       /// 货位的描述性名称
        /// </summary>
        [Display(Name ="货位名称")]
        [MaxLength(100)]
@@ -57,7 +57,7 @@ namespace VOL.Entity.DomainModels
        public string LocationName { get; set; }
 
        /// <summary>
-       ///货位类型
+       /// 货位的类型 (例如: 存储区, 拣选区, 暂存区等，具体值需参照业务定义)
        /// </summary>
        [Display(Name ="货位类型")]
        [MaxLength(100)]
@@ -66,7 +66,7 @@ namespace VOL.Entity.DomainModels
        public string LocationType { get; set; }
 
        /// <summary>
-       ///货位容量
+       /// 货位的容量 (例如: 可以存放的物料数量或体积)
        /// </summary>
        [Display(Name ="货位容量")]
        [Column(TypeName="int")]
@@ -75,7 +75,7 @@ namespace VOL.Entity.DomainModels
        public int LocationCapacity { get; set; }
 
        /// <summary>
-       ///货位状态
+       /// 货位的当前状态 (例如: 空闲, 已占用, 禁用等，具体值需参照业务定义)
        /// </summary>
        [Display(Name ="货位状态")]
        [MaxLength(100)]
@@ -84,7 +84,7 @@ namespace VOL.Entity.DomainModels
        public string LocationStatus { get; set; }
 
        /// <summary>
-       ///货位行号
+       /// 货位在仓库布局中的行号标识
        /// </summary>
        [Display(Name ="货位行号")]
        [Column(TypeName="int")]
@@ -93,7 +93,7 @@ namespace VOL.Entity.DomainModels
        public int LocationRow { get; set; }
 
        /// <summary>
-       ///货位列号
+       /// 货位在仓库布局中的列号标识
        /// </summary>
        [Display(Name ="货位列号")]
        [Column(TypeName="int")]
@@ -102,7 +102,7 @@ namespace VOL.Entity.DomainModels
        public int LocationColumn { get; set; }
 
        /// <summary>
-       ///货位层数
+       /// 货位在仓库布局中的层数或高度标识
        /// </summary>
        [Display(Name ="货位层数")]
        [Column(TypeName="int")]
@@ -111,7 +111,7 @@ namespace VOL.Entity.DomainModels
        public int LocationFloor { get; set; }
 
        /// <summary>
-       ///创建人ID
+       /// 创建者ID
        /// </summary>
        [Display(Name ="创建人ID")]
        [Column(TypeName="int")]
@@ -119,7 +119,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(100)]
@@ -128,7 +128,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -136,7 +136,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///修改人ID
+       /// 修改者ID
        /// </summary>
        [Display(Name ="修改人ID")]
        [Column(TypeName="int")]
@@ -144,7 +144,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(100)]
@@ -153,7 +153,7 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]

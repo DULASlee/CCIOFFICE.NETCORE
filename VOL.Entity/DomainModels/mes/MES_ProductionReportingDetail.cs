@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class MES_ProductionReportingDetail:BaseEntity
     {
         /// <summary>
-       ///明细ID
+       /// 报工明细ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="明细ID")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid DetailID { get; set; }
 
        /// <summary>
-       ///报工ID
+       /// 所属生产报工ID (外键, 关联MES_ProductionReporting.ReportingID)
        /// </summary>
        [Display(Name ="报工ID")]
        [MaxLength(36)]
@@ -37,7 +37,7 @@ namespace VOL.Entity.DomainModels
        public Guid? ReportingID { get; set; }
 
        /// <summary>
-       ///报工物料
+       /// 报工的物料编码 (外键, 关联MES_Material.MaterialCode)
        /// </summary>
        [Display(Name ="报工物料")]
        [MaxLength(100)]
@@ -47,7 +47,7 @@ namespace VOL.Entity.DomainModels
        public string MaterialCode { get; set; }
 
        /// <summary>
-       ///物料名称
+       /// 报工的物料名称
        /// </summary>
        [Display(Name ="物料名称")]
        [MaxLength(100)]
@@ -57,7 +57,7 @@ namespace VOL.Entity.DomainModels
        public string MaterialName { get; set; }
 
        /// <summary>
-       ///物料规格
+       /// 报工的物料规格型号
        /// </summary>
        [Display(Name ="物料规格")]
        [MaxLength(100)]
@@ -67,7 +67,7 @@ namespace VOL.Entity.DomainModels
        public string MaterialSpecification { get; set; }
 
        /// <summary>
-       ///工时(小时)
+       /// 此明细项相关的工时 (单位: 小时)
        /// </summary>
        [Display(Name ="工时(小时)")]
        [DisplayFormat(DataFormatString="11,2")]
@@ -76,7 +76,7 @@ namespace VOL.Entity.DomainModels
        public decimal? ReportHour { get; set; }
 
        /// <summary>
-       ///报工数量
+       /// 此明细项的报工总数量
        /// </summary>
        [Display(Name ="报工数量")]
        [Column(TypeName="int")]
@@ -85,7 +85,7 @@ namespace VOL.Entity.DomainModels
        public int ReportedQuantity { get; set; }
 
        /// <summary>
-       ///合格数量
+       /// 此明细项中的合格品数量
        /// </summary>
        [Display(Name ="合格数量")]
        [Column(TypeName="int")]
@@ -94,7 +94,7 @@ namespace VOL.Entity.DomainModels
        public int AcceptedQuantity { get; set; }
 
        /// <summary>
-       ///不合格数量
+       /// 此明细项中的不合格品数量
        /// </summary>
        [Display(Name ="不合格数量")]
        [Column(TypeName="int")]
@@ -103,7 +103,7 @@ namespace VOL.Entity.DomainModels
        public int RejectedQuantity { get; set; }
 
        /// <summary>
-       ///创建人ID
+       /// 创建者ID
        /// </summary>
        [Display(Name ="创建人ID")]
        [Column(TypeName="int")]
@@ -111,7 +111,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(100)]
@@ -120,7 +120,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -128,7 +128,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///修改人ID
+       /// 修改者ID
        /// </summary>
        [Display(Name ="修改人ID")]
        [Column(TypeName="int")]
@@ -136,7 +136,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(100)]
@@ -145,7 +145,7 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]

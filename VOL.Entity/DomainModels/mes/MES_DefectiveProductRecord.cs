@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class MES_DefectiveProductRecord:BaseEntity
     {
         /// <summary>
-       ///不良品ID
+       /// 不良品记录ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="不良品ID")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid DefectiveID { get; set; }
 
        /// <summary>
-       ///报工ID
+       /// 关联的生产报工记录ID
        /// </summary>
        [Display(Name ="报工ID")]
        [MaxLength(36)]
@@ -37,7 +37,7 @@ namespace VOL.Entity.DomainModels
        public Guid? ReportingID { get; set; }
 
        /// <summary>
-       ///物料编号
+       /// 产生不良品的物料编号
        /// </summary>
        [Display(Name ="物料编号")]
        [MaxLength(100)]
@@ -47,7 +47,7 @@ namespace VOL.Entity.DomainModels
        public string MaterialCode { get; set; }
 
        /// <summary>
-       ///物料名称
+       /// 产生不良品的物料名称
        /// </summary>
        [Display(Name ="物料名称")]
        [MaxLength(100)]
@@ -57,7 +57,7 @@ namespace VOL.Entity.DomainModels
        public string MaterialName { get; set; }
 
        /// <summary>
-       ///物料规格
+       /// 产生不良品的物料规格型号
        /// </summary>
        [Display(Name ="物料规格")]
        [MaxLength(100)]
@@ -67,7 +67,7 @@ namespace VOL.Entity.DomainModels
        public string MaterialSpecification { get; set; }
 
        /// <summary>
-       ///不良品数量
+       /// 记录的不良品数量
        /// </summary>
        [Display(Name ="不良品数量")]
        [Column(TypeName="int")]
@@ -76,7 +76,7 @@ namespace VOL.Entity.DomainModels
        public int DefectiveQuantity { get; set; }
 
        /// <summary>
-       ///缺陷类型
+       /// 缺陷的类型 (例如: 外观不良, 功能不良等，具体值需参照业务定义)
        /// </summary>
        [Display(Name ="缺陷类型")]
        [MaxLength(100)]
@@ -86,7 +86,7 @@ namespace VOL.Entity.DomainModels
        public string DefectType { get; set; }
 
        /// <summary>
-       ///缺陷原因
+       /// 产生缺陷的具体原因 (具体值需参照业务定义)
        /// </summary>
        [Display(Name ="缺陷原因")]
        [MaxLength(100)]
@@ -96,7 +96,7 @@ namespace VOL.Entity.DomainModels
        public string DefectReason { get; set; }
 
        /// <summary>
-       ///处理方式
+       /// 不良品的处理方式 (例如: 返修, 报废, 降级等，具体值需参照业务定义)
        /// </summary>
        [Display(Name ="处理方式")]
        [MaxLength(100)]
@@ -106,7 +106,7 @@ namespace VOL.Entity.DomainModels
        public string DisposalMethod { get; set; }
 
        /// <summary>
-       ///处理状态
+       /// 不良品的处理状态 (例如: 待处理, 处理中, 已处理等，具体值需参照业务定义)
        /// </summary>
        [Display(Name ="处理状态")]
        [MaxLength(100)]
@@ -116,7 +116,7 @@ namespace VOL.Entity.DomainModels
        public string DisposalStatus { get; set; }
 
        /// <summary>
-       ///创建人ID
+       /// 创建者ID
        /// </summary>
        [Display(Name ="创建人ID")]
        [Column(TypeName="int")]
@@ -124,7 +124,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(100)]
@@ -133,7 +133,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -141,7 +141,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///修改人ID
+       /// 修改者ID
        /// </summary>
        [Display(Name ="修改人ID")]
        [Column(TypeName="int")]
@@ -149,7 +149,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(100)]
@@ -158,7 +158,7 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]

@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class MES_ProductionOrder:BaseEntity
     {
         /// <summary>
-       ///订单ID
+       /// 生产订单ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="订单ID")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid OrderID { get; set; }
 
        /// <summary>
-       ///订单编号
+       /// 生产订单的唯一编号
        /// </summary>
        [Display(Name ="订单编号")]
        [MaxLength(100)]
@@ -38,7 +38,7 @@ namespace VOL.Entity.DomainModels
        public string OrderNumber { get; set; }
 
        /// <summary>
-       ///客户名称
+       /// 客户的公司或个人名称 (外键, 可能关联MES_Customer.CustomerName)
        /// </summary>
        [Display(Name ="客户名称")]
        [MaxLength(100)]
@@ -48,7 +48,7 @@ namespace VOL.Entity.DomainModels
        public string CustomerName { get; set; }
 
        /// <summary>
-       ///订单日期
+       /// 生产订单的创建日期
        /// </summary>
        [Display(Name ="订单日期")]
        [Column(TypeName="datetime")]
@@ -57,7 +57,7 @@ namespace VOL.Entity.DomainModels
        public DateTime OrderDate { get; set; }
 
        /// <summary>
-       ///交货日期
+       /// 客户要求的或计划的交货日期
        /// </summary>
        [Display(Name ="交货日期")]
        [Column(TypeName="datetime")]
@@ -66,7 +66,7 @@ namespace VOL.Entity.DomainModels
        public DateTime DeliveryDate { get; set; }
 
        /// <summary>
-       ///订单数量
+       /// 订单的总数量 (通常是主产品的数量)
        /// </summary>
        [Display(Name ="订单数量")]
        [Column(TypeName="int")]
@@ -74,7 +74,7 @@ namespace VOL.Entity.DomainModels
        public int? OrderQty { get; set; }
 
        /// <summary>
-       ///优先级
+       /// 订单的优先级 (例如: 高, 中, 低，具体值参照业务定义)
        /// </summary>
        [Display(Name ="优先级")]
        [MaxLength(255)]
@@ -83,7 +83,7 @@ namespace VOL.Entity.DomainModels
        public string LV { get; set; }
 
        /// <summary>
-       ///排产状态
+       /// 订单的排产状态 (例如: 未排产, 已排产, 生产中, 已完成, 已取消等，具体值参照业务定义)
        /// </summary>
        [Display(Name ="排产状态")]
        [MaxLength(100)]
@@ -93,7 +93,7 @@ namespace VOL.Entity.DomainModels
        public string OrderStatus { get; set; }
 
        /// <summary>
-       ///创建人ID
+       /// 创建者ID
        /// </summary>
        [Display(Name ="创建人ID")]
        [Column(TypeName="int")]
@@ -101,7 +101,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(100)]
@@ -110,7 +110,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -118,7 +118,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///修改人ID
+       /// 修改者ID
        /// </summary>
        [Display(Name ="修改人ID")]
        [Column(TypeName="int")]
@@ -126,7 +126,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(100)]
@@ -134,13 +134,16 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]
        [Editable(true)]
        public DateTime? ModifyDate { get; set; }
 
+       /// <summary>
+       /// 关联的生产计划明细或订单明细列表
+       /// </summary>
        [Display(Name ="订单明细")]
        [ForeignKey("OrderID")]
        public List<MES_ProductionPlanDetail> MES_ProductionPlanDetail { get; set; }

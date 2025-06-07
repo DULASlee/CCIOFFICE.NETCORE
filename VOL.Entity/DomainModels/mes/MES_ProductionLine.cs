@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class MES_ProductionLine:BaseEntity
     {
         /// <summary>
-       ///产线ID
+       /// 产线ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="产线ID")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid ProductionLineID { get; set; }
 
        /// <summary>
-       ///产线名称
+       /// 生产线的名称
        /// </summary>
        [Display(Name ="产线名称")]
        [MaxLength(100)]
@@ -38,7 +38,7 @@ namespace VOL.Entity.DomainModels
        public string LineName { get; set; }
 
        /// <summary>
-       ///产线类型
+       /// 生产线的类型 (例如: 装配线, 加工线, 包装线等，具体值参照业务定义)
        /// </summary>
        [Display(Name ="产线类型")]
        [MaxLength(100)]
@@ -47,7 +47,7 @@ namespace VOL.Entity.DomainModels
        public string LineType { get; set; }
 
        /// <summary>
-       ///产能信息
+       /// 生产线的设计产能或额定产能信息 (例如: 件/小时)
        /// </summary>
        [Display(Name ="产能信息")]
        [MaxLength(100)]
@@ -55,7 +55,7 @@ namespace VOL.Entity.DomainModels
        public string Capacity { get; set; }
 
        /// <summary>
-       ///产线状态
+       /// 生产线的当前状态 (例如: 运行中, 停线, 维护中, 闲置等，具体值参照业务定义)
        /// </summary>
        [Display(Name ="产线状态")]
        [MaxLength(100)]
@@ -63,7 +63,7 @@ namespace VOL.Entity.DomainModels
        public string Status { get; set; }
 
        /// <summary>
-       ///负责人
+       /// 此生产线的负责人姓名或ID
        /// </summary>
        [Display(Name ="负责人")]
        [MaxLength(100)]
@@ -72,7 +72,7 @@ namespace VOL.Entity.DomainModels
        public string ResponsiblePerson { get; set; }
 
        /// <summary>
-       ///产线位置
+       /// 生产线在车间或工厂中的具体位置
        /// </summary>
        [Display(Name ="产线位置")]
        [MaxLength(100)]
@@ -81,7 +81,7 @@ namespace VOL.Entity.DomainModels
        public string Location { get; set; }
 
        /// <summary>
-       ///启用日期
+       /// 生产线正式启用的日期
        /// </summary>
        [Display(Name ="启用日期")]
        [Column(TypeName="datetime")]
@@ -89,7 +89,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? StartDate { get; set; }
 
        /// <summary>
-       ///停用日期
+       /// 生产线停用的日期 (如果已停用)
        /// </summary>
        [Display(Name ="停用日期")]
        [Column(TypeName="datetime")]
@@ -97,7 +97,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? EndDate { get; set; }
 
        /// <summary>
-       ///备注信息
+       /// 其他备注信息
        /// </summary>
        [Display(Name ="备注信息")]
        [MaxLength(100)]
@@ -106,7 +106,7 @@ namespace VOL.Entity.DomainModels
        public string Remarks { get; set; }
 
        /// <summary>
-       ///创建人ID
+       /// 创建者ID
        /// </summary>
        [Display(Name ="创建人ID")]
        [Column(TypeName="int")]
@@ -114,7 +114,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(100)]
@@ -123,7 +123,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -131,7 +131,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///修改人ID
+       /// 修改者ID
        /// </summary>
        [Display(Name ="修改人ID")]
        [Column(TypeName="int")]
@@ -139,7 +139,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(100)]
@@ -148,13 +148,16 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]
        [Editable(true)]
        public DateTime? ModifyDate { get; set; }
 
+       /// <summary>
+       /// 关联的产线设备列表 (定义此产线包含哪些设备)
+       /// </summary>
        [Display(Name ="产线设备")]
        [ForeignKey("ProductionLineID")]
        public List<MES_ProductionLineDevice> MES_ProductionLineDevice { get; set; }

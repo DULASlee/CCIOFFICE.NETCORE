@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class MES_Material:BaseEntity
     {
         /// <summary>
-       ///物料ID
+       /// 物料ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="物料ID")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid MaterialID { get; set; }
 
        /// <summary>
-       ///物料编码
+       /// 物料的唯一编码
        /// </summary>
        [Display(Name ="物料编码")]
        [MaxLength(100)]
@@ -38,7 +38,7 @@ namespace VOL.Entity.DomainModels
        public string MaterialCode { get; set; }
 
        /// <summary>
-       ///物料名称
+       /// 物料的名称
        /// </summary>
        [Display(Name ="物料名称")]
        [MaxLength(100)]
@@ -48,7 +48,7 @@ namespace VOL.Entity.DomainModels
        public string MaterialName { get; set; }
 
        /// <summary>
-       ///物料图片
+       /// 物料的图片存储路径或URL
        /// </summary>
        [Display(Name ="物料图片")]
        [MaxLength(2000)]
@@ -57,7 +57,7 @@ namespace VOL.Entity.DomainModels
        public string Img { get; set; }
 
        /// <summary>
-       ///物料分类
+       /// 物料所属的分类ID (外键, 可能关联物料分类表)
        /// </summary>
        [Display(Name ="物料分类")]
        [MaxLength(36)]
@@ -66,7 +66,7 @@ namespace VOL.Entity.DomainModels
        public Guid? CatalogID { get; set; }
 
        /// <summary>
-       ///物料类型
+       /// 物料的类型 (例如: 原材料, 半成品, 成品, 辅料等，具体值需参照业务定义)
        /// </summary>
        [Display(Name ="物料类型")]
        [MaxLength(100)]
@@ -75,7 +75,7 @@ namespace VOL.Entity.DomainModels
        public string MaterialType { get; set; }
 
        /// <summary>
-       ///规格型号
+       /// 物料的规格型号描述
        /// </summary>
        [Display(Name ="规格型号")]
        [MaxLength(100)]
@@ -84,7 +84,7 @@ namespace VOL.Entity.DomainModels
        public string Specification { get; set; }
 
        /// <summary>
-       ///单位
+       /// 物料的计量单位 (例如: 个, Kg, 米, 台等)
        /// </summary>
        [Display(Name ="单位")]
        [MaxLength(100)]
@@ -93,7 +93,7 @@ namespace VOL.Entity.DomainModels
        public string Unit { get; set; }
 
        /// <summary>
-       ///单价
+       /// 物料的参考单价或成本价
        /// </summary>
        [Display(Name ="单价")]
        [DisplayFormat(DataFormatString="10,2")]
@@ -102,7 +102,7 @@ namespace VOL.Entity.DomainModels
        public decimal? Price { get; set; }
 
        /// <summary>
-       ///备注信息
+       /// 其他备注信息
        /// </summary>
        [Display(Name ="备注信息")]
        [MaxLength(100)]
@@ -111,7 +111,7 @@ namespace VOL.Entity.DomainModels
        public string Remarks { get; set; }
 
        /// <summary>
-       ///创建人ID
+       /// 创建者ID
        /// </summary>
        [Display(Name ="创建人ID")]
        [Column(TypeName="int")]
@@ -119,7 +119,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(100)]
@@ -128,7 +128,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -136,7 +136,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///修改人ID
+       /// 修改者ID
        /// </summary>
        [Display(Name ="修改人ID")]
        [Column(TypeName="int")]
@@ -144,7 +144,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(100)]
@@ -153,7 +153,7 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]

@@ -30,9 +30,14 @@ namespace VOL.Core.DBManager
         //}
 
 
-        ///// <summary>
-        ///// 如果有多个不同的mysql数据库，这里再加一个配置
-        ///// </summary>
+        /// <summary>
+        /// 获取第二个MySql数据库的Dapper实例 (如果配置了多个MySql数据库)
+        /// </summary>
+        /// <remarks>
+        /// 连接字符串通常在appsettings.json中配置，键名为"key2"。
+        /// 使用方法: DBServerProvider.SqlDapperMySql2.xxx
+        /// </remarks>
+        /// <returns>MySql数据库的Dapper实例 : VOL.Core.Dapper.ISqlDapper</returns>
         public static ISqlDapper SqlDapperMySql2
         {
             get

@@ -71,9 +71,9 @@ namespace VOL.Builder.Services
         }
 
         /// <summary>
-        /// 获取生成配置的树开菜单
+        /// 获取生成配置的树形菜单
         /// </summary>
-        /// <returns></returns>
+        /// <returns>返回一个元组，包含树形数据的JSON字符串和项目文件名 : (System.String, System.String)</returns>
         public async Task<(string, string)> GetTableTree()
         {
             var treeData = await repository.FindAsIQueryable(x => 1 == 1)
@@ -335,10 +335,10 @@ DISTINCT
         }
 
         /// <summary>
-        /// 生成实体Model
+        /// 生成实体模型
         /// </summary>
-        /// <param name="sysTableInfo"></param>
-        /// <returns></returns>
+        /// <param name="sysTableInfo">系统表信息对象 : VOL.Entity.DomainModels.Sys_TableInfo</param>
+        /// <returns>操作结果信息 : System.String</returns>
         public string CreateEntityModel(Sys_TableInfo sysTableInfo)
         {
             if (sysTableInfo == null
@@ -397,10 +397,10 @@ DISTINCT
         }
 
         /// <summary>
-        /// 保存配置信息
+        /// 保存编辑后的表信息
         /// </summary>
-        /// <param name="sysTableInfo"></param>
-        /// <returns></returns>
+        /// <param name="sysTableInfo">系统表信息对象 : VOL.Entity.DomainModels.Sys_TableInfo</param>
+        /// <returns>Web响应内容 : VOL.Core.Utilities.WebResponseContent</returns>
         public WebResponseContent SaveEidt(Sys_TableInfo sysTableInfo)
         {
             WebResponseContent webResponse = ValidColumnString(sysTableInfo);
@@ -464,10 +464,10 @@ DISTINCT
         }
 
         /// <summary>
-        /// 将表结构重新同步到代码生成配置
+        /// 将指定表的结构同步到代码生成配置中
         /// </summary>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
+        /// <param name="tableName">要同步的表名 : System.String</param>
+        /// <returns>Web响应内容，包含同步操作的结果信息 : System.Threading.Tasks.Task<VOL.Core.Utilities.WebResponseContent></returns>
         public async Task<WebResponseContent> SyncTable(string tableName)
         {
             WebResponseContent webResponse = new WebResponseContent();
@@ -531,14 +531,14 @@ DISTINCT
         }
 
         /// <summary>
-        /// 生成Services/Repository与对应的Partial类
+        /// 创建服务层(Services)、仓储层(Repository)及对应的部分类(Partial)
         /// </summary>
-        /// <param name="tableName"></param>
-        /// <param name="nameSpace"></param>
-        /// <param name="foldername"></param>
-        /// <param name="webController"></param>
-        /// <param name="apiController"></param>
-        /// <returns></returns>
+        /// <param name="tableName">表名 : System.String</param>
+        /// <param name="nameSpace">命名空间 : System.String</param>
+        /// <param name="foldername">文件夹名称 : System.String</param>
+        /// <param name="webController">是否创建Web控制器 : System.Boolean</param>
+        /// <param name="apiController">是否创建Api控制器 : System.Boolean</param>
+        /// <returns>操作结果信息 : System.String</returns>
         public string CreateServices(string tableName, string nameSpace, string foldername, bool webController, bool apiController)
         {
             var tableColumn = repository.FindAsyncFirst<Sys_TableColumn>(x => x.TableName == tableName).Result;
@@ -751,11 +751,11 @@ DISTINCT
         }
 
         /// <summary>
-        /// 生成Vue页面
+        /// 创建Vue页面
         /// </summary>
-        /// <param name="sysTableInfo"></param>
-        /// <param name="vuePath">为本地Vue项目Views所在的绝对路径:E:/web/myProject/Views</param>
-        /// <returns></returns>
+        /// <param name="sysTableInfo">系统表信息对象 : VOL.Entity.DomainModels.Sys_TableInfo</param>
+        /// <param name="vuePath">Vue项目Views目录的绝对路径 (例如: E:/web/myProject/Views) : System.String</param>
+        /// <returns>操作结果信息 : System.String</returns>
         public string CreateVuePage(Sys_TableInfo sysTableInfo, string vuePath)
         {
             //2024.03.16增加vite代码生成
@@ -1175,10 +1175,10 @@ DISTINCT
 
 
         /// <summary>
-        /// 
+        /// 创建扩展页面 (当前功能正在开发中)
         /// </summary>
-        /// <param name="tableInfo"></param>
-        /// <returns></returns>
+        /// <param name="tableInfo">系统表信息对象 : VOL.Entity.DomainModels.Sys_TableInfo</param>
+        /// <returns>操作结果信息 : System.String</returns>
         public string CreateExtensionPage(Sys_TableInfo tableInfo)
         {
             return "开发中。。。";
@@ -1641,16 +1641,16 @@ DISTINCT
         }
 
         /// <summary>
-        /// 界面加载表的配置信息
+        /// 加载表的配置信息到界面
         /// </summary>
-        /// <param name="parentId"></param>
-        /// <param name="tableName"></param>
-        /// <param name="columnCNName"></param>
-        /// <param name="nameSpace"></param>
-        /// <param name="foldername"></param>
-        /// <param name="tableId"></param>
-        /// <param name="isTreeLoad">true只加载表数据</param>
-        /// <returns></returns>
+        /// <param name="parentId">父节点ID : System.Int32</param>
+        /// <param name="tableName">表名 : System.String</param>
+        /// <param name="columnCNName">列中文名 : System.String</param>
+        /// <param name="nameSpace">命名空间 : System.String</param>
+        /// <param name="foldername">文件夹名称 : System.String</param>
+        /// <param name="tableId">表ID : System.Int32</param>
+        /// <param name="isTreeLoad">是否为树形加载 (true表示只加载表数据，不进行初始化) : System.Boolean</param>
+        /// <returns>Web响应内容，包含加载的表配置信息 : System.Object</returns>
         public object LoadTable(int parentId, string tableName, string columnCNName, string nameSpace, string foldername, int tableId, bool isTreeLoad)
         {
             if (!UserContext.Current.IsSuperAdmin && !isTreeLoad)
@@ -1669,6 +1669,11 @@ DISTINCT
             return new WebResponseContent().OK(null, tableInfo);
         }
 
+        /// <summary>
+        /// 删除树节点（表信息）
+        /// </summary>
+        /// <param name="table_Id">要删除的表ID : System.Int32</param>
+        /// <returns>Web响应内容，包含删除操作的结果信息 : System.Threading.Tasks.Task<VOL.Core.Utilities.WebResponseContent></returns>
         public async Task<WebResponseContent> DelTree(int table_Id)
         {
             if (table_Id == 0) return new WebResponseContent().Error("没有传入参数");

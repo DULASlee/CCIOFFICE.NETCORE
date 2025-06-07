@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class Sys_Department:BaseEntity
     {
         /// <summary>
-       ///
+       /// 部门ID
        /// </summary>
        [Key]
        [Display(Name ="DepartmentId")]
@@ -27,7 +27,7 @@ namespace VOL.Entity.DomainModels
        public Guid DepartmentId { get; set; }
 
        /// <summary>
-       ///组织名称
+       /// 组织或部门的名称
        /// </summary>
        [Display(Name ="组织名称")]
        [MaxLength(200)]
@@ -37,7 +37,7 @@ namespace VOL.Entity.DomainModels
        public string DepartmentName { get; set; }
 
        /// <summary>
-       ///组织编号
+       /// 组织或部门的编号
        /// </summary>
        [Display(Name ="组织编号")]
        [MaxLength(50)]
@@ -46,7 +46,7 @@ namespace VOL.Entity.DomainModels
        public string DepartmentCode { get; set; }
 
        /// <summary>
-       ///上级组织
+       /// 上级组织或部门的ID (外键，自关联)
        /// </summary>
        [Display(Name ="上级组织")]
        [Column(TypeName="uniqueidentifier")]
@@ -54,7 +54,7 @@ namespace VOL.Entity.DomainModels
        public Guid? ParentId { get; set; }
 
        /// <summary>
-       ///部门类型
+       /// 部门类型 (具体类型需参照业务定义, 例如: 公司, 子公司, 部门, 小组等)
        /// </summary>
        [Display(Name ="部门类型")]
        [MaxLength(50)]
@@ -63,7 +63,10 @@ namespace VOL.Entity.DomainModels
        public string DepartmentType { get; set; }
 
        /// <summary>
-       ///是否可用
+       /// 是否启用或可用
+       /// 可能的值:
+       /// 1: 是 (Enabled/Active)
+       /// 0: 否 (Disabled/Inactive)
        /// </summary>
        [Display(Name ="是否可用")]
        [Column(TypeName="int")]
@@ -71,7 +74,7 @@ namespace VOL.Entity.DomainModels
        public int? Enable { get; set; }
 
        /// <summary>
-       ///备注
+       /// 备注信息
        /// </summary>
        [Display(Name ="备注")]
        [MaxLength(500)]
@@ -80,7 +83,7 @@ namespace VOL.Entity.DomainModels
        public string Remark { get; set; }
 
        /// <summary>
-       ///
+       /// 创建者ID
        /// </summary>
        [Display(Name ="CreateID")]
        [Column(TypeName="int")]
@@ -88,7 +91,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(30)]
@@ -97,7 +100,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -105,7 +108,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///
+       /// 修改者ID
        /// </summary>
        [Display(Name ="ModifyID")]
        [Column(TypeName="int")]
@@ -113,7 +116,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(30)]
@@ -122,7 +125,7 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]
