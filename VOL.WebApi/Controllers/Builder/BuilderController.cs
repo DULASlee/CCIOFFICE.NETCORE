@@ -36,9 +36,9 @@ namespace VOL.WebApi.Controllers.Builder
         [Route("CreateVuePage")]
         [ApiActionPermission(ActionRolePermission.SuperAdmin)]
         [HttpPost]
-        public ActionResult CreateVuePage([FromBody] Sys_TableInfo sysTableInfo, string vuePath)
+        public ActionResult CreateVuePage([FromBody] Sys_TableInfo sysTableInfo, string vuePath, bool isVite = false, bool isApp = false, bool isV3 = false)
         {
-            return Content(Service.CreateVuePage(sysTableInfo, vuePath));
+            return Content(Service.CreateVuePage(sysTableInfo, vuePath, isVite, isApp, isV3));
         }
         [Route("CreateModel")]
         [ApiActionPermission(ActionRolePermission.SuperAdmin)]
