@@ -12,13 +12,13 @@ namespace VOL.Core.Utilities
         private static object _filePathObj = new object();
 
         /// <summary>
-        /// 通过迭代器读取平面文件行内容(必须是带有\r\n换行的文件,百万行以上的内容读取效率存在问题,适用于100M左右文件，行100W内，超出的会有卡顿)
+        /// 通过迭代器读取平面文件行内容。注意：必须是带有\r\n换行的文件。对于百万行以上的内容，读取效率可能存在问题，适用于100M左右、100万行以内的文件，超出范围可能会导致卡顿。
         /// </summary>
         /// <param name="fullPath">文件全路径 : System.String</param>
         /// <param name="page">分页页数 : System.Int32</param>
         /// <param name="pageSize">分页大小 : System.Int32</param>
-        /// <param name="seekEnd"> 是否最后一行向前读取,默认从前向后读取 : System.Boolean</param>
-        /// <returns>读取到的文件行内容 : System.Collections.Generic.IEnumerable<System.String></returns>
+        /// <param name="seekEnd">是否从最后一行向前读取，默认为false（从前向后读取） : System.Boolean</param>
+        /// <returns>读取到的文件行内容 : System.Collections.Generic.IEnumerable&lt;System.String&gt;</returns>
         public static IEnumerable<string> ReadPageLine(string fullPath, int page, int pageSize, bool seekEnd = false)
         {
             if (page <= 0)
@@ -71,9 +71,9 @@ namespace VOL.Core.Utilities
         }
 
         /// <summary>
-        /// 检查文件是否存在
+        /// 检查指定路径的文件是否存在。
         /// </summary>
-        /// <param name="path">文件路径 : System.String</param>
+        /// <param name="path">文件的完整路径 : System.String</param>
         /// <returns>如果文件存在则返回true，否则返回false : System.Boolean</returns>
         public static bool FileExists(string path)
         {
@@ -81,18 +81,18 @@ namespace VOL.Core.Utilities
         }
 
         /// <summary>
-        /// 获取当前应用程序的下载路径
+        /// 获取当前应用程序的下载路径。
         /// </summary>
-        /// <returns>下载路径 : System.String</returns>
+        /// <returns>应用程序的下载路径 : System.String</returns>
         public static string GetCurrentDownLoadPath()
         {
             return ("Download\\").MapPath();
         }
 
         /// <summary>
-        /// 检查目录是否存在
+        /// 检查指定路径的目录是否存在。
         /// </summary>
-        /// <param name="path">目录路径 : System.String</param>
+        /// <param name="path">目录的完整路径 : System.String</param>
         /// <returns>如果目录存在则返回true，否则返回false : System.Boolean</returns>
         public static bool DirectoryExists(string path)
         {
@@ -100,11 +100,11 @@ namespace VOL.Core.Utilities
         }
 
         /// <summary>
-        /// 读取文件内容
+        /// 根据目录、文件名和后缀读取文件内容。
         /// </summary>
         /// <param name="fullpath">文件所在目录的完整路径 : System.String</param>
-        /// <param name="filename">文件名 : System.String</param>
-        /// <param name="suffix">文件后缀名 : System.String</param>
+        /// <param name="filename">文件名（不含后缀） : System.String</param>
+        /// <param name="suffix">文件后缀名 (例如: .txt) : System.String</param>
         /// <returns>文件内容 : System.String</returns>
         public static string Read_File(string fullpath, string filename, string suffix)
         {
@@ -112,9 +112,9 @@ namespace VOL.Core.Utilities
         }
 
         /// <summary>
-        /// 读取文件内容
+        /// 根据文件的完整路径读取文件内容。
         /// </summary>
-        /// <param name="fullName">文件的完整路径 : System.String</param>
+        /// <param name="fullName">文件的完整路径 (包括文件名和后缀) : System.String</param>
         /// <returns>文件内容 : System.String</returns>
         public static string ReadFile(string fullName)
         {
@@ -140,10 +140,10 @@ namespace VOL.Core.Utilities
 
 
         /// <summary>
-        /// 获取文件名的后缀部分
+        /// 从完整文件名中提取并返回文件的后缀名。
         /// </summary>
-        /// <param name="filename">文件名 : System.String</param>
-        /// <returns>文件后缀名 (例如: .txt, .jpg) : System.String</returns>
+        /// <param name="filename">包含后缀的文件名 (例如: "example.txt", "image.jpg") : System.String</param>
+        /// <returns>文件的后缀名 (例如: ".txt", ".jpg") : System.String</returns>
         public static string GetPostfixStr(string filename)
         {
             int start = filename.LastIndexOf(".");
@@ -154,12 +154,12 @@ namespace VOL.Core.Utilities
 
 
         /// <summary>
-        /// 将内容写入文件
+        /// 将指定的文本内容写入到文件中。可以选择是覆盖现有文件还是追加到文件末尾。
         /// </summary>
-        /// <param name="path">文件保存的路径 : System.String</param>
-        /// <param name="fileName">文件名 : System.String</param>
-        /// <param name="content">要写入文件的内容 : System.String</param>
-        /// <param name="appendToLast">是否将内容追加到文件末尾，默认为false（覆盖文件） : System.Boolean</param>
+        /// <param name="path">文件保存的目录路径 : System.String</param>
+        /// <param name="fileName">要写入的文件名 (包含后缀) : System.String</param>
+        /// <param name="content">要写入文件的文本内容 : System.String</param>
+        /// <param name="appendToLast">如果为true，则将内容追加到文件末尾；如果为false（默认值），则覆盖现有文件内容 : System.Boolean</param>
         public static void WriteFile(string path, string fileName, string content, bool appendToLast = false)
         {
             path = path.ReplacePath();
@@ -185,10 +185,10 @@ namespace VOL.Core.Utilities
 
 
         /// <summary>
-        /// 向文件中追加内容
+        /// 向指定的文件中追加文本内容。
         /// </summary>
-        /// <param name="Path">文件路径 : System.String</param>
-        /// <param name="strings">要追加的内容 : System.String</param>
+        /// <param name="Path">目标文件的完整路径 : System.String</param>
+        /// <param name="strings">要追加到文件中的文本内容 : System.String</param>
         public static void FileAdd(string Path, string strings)
         {
             StreamWriter sw = File.AppendText(Path.ReplacePath());
@@ -200,10 +200,10 @@ namespace VOL.Core.Utilities
 
 
         /// <summary>
-        /// 复制文件
+        /// 将源文件复制到目标文件路径。如果目标文件已存在，则覆盖它。
         /// </summary>
-        /// <param name="OrignFile">原始文件路径 : System.String</param>
-        /// <param name="NewFile">目标文件路径 : System.String</param>
+        /// <param name="OrignFile">原始文件的完整路径 : System.String</param>
+        /// <param name="NewFile">目标文件的完整路径 : System.String</param>
         public static void FileCoppy(string OrignFile, string NewFile)
         {
             File.Copy(OrignFile.ReplacePath(), NewFile.ReplacePath(), true);
@@ -211,29 +211,29 @@ namespace VOL.Core.Utilities
 
 
         /// <summary>
-        /// 删除文件
+        /// 删除指定路径的文件。
         /// </summary>
-        /// <param name="Path">文件路径 : System.String</param>
+        /// <param name="Path">要删除的文件的完整路径 : System.String</param>
         public static void FileDel(string Path)
         {
             File.Delete(Path.ReplacePath());
         }
 
         /// <summary>
-        /// 移动文件
+        /// 将源文件移动到目标文件路径。
         /// </summary>
-        /// <param name="OrignFile">原始文件路径 : System.String</param>
-        /// <param name="NewFile">目标文件路径 : System.String</param>
+        /// <param name="OrignFile">原始文件的完整路径 : System.String</param>
+        /// <param name="NewFile">目标文件的完整路径 : System.String</param>
         public static void FileMove(string OrignFile, string NewFile)
         {
             File.Move(OrignFile.ReplacePath(), NewFile.ReplacePath());
         }
 
         /// <summary>
-        /// 在指定目录下创建新目录
+        /// 在指定的原始目录下创建一个新的子目录。
         /// </summary>
-        /// <param name="OrignFolder">原始目录路径 (将在此目录下创建新目录) : System.String</param>
-        /// <param name="NewFloder">新目录的名称 : System.String</param>
+        /// <param name="OrignFolder">原始目录的路径，新目录将在此目录下创建 : System.String</param>
+        /// <param name="NewFloder">要创建的新子目录的名称 : System.String</param>
         public static void FolderCreate(string OrignFolder, string NewFloder)
         {
             Directory.SetCurrentDirectory(OrignFolder.ReplacePath());
@@ -241,9 +241,9 @@ namespace VOL.Core.Utilities
         }
 
         /// <summary>
-        /// 创建文件夹
+        /// 根据指定的路径创建文件夹。如果文件夹已存在，则不进行任何操作。
         /// </summary>
-        /// <param name="Path">要创建的文件夹路径 : System.String</param>
+        /// <param name="Path">要创建的文件夹的完整路径 : System.String</param>
         public static void FolderCreate(string Path)
         {
             // 判断目标目录是否存在如果不存在则新建之
@@ -252,9 +252,9 @@ namespace VOL.Core.Utilities
         }
 
         /// <summary>
-        /// 创建文件
+        /// 根据指定的路径创建一个空文件。如果文件已存在，则不进行任何操作。
         /// </summary>
-        /// <param name="Path">要创建的文件路径 : System.String</param>
+        /// <param name="Path">要创建的文件的完整路径 : System.String</param>
         public static void FileCreate(string Path)
         {
             FileInfo CreateFile = new FileInfo(Path.ReplacePath()); //创建文件 
@@ -266,9 +266,9 @@ namespace VOL.Core.Utilities
         }
 
         /// <summary>
-        /// 递归删除文件夹目录及文件
+        /// 递归删除指定目录及其所有子目录和文件。
         /// </summary>
-        /// <param name="dir">要删除的目录路径 : System.String</param>
+        /// <param name="dir">要删除的目录的完整路径 : System.String</param>
         public static void DeleteFolder(string dir)
         {
             dir = dir.ReplacePath();
@@ -287,10 +287,10 @@ namespace VOL.Core.Utilities
 
 
         /// <summary>
-        /// 将指定文件夹下的所有内容复制到目标文件夹
+        /// 将源文件夹的所有内容（包括子文件夹和文件）复制到目标文件夹。
         /// </summary>
-        /// <param name="srcPath">源文件夹路径 : System.String</param>
-        /// <param name="aimPath">目标文件夹路径 : System.String</param>
+        /// <param name="srcPath">源文件夹的完整路径 : System.String</param>
+        /// <param name="aimPath">目标文件夹的完整路径。如果目标文件夹不存在，将会被创建。 : System.String</param>
         public static void CopyDir(string srcPath, string aimPath)
         {
             try
@@ -325,10 +325,10 @@ namespace VOL.Core.Utilities
         }
 
         /// <summary>
-        /// 获取文件夹的大小
+        /// 计算指定文件夹的总大小（包括所有子文件夹和文件）。
         /// </summary>
-        /// <param name="dirPath">文件夹路径 : System.String</param>
-        /// <returns>文件夹的大小（字节数） : System.Int64</returns>
+        /// <param name="dirPath">要计算大小的文件夹的完整路径 : System.String</param>
+        /// <returns>文件夹的总大小（单位：字节） : System.Int64</returns>
         public static long GetDirectoryLength(string dirPath)
         {
             dirPath = dirPath.ReplacePath();
@@ -352,10 +352,10 @@ namespace VOL.Core.Utilities
         }
 
         /// <summary>
-        /// 获取指定文件的详细属性
+        /// 获取指定文件的详细属性信息，并以字符串形式返回。
         /// </summary>
-        /// <param name="filePath">文件的完整路径 : System.String</param>
-        /// <returns>包含文件属性的描述字符串 : System.String</returns>
+        /// <param name="filePath">要获取属性的文件的完整路径 : System.String</param>
+        /// <returns>一个包含文件详细属性（如路径、名称、大小、创建时间、修改时间等）的描述字符串 : System.String</returns>
         public static string GetFileAttibe(string filePath)
         {
             string str = "";
