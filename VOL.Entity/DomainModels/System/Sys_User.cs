@@ -18,7 +18,7 @@ namespace VOL.Entity.DomainModels
     public partial class Sys_User:BaseEntity
     {
         /// <summary>
-       ///帐号
+       /// 用户登录帐号
        /// </summary>
        [Display(Name ="帐号")]
        [MaxLength(100)]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public string UserName { get; set; }
 
        /// <summary>
-       ///
+       /// 用户ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="User_Id")]
@@ -37,7 +37,11 @@ namespace VOL.Entity.DomainModels
        public int User_Id { get; set; }
 
        /// <summary>
-       ///性别
+       /// 性别
+       /// 可能的值:
+       /// 0: 未知 (Unknown)
+       /// 1: 男性 (Male)
+       /// 2: 女性 (Female)
        /// </summary>
        [Display(Name ="性别")]
        [Column(TypeName="int")]
@@ -45,7 +49,7 @@ namespace VOL.Entity.DomainModels
        public int? Gender { get; set; }
 
        /// <summary>
-       ///头像
+       /// 用户头像的URL链接
        /// </summary>
        [Display(Name ="头像")]
        [MaxLength(500)]
@@ -54,14 +58,14 @@ namespace VOL.Entity.DomainModels
        public string HeadImageUrl { get; set; }
 
        /// <summary>
-       ///不用
+       /// 用户所属部门ID (此字段可能已废弃或由其他方式管理，标记为"不用")
        /// </summary>
        [Display(Name ="不用")]
        [Column(TypeName="int")]
        public int? Dept_Id { get; set; }
 
        /// <summary>
-       ///不用
+       /// 用户所属部门名称 (此字段可能已废弃或由其他方式管理，标记为"不用")
        /// </summary>
        [Display(Name ="不用")]
        [MaxLength(150)]
@@ -70,7 +74,7 @@ namespace VOL.Entity.DomainModels
        public string DeptName { get; set; }
 
        /// <summary>
-       ///角色
+       /// 用户所属角色ID
        /// </summary>
        [Display(Name ="角色")]
        [Column(TypeName="int")]
@@ -79,7 +83,7 @@ namespace VOL.Entity.DomainModels
        public int Role_Id { get; set; }
 
        /// <summary>
-       ///不用
+       /// 用户所属角色名称 (此字段可能已废弃或由其他方式管理，标记为"不用")
        /// </summary>
        [Display(Name ="不用")]
        [MaxLength(200)]
@@ -88,7 +92,7 @@ namespace VOL.Entity.DomainModels
        public string RoleName { get; set; }
 
        /// <summary>
-       ///Token
+       /// 用户当前的身份验证Token
        /// </summary>
        [Display(Name ="Token")]
        [MaxLength(500)]
@@ -97,7 +101,10 @@ namespace VOL.Entity.DomainModels
        public string Token { get; set; }
 
        /// <summary>
-       ///类型
+       /// 应用类型或用户类型 (具体含义需参照业务文档或相关枚举)
+       /// 例如可能表示:
+       /// 1: Web端用户
+       /// 2: App端用户
        /// </summary>
        [Display(Name ="类型")]
        [Column(TypeName="int")]
@@ -105,7 +112,7 @@ namespace VOL.Entity.DomainModels
        public int? AppType { get; set; }
 
        /// <summary>
-       ///组织构架
+       /// 用户所属的部门ID列表 (通常用于多部门场景，格式可能为逗号分隔的ID字符串)
        /// </summary>
        [Display(Name ="组织构架")]
        [MaxLength(2000)]
@@ -114,7 +121,7 @@ namespace VOL.Entity.DomainModels
        public string DeptIds { get; set; }
 
        /// <summary>
-       ///姓名
+       /// 用户真实姓名
        /// </summary>
        [Display(Name ="姓名")]
        [MaxLength(20)]
@@ -124,7 +131,7 @@ namespace VOL.Entity.DomainModels
        public string UserTrueName { get; set; }
 
        /// <summary>
-       ///密码
+       /// 用户登录密码 (通常存储加密后的哈希值)
        /// </summary>
        [Display(Name ="密码")]
        [MaxLength(200)]
@@ -133,21 +140,24 @@ namespace VOL.Entity.DomainModels
        public string UserPwd { get; set; }
 
        /// <summary>
-       ///注册时间
+       /// 用户账户创建或注册时间
        /// </summary>
        [Display(Name ="注册时间")]
        [Column(TypeName="datetime")]
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///手机用户
+       /// 是否为手机注册用户
+       /// 可能的值:
+       /// 1: 是 (Yes)
+       /// 0: 否 (No)
        /// </summary>
        [Display(Name ="手机用户")]
        [Column(TypeName="int")]
        public int? IsRegregisterPhone { get; set; }
 
        /// <summary>
-       ///手机号
+       /// 用户绑定的手机号码
        /// </summary>
        [Display(Name ="手机号")]
        [MaxLength(11)]
@@ -155,7 +165,7 @@ namespace VOL.Entity.DomainModels
        public string PhoneNo { get; set; }
 
        /// <summary>
-       ///
+       /// 用户固定电话号码
        /// </summary>
        [Display(Name ="Tel")]
        [MaxLength(20)]
@@ -163,14 +173,14 @@ namespace VOL.Entity.DomainModels
        public string Tel { get; set; }
 
        /// <summary>
-       ///
+       /// 创建者ID
        /// </summary>
        [Display(Name ="CreateID")]
        [Column(TypeName="int")]
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(200)]
@@ -178,7 +188,10 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///是否可用
+       /// 账户是否启用
+       /// 可能的值:
+       /// 1: 启用 (Enabled)
+       /// 0: 禁用 (Disabled)
        /// </summary>
        [Display(Name ="是否可用")]
        [Column(TypeName="tinyint")]
@@ -187,14 +200,14 @@ namespace VOL.Entity.DomainModels
        public byte Enable { get; set; }
 
        /// <summary>
-       ///
+       /// 修改者ID
        /// </summary>
        [Display(Name ="ModifyID")]
        [Column(TypeName="int")]
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(200)]
@@ -202,21 +215,25 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]
        public DateTime? ModifyDate { get; set; }
 
        /// <summary>
-       ///审核状态
+       /// 审核状态
+       /// 可能的值:
+       /// 0: 待审核 (Pending)
+       /// 1: 审核通过 (Approved)
+       /// 2: 审核未通过 (Rejected)
        /// </summary>
        [Display(Name ="审核状态")]
        [Column(TypeName="int")]
        public int? AuditStatus { get; set; }
 
        /// <summary>
-       ///审核人
+       /// 审核人名称
        /// </summary>
        [Display(Name ="审核人")]
        [MaxLength(200)]
@@ -224,28 +241,28 @@ namespace VOL.Entity.DomainModels
        public string Auditor { get; set; }
 
        /// <summary>
-       ///审核时间
+       /// 审核操作的时间
        /// </summary>
        [Display(Name ="审核时间")]
        [Column(TypeName="datetime")]
        public DateTime? AuditDate { get; set; }
 
        /// <summary>
-       ///最后登陆时间
+       /// 用户最后一次登录系统的时间
        /// </summary>
        [Display(Name ="最后登陆时间")]
        [Column(TypeName="datetime")]
        public DateTime? LastLoginDate { get; set; }
 
        /// <summary>
-       ///最后密码修改时间
+       /// 用户最后一次修改密码的时间
        /// </summary>
        [Display(Name ="最后密码修改时间")]
        [Column(TypeName="datetime")]
        public DateTime? LastModifyPwdDate { get; set; }
 
        /// <summary>
-       ///地址
+       /// 用户联系地址
        /// </summary>
        [Display(Name ="地址")]
        [MaxLength(200)]
@@ -254,7 +271,7 @@ namespace VOL.Entity.DomainModels
        public string Address { get; set; }
 
        /// <summary>
-       ///电话
+       /// 用户备用联系电话或移动电话
        /// </summary>
        [Display(Name ="电话")]
        [MaxLength(100)]
@@ -263,7 +280,7 @@ namespace VOL.Entity.DomainModels
        public string Mobile { get; set; }
 
        /// <summary>
-       ///Email
+       /// 用户电子邮箱地址
        /// </summary>
        [Display(Name ="Email")]
        [MaxLength(100)]
@@ -272,7 +289,7 @@ namespace VOL.Entity.DomainModels
        public string Email { get; set; }
 
        /// <summary>
-       ///备注
+       /// 其他备注信息
        /// </summary>
        [Display(Name ="备注")]
        [MaxLength(200)]
@@ -281,7 +298,7 @@ namespace VOL.Entity.DomainModels
        public string Remark { get; set; }
 
        /// <summary>
-       ///排序号
+       /// 用于排序的序号
        /// </summary>
        [Display(Name ="排序号")]
        [Column(TypeName="int")]

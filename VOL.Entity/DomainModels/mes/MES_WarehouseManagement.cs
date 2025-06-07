@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class MES_WarehouseManagement:BaseEntity
     {
         /// <summary>
-       ///仓库ID
+       /// 仓库ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="仓库ID")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid WarehouseID { get; set; }
 
        /// <summary>
-       ///仓库编码
+       /// 仓库的唯一编码
        /// </summary>
        [Display(Name ="仓库编码")]
        [MaxLength(100)]
@@ -37,7 +37,7 @@ namespace VOL.Entity.DomainModels
        public string WarehouseCode { get; set; }
 
        /// <summary>
-       ///仓库名称
+       /// 仓库的名称
        /// </summary>
        [Display(Name ="仓库名称")]
        [MaxLength(100)]
@@ -46,7 +46,7 @@ namespace VOL.Entity.DomainModels
        public string WarehouseName { get; set; }
 
        /// <summary>
-       ///仓库类型
+       /// 仓库的类型 (例如: 原材料仓, 成品仓, 半成品仓, 不良品仓等，具体值参照业务定义)
        /// </summary>
        [Display(Name ="仓库类型")]
        [MaxLength(100)]
@@ -55,7 +55,7 @@ namespace VOL.Entity.DomainModels
        public string WarehouseType { get; set; }
 
        /// <summary>
-       ///仓库面积
+       /// 仓库的实际面积 (例如: 平方米)
        /// </summary>
        [Display(Name ="仓库面积")]
        [DisplayFormat(DataFormatString="10,2")]
@@ -65,7 +65,7 @@ namespace VOL.Entity.DomainModels
        public decimal WarehouseArea { get; set; }
 
        /// <summary>
-       ///仓库地址
+       /// 仓库所在的物理地址
        /// </summary>
        [Display(Name ="仓库地址")]
        [MaxLength(100)]
@@ -74,7 +74,7 @@ namespace VOL.Entity.DomainModels
        public string WarehouseAddress { get; set; }
 
        /// <summary>
-       ///仓库电话
+       /// 仓库的联系电话
        /// </summary>
        [Display(Name ="仓库电话")]
        [MaxLength(100)]
@@ -83,7 +83,7 @@ namespace VOL.Entity.DomainModels
        public string WarehousePhone { get; set; }
 
        /// <summary>
-       ///仓库管理员
+       /// 负责此仓库的管理员姓名或ID
        /// </summary>
        [Display(Name ="仓库管理员")]
        [MaxLength(100)]
@@ -92,7 +92,7 @@ namespace VOL.Entity.DomainModels
        public string WarehouseManager { get; set; }
 
        /// <summary>
-       ///仓库状态
+       /// 仓库的当前状态 (例如: 正常, 盘点中, 禁用等，具体值参照业务定义)
        /// </summary>
        [Display(Name ="仓库状态")]
        [MaxLength(100)]
@@ -101,7 +101,7 @@ namespace VOL.Entity.DomainModels
        public string WarehouseStatus { get; set; }
 
        /// <summary>
-       ///仓库容量
+       /// 仓库的设计或额定容量 (例如: 存储单元数量, 最大重量等)
        /// </summary>
        [Display(Name ="仓库容量")]
        [Column(TypeName="int")]
@@ -110,7 +110,7 @@ namespace VOL.Entity.DomainModels
        public int WarehouseCapacity { get; set; }
 
        /// <summary>
-       ///创建人ID
+       /// 创建者ID
        /// </summary>
        [Display(Name ="创建人ID")]
        [Column(TypeName="int")]
@@ -118,7 +118,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(100)]
@@ -127,7 +127,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -135,7 +135,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///修改人ID
+       /// 修改者ID
        /// </summary>
        [Display(Name ="修改人ID")]
        [Column(TypeName="int")]
@@ -143,7 +143,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(100)]
@@ -152,7 +152,7 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]

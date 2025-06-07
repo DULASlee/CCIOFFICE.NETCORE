@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class MES_QualityInspectionRecord:BaseEntity
     {
         /// <summary>
-       ///检验记录ID
+       /// 质量检验记录ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="检验记录ID")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid InspectionRecordID { get; set; }
 
        /// <summary>
-       ///检验计划明细ID
+       /// 关联的质量检验计划明细ID (外键, 关联MES_QualityInspectionPlanDetail.InspectionPlanDetailID)
        /// </summary>
        [Display(Name ="检验计划明细ID")]
        [MaxLength(36)]
@@ -37,7 +37,7 @@ namespace VOL.Entity.DomainModels
        public Guid? InspectionPlanDetailID { get; set; }
 
        /// <summary>
-       ///检验单号
+       /// 本次检验的唯一单据编号 (可能与检验计划单号关联)
        /// </summary>
        [Display(Name ="检验单号")]
        [MaxLength(100)]
@@ -47,7 +47,7 @@ namespace VOL.Entity.DomainModels
        public string InspectionNumber { get; set; }
 
        /// <summary>
-       ///检验员
+       /// 执行检验操作的人员姓名或ID
        /// </summary>
        [Display(Name ="检验员")]
        [MaxLength(100)]
@@ -57,7 +57,7 @@ namespace VOL.Entity.DomainModels
        public string Inspector { get; set; }
 
        /// <summary>
-       ///检验时间
+       /// 实际进行检验操作的时间
        /// </summary>
        [Display(Name ="检验时间")]
        [Column(TypeName="datetime")]
@@ -66,7 +66,7 @@ namespace VOL.Entity.DomainModels
        public DateTime InspectionTime { get; set; }
 
        /// <summary>
-       ///实际检验数量
+       /// 本次实际执行检验的物料数量
        /// </summary>
        [Display(Name ="实际检验数量")]
        [Column(TypeName="int")]
@@ -75,7 +75,7 @@ namespace VOL.Entity.DomainModels
        public int InspectedQuantity { get; set; }
 
        /// <summary>
-       ///合格数量
+       /// 经检验合格的物料数量
        /// </summary>
        [Display(Name ="合格数量")]
        [Column(TypeName="int")]
@@ -84,7 +84,7 @@ namespace VOL.Entity.DomainModels
        public int PassedQuantity { get; set; }
 
        /// <summary>
-       ///不合格数量
+       /// 经检验不合格的物料数量
        /// </summary>
        [Display(Name ="不合格数量")]
        [Column(TypeName="int")]
@@ -93,7 +93,11 @@ namespace VOL.Entity.DomainModels
        public int FailedQuantity { get; set; }
 
        /// <summary>
-       ///检验结果（合格、不合格）
+       /// 本次检验的总体结果
+       /// 可能的值:
+       /// "合格" (Passed)
+       /// "不合格" (Failed)
+       /// (也可能包含其他如 "让步接收" 等状态，具体值参照业务定义)
        /// </summary>
        [Display(Name ="检验结果（合格、不合格）")]
        [MaxLength(100)]
@@ -103,7 +107,7 @@ namespace VOL.Entity.DomainModels
        public string InspectionResult { get; set; }
 
        /// <summary>
-       ///缺陷描述
+       /// 如果检验结果为不合格，此处记录缺陷的详细描述
        /// </summary>
        [Display(Name ="缺陷描述")]
        [MaxLength(100)]
@@ -112,7 +116,7 @@ namespace VOL.Entity.DomainModels
        public string DefectDescription { get; set; }
 
        /// <summary>
-       ///创建人ID
+       /// 创建者ID
        /// </summary>
        [Display(Name ="创建人ID")]
        [Column(TypeName="int")]
@@ -120,7 +124,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(100)]
@@ -129,7 +133,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -137,7 +141,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///修改人ID
+       /// 修改者ID
        /// </summary>
        [Display(Name ="修改人ID")]
        [Column(TypeName="int")]
@@ -145,7 +149,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(100)]
@@ -154,7 +158,7 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]

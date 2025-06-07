@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class Sys_WorkFlowTable:BaseEntity
     {
         /// <summary>
-       ///
+       /// 工作流实例ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="WorkFlowTable_Id")]
@@ -26,14 +26,14 @@ namespace VOL.Entity.DomainModels
        public Guid WorkFlowTable_Id { get; set; }
 
        /// <summary>
-       ///流程id
+       /// 关联的工作流程定义ID (外键，关联Sys_WorkFlow.WorkFlow_Id)
        /// </summary>
        [Display(Name ="流程id")]
        [Column(TypeName="uniqueidentifier")]
        public Guid? WorkFlow_Id { get; set; }
 
        /// <summary>
-       ///流程名称
+       /// 工作流程的名称
        /// </summary>
        [Display(Name ="流程名称")]
        [MaxLength(200)]
@@ -41,7 +41,7 @@ namespace VOL.Entity.DomainModels
        public string WorkName { get; set; }
 
        /// <summary>
-       ///表主键id
+       /// 关联的业务表记录的主键ID值
        /// </summary>
        [Display(Name ="表主键id")]
        [MaxLength(200)]
@@ -49,7 +49,7 @@ namespace VOL.Entity.DomainModels
        public string WorkTableKey { get; set; }
 
        /// <summary>
-       ///表名
+       /// 关联的业务表名
        /// </summary>
        [Display(Name ="表名")]
        [MaxLength(200)]
@@ -57,7 +57,7 @@ namespace VOL.Entity.DomainModels
        public string WorkTable { get; set; }
 
        /// <summary>
-       ///业务名称
+       /// 关联的业务表对应的功能菜单或业务描述名称
        /// </summary>
        [Display(Name ="业务名称")]
        [MaxLength(200)]
@@ -65,7 +65,7 @@ namespace VOL.Entity.DomainModels
        public string WorkTableName { get; set; }
 
        /// <summary>
-       ///审核节点ID
+       /// 当前审批节点的ID (关联Sys_WorkFlowStep.StepId)
        /// </summary>
        [Display(Name ="审核节点ID")]
        [MaxLength(100)]
@@ -73,7 +73,7 @@ namespace VOL.Entity.DomainModels
        public string CurrentStepId { get; set; }
 
        /// <summary>
-       ///审核节点名称
+       /// 当前审批节点的名称
        /// </summary>
        [Display(Name ="审核节点名称")]
        [MaxLength(500)]
@@ -81,21 +81,27 @@ namespace VOL.Entity.DomainModels
        public string StepName { get; set; }
 
        /// <summary>
-       ///不用
+       /// 当前审批节点的顺序ID (此字段标记为"不用", 可能已废弃)
        /// </summary>
        [Display(Name ="不用")]
        [Column(TypeName="int")]
        public int? CurrentOrderId { get; set; }
 
        /// <summary>
-       ///审批状态
+       /// 审批状态
+       /// 可能的值 (具体需参照业务或枚举定义):
+       /// 0: 待审核 (Pending)
+       /// 1: 审核通过 (Approved)
+       /// 2: 审核未通过 (Rejected)
+       /// 3: 审核中 (In Progress)
+       /// 4: 已撤回 (Recalled)
        /// </summary>
        [Display(Name ="审批状态")]
        [Column(TypeName="int")]
        public int? AuditStatus { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称 (发起人)
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(30)]
@@ -103,28 +109,31 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间 (流程发起时间)
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///
+       /// 创建者ID (发起人ID)
        /// </summary>
        [Display(Name ="CreateID")]
        [Column(TypeName="int")]
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///
+       /// 是否启用 (此字段可能表示流程实例的有效性)
+       /// 可能的值:
+       /// 1: 启用 (Enabled)
+       /// 0: 禁用 (Disabled)
        /// </summary>
        [Display(Name ="Enable")]
        [Column(TypeName="tinyint")]
        public byte? Enable { get; set; }
 
        /// <summary>
-       ///
+       /// 修改者名称
        /// </summary>
        [Display(Name ="Modifier")]
        [MaxLength(30)]
@@ -132,19 +141,22 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="ModifyDate")]
        [Column(TypeName="datetime")]
        public DateTime? ModifyDate { get; set; }
 
        /// <summary>
-       ///
+       /// 修改者ID
        /// </summary>
        [Display(Name ="ModifyID")]
        [Column(TypeName="int")]
        public int? ModifyID { get; set; }
 
+       /// <summary>
+       /// 关联的审批流程的具体步骤实例列表
+       /// </summary>
        [Display(Name ="审批节点")]
        [ForeignKey("WorkFlowTable_Id")]
        public List<Sys_WorkFlowTableStep> Sys_WorkFlowTableStep { get; set; }

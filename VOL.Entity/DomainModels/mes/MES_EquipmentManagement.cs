@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class MES_EquipmentManagement:BaseEntity
     {
         /// <summary>
-       ///设备ID
+       /// 设备ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="设备ID")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid EquipmentID { get; set; }
 
        /// <summary>
-       ///设备编码
+       /// 设备的唯一编码
        /// </summary>
        [Display(Name ="设备编码")]
        [MaxLength(100)]
@@ -37,7 +37,7 @@ namespace VOL.Entity.DomainModels
        public string EquipmentCode { get; set; }
 
        /// <summary>
-       ///设备名称
+       /// 设备的名称
        /// </summary>
        [Display(Name ="设备名称")]
        [MaxLength(100)]
@@ -46,7 +46,7 @@ namespace VOL.Entity.DomainModels
        public string EquipmentName { get; set; }
 
        /// <summary>
-       ///设备类型
+       /// 设备类型 (例如: 车床, 铣床, 检测设备等，具体值需参照业务定义)
        /// </summary>
        [Display(Name ="设备类型")]
        [MaxLength(100)]
@@ -55,7 +55,7 @@ namespace VOL.Entity.DomainModels
        public string EquipmentType { get; set; }
 
        /// <summary>
-       ///制造商
+       /// 设备的制造商名称
        /// </summary>
        [Display(Name ="制造商")]
        [MaxLength(100)]
@@ -64,7 +64,7 @@ namespace VOL.Entity.DomainModels
        public string Manufacturer { get; set; }
 
        /// <summary>
-       ///购买日期
+       /// 设备的购买日期
        /// </summary>
        [Display(Name ="购买日期")]
        [Column(TypeName="datetime")]
@@ -72,7 +72,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? PurchaseDate { get; set; }
 
        /// <summary>
-       ///保修期（月）
+       /// 设备的保修期限 (单位: 月)
        /// </summary>
        [Display(Name ="保修期（月）")]
        [Column(TypeName="int")]
@@ -80,7 +80,7 @@ namespace VOL.Entity.DomainModels
        public int? WarrantyPeriod { get; set; }
 
        /// <summary>
-       ///安装位置
+       /// 设备在车间或工厂中的具体安装位置
        /// </summary>
        [Display(Name ="安装位置")]
        [MaxLength(100)]
@@ -89,7 +89,7 @@ namespace VOL.Entity.DomainModels
        public string InstallationLocation { get; set; }
 
        /// <summary>
-       ///设备状态
+       /// 设备的当前状态 (例如: 运行中, 停机, 维修中, 保养中, 待报废等，具体值需参照业务定义)
        /// </summary>
        [Display(Name ="设备状态")]
        [MaxLength(100)]
@@ -98,7 +98,7 @@ namespace VOL.Entity.DomainModels
        public string EquipmentStatus { get; set; }
 
        /// <summary>
-       ///责任人
+       /// 此设备的负责人姓名或ID
        /// </summary>
        [Display(Name ="责任人")]
        [MaxLength(100)]
@@ -107,7 +107,7 @@ namespace VOL.Entity.DomainModels
        public string ResponsiblePerson { get; set; }
 
        /// <summary>
-       ///创建人ID
+       /// 创建者ID
        /// </summary>
        [Display(Name ="创建人ID")]
        [Column(TypeName="int")]
@@ -115,7 +115,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(100)]
@@ -124,7 +124,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -132,7 +132,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///修改人ID
+       /// 修改者ID
        /// </summary>
        [Display(Name ="修改人ID")]
        [Column(TypeName="int")]
@@ -140,7 +140,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(100)]
@@ -149,7 +149,7 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]

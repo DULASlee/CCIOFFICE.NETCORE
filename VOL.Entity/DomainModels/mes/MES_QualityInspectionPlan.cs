@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class MES_QualityInspectionPlan:BaseEntity
     {
         /// <summary>
-       ///检验计划ID
+       /// 质量检验计划ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="检验计划ID")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid InspectionPlanID { get; set; }
 
        /// <summary>
-       ///检验单号
+       /// 检验计划的唯一单据编号
        /// </summary>
        [Display(Name ="检验单号")]
        [MaxLength(100)]
@@ -38,7 +38,7 @@ namespace VOL.Entity.DomainModels
        public string InspectionPlanNumber { get; set; }
 
        /// <summary>
-       ///订单ID
+       /// 关联的生产订单ID (外键, 关联MES_ProductionOrder.OrderID)
        /// </summary>
        [Display(Name ="订单ID")]
        [MaxLength(36)]
@@ -47,7 +47,7 @@ namespace VOL.Entity.DomainModels
        public Guid? OrderID { get; set; }
 
        /// <summary>
-       ///检验开始时间
+       /// 计划的检验开始时间
        /// </summary>
        [Display(Name ="检验开始时间")]
        [Column(TypeName="datetime")]
@@ -56,7 +56,7 @@ namespace VOL.Entity.DomainModels
        public DateTime PlanStartTime { get; set; }
 
        /// <summary>
-       ///检验结束时间
+       /// 计划的检验结束时间
        /// </summary>
        [Display(Name ="检验结束时间")]
        [Column(TypeName="datetime")]
@@ -65,7 +65,7 @@ namespace VOL.Entity.DomainModels
        public DateTime PlanEndTime { get; set; }
 
        /// <summary>
-       ///检验人
+       /// 负责执行此检验计划的人员姓名或ID
        /// </summary>
        [Display(Name ="检验人")]
        [MaxLength(100)]
@@ -75,7 +75,7 @@ namespace VOL.Entity.DomainModels
        public string ResponsiblePerson { get; set; }
 
        /// <summary>
-       ///计划状态
+       /// 检验计划的当前状态 (例如: 待检验, 检验中, 已完成, 已取消等，具体值参照业务定义)
        /// </summary>
        [Display(Name ="计划状态")]
        [MaxLength(100)]
@@ -84,7 +84,7 @@ namespace VOL.Entity.DomainModels
        public string PlanStatus { get; set; }
 
        /// <summary>
-       ///创建人ID
+       /// 创建者ID
        /// </summary>
        [Display(Name ="创建人ID")]
        [Column(TypeName="int")]
@@ -92,7 +92,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(100)]
@@ -101,7 +101,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -109,7 +109,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///修改人ID
+       /// 修改者ID
        /// </summary>
        [Display(Name ="修改人ID")]
        [Column(TypeName="int")]
@@ -117,7 +117,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(100)]
@@ -126,13 +126,16 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]
        [Editable(true)]
        public DateTime? ModifyDate { get; set; }
 
+       /// <summary>
+       /// 关联的质量检验计划明细列表
+       /// </summary>
        [Display(Name ="质检明细")]
        [ForeignKey("InspectionPlanID")]
        public List<MES_QualityInspectionPlanDetail> MES_QualityInspectionPlanDetail { get; set; }

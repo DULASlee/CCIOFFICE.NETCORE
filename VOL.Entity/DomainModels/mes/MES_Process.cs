@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class MES_Process:BaseEntity
     {
         /// <summary>
-       ///工序ID
+       /// 工序ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="工序ID")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid ProcessID { get; set; }
 
        /// <summary>
-       ///工序编码
+       /// 工序的唯一编码
        /// </summary>
        [Display(Name ="工序编码")]
        [MaxLength(100)]
@@ -37,7 +37,7 @@ namespace VOL.Entity.DomainModels
        public string ProcessCode { get; set; }
 
        /// <summary>
-       ///工序名称
+       /// 工序的名称
        /// </summary>
        [Display(Name ="工序名称")]
        [MaxLength(100)]
@@ -46,7 +46,7 @@ namespace VOL.Entity.DomainModels
        public string ProcessName { get; set; }
 
        /// <summary>
-       ///工序类型
+       /// 工序的类型 (例如: 机加工, 装配, 检验等，具体值参照业务定义)
        /// </summary>
        [Display(Name ="工序类型")]
        [MaxLength(100)]
@@ -55,7 +55,7 @@ namespace VOL.Entity.DomainModels
        public string ProcessType { get; set; }
 
        /// <summary>
-       ///工序顺序
+       /// 工序在工艺路线中的顺序号
        /// </summary>
        [Display(Name ="工序顺序")]
        [Column(TypeName="int")]
@@ -64,7 +64,7 @@ namespace VOL.Entity.DomainModels
        public int ProcessSequence { get; set; }
 
        /// <summary>
-       ///工序描述
+       /// 对工序的详细描述
        /// </summary>
        [Display(Name ="工序描述")]
        [MaxLength(100)]
@@ -73,7 +73,7 @@ namespace VOL.Entity.DomainModels
        public string ProcessDescription { get; set; }
 
        /// <summary>
-       ///工作中心
+       /// 执行此工序的工作中心或设备组
        /// </summary>
        [Display(Name ="工作中心")]
        [MaxLength(100)]
@@ -82,7 +82,7 @@ namespace VOL.Entity.DomainModels
        public string WorkCenter { get; set; }
 
        /// <summary>
-       ///标准工时
+       /// 完成此工序所需的标准工时 (例如: 小时)
        /// </summary>
        [Display(Name ="标准工时")]
        [DisplayFormat(DataFormatString="10,2")]
@@ -92,7 +92,7 @@ namespace VOL.Entity.DomainModels
        public decimal StandardWorkingHours { get; set; }
 
        /// <summary>
-       ///工序状态
+       /// 工序的当前状态 (例如: 启用, 禁用, 审核中等，具体值参照业务定义)
        /// </summary>
        [Display(Name ="工序状态")]
        [MaxLength(100)]
@@ -101,7 +101,7 @@ namespace VOL.Entity.DomainModels
        public string ProcessStatus { get; set; }
 
        /// <summary>
-       ///责任人
+       /// 此工序的负责人姓名或ID
        /// </summary>
        [Display(Name ="责任人")]
        [MaxLength(100)]
@@ -110,7 +110,7 @@ namespace VOL.Entity.DomainModels
        public string ResponsibleWorker { get; set; }
 
        /// <summary>
-       ///创建人ID
+       /// 创建者ID
        /// </summary>
        [Display(Name ="创建人ID")]
        [Column(TypeName="int")]
@@ -118,7 +118,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(100)]
@@ -127,7 +127,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -135,7 +135,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///修改人ID
+       /// 修改者ID
        /// </summary>
        [Display(Name ="修改人ID")]
        [Column(TypeName="int")]
@@ -143,7 +143,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(100)]
@@ -152,13 +152,16 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]
        [Editable(true)]
        public DateTime? ModifyDate { get; set; }
 
+       /// <summary>
+       /// 关联的工艺路线列表 (定义此工序可用于哪些工艺路线)
+       /// </summary>
        [Display(Name ="工艺路线")]
        [ForeignKey("ProcessID")]
        public List<MES_ProcessRoute> MES_ProcessRoute { get; set; }

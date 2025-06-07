@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class MES_ProductionPlanDetail:BaseEntity
     {
         /// <summary>
-       ///计划明细ID
+       /// 生产计划明细ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="计划明细ID")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid PlanDetailID { get; set; }
 
        /// <summary>
-       ///订单ID
+       /// 所属生产订单ID (外键, 关联MES_ProductionOrder.OrderID)
        /// </summary>
        [Display(Name ="订单ID")]
        [MaxLength(36)]
@@ -37,7 +37,7 @@ namespace VOL.Entity.DomainModels
        public Guid? OrderID { get; set; }
 
        /// <summary>
-       ///物料编码
+       /// 计划生产的物料编码 (外键, 关联MES_Material.MaterialCode)
        /// </summary>
        [Display(Name ="物料编码")]
        [MaxLength(100)]
@@ -47,7 +47,7 @@ namespace VOL.Entity.DomainModels
        public string MaterialCode { get; set; }
 
        /// <summary>
-       ///物料名称
+       /// 计划生产的物料名称
        /// </summary>
        [Display(Name ="物料名称")]
        [MaxLength(100)]
@@ -57,7 +57,7 @@ namespace VOL.Entity.DomainModels
        public string MaterialName { get; set; }
 
        /// <summary>
-       ///物料规格
+       /// 计划生产的物料规格型号
        /// </summary>
        [Display(Name ="物料规格")]
        [MaxLength(100)]
@@ -66,7 +66,7 @@ namespace VOL.Entity.DomainModels
        public string MaterialSpecification { get; set; }
 
        /// <summary>
-       ///单位
+       /// 计划数量的单位 (例如: 个, 件, Kg)
        /// </summary>
        [Display(Name ="单位")]
        [MaxLength(100)]
@@ -75,7 +75,7 @@ namespace VOL.Entity.DomainModels
        public string Unit { get; set; }
 
        /// <summary>
-       ///订单数量
+       /// 此明细项的计划生产数量
        /// </summary>
        [Display(Name ="订单数量")]
        [Column(TypeName="int")]
@@ -83,7 +83,7 @@ namespace VOL.Entity.DomainModels
        public int? PlanQuantity { get; set; }
 
        /// <summary>
-       ///计划开始时间
+       /// 计划开始生产的时间
        /// </summary>
        [Display(Name ="计划开始时间")]
        [Column(TypeName="datetime")]
@@ -91,7 +91,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? PlannedStartTime { get; set; }
 
        /// <summary>
-       ///计划结束时间
+       /// 计划结束生产的时间
        /// </summary>
        [Display(Name ="计划结束时间")]
        [Column(TypeName="datetime")]
@@ -99,7 +99,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? PlannedEndTime { get; set; }
 
        /// <summary>
-       ///计划状态
+       /// 生产计划明细的状态 (例如: 未开始, 进行中, 已完成, 已暂停, 已取消等，具体值参照业务定义)
        /// </summary>
        [Display(Name ="计划状态")]
        [MaxLength(100)]
@@ -108,7 +108,7 @@ namespace VOL.Entity.DomainModels
        public string PlanStatus { get; set; }
 
        /// <summary>
-       ///创建人ID
+       /// 创建者ID
        /// </summary>
        [Display(Name ="创建人ID")]
        [Column(TypeName="int")]
@@ -116,7 +116,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(100)]
@@ -125,7 +125,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -133,7 +133,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///修改人ID
+       /// 修改者ID
        /// </summary>
        [Display(Name ="修改人ID")]
        [Column(TypeName="int")]
@@ -141,7 +141,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(100)]
@@ -150,7 +150,7 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]

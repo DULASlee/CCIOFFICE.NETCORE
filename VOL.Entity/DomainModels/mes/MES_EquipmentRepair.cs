@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class MES_EquipmentRepair:BaseEntity
     {
         /// <summary>
-       ///维修ID
+       /// 维修记录ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="维修ID")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid RepairID { get; set; }
 
        /// <summary>
-       ///设备ID
+       /// 进行维修的设备ID (外键, 关联MES_EquipmentManagement.EquipmentID)
        /// </summary>
        [Display(Name ="设备ID")]
        [MaxLength(36)]
@@ -37,7 +37,7 @@ namespace VOL.Entity.DomainModels
        public Guid? EquipmentID { get; set; }
 
        /// <summary>
-       ///维修日期
+       /// 维修实际发生的日期
        /// </summary>
        [Display(Name ="维修日期")]
        [Column(TypeName="datetime")]
@@ -45,7 +45,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? RepairDate { get; set; }
 
        /// <summary>
-       ///维修原因
+       /// 进行本次维修的主要原因或故障现象
        /// </summary>
        [Display(Name ="维修原因")]
        [MaxLength(100)]
@@ -54,7 +54,7 @@ namespace VOL.Entity.DomainModels
        public string RepairReason { get; set; }
 
        /// <summary>
-       ///维修内容
+       /// 本次维修的具体工作内容描述
        /// </summary>
        [Display(Name ="维修内容")]
        [MaxLength(100)]
@@ -63,7 +63,7 @@ namespace VOL.Entity.DomainModels
        public string RepairContent { get; set; }
 
        /// <summary>
-       ///维修人员
+       /// 执行维修的人员姓名或ID
        /// </summary>
        [Display(Name ="维修人员")]
        [MaxLength(100)]
@@ -72,7 +72,7 @@ namespace VOL.Entity.DomainModels
        public string RepairPerson { get; set; }
 
        /// <summary>
-       ///维修成本
+       /// 本次维修所花费的成本 (材料费、人工费等)
        /// </summary>
        [Display(Name ="维修成本")]
        [DisplayFormat(DataFormatString="10,2")]
@@ -81,7 +81,7 @@ namespace VOL.Entity.DomainModels
        public decimal? RepairCost { get; set; }
 
        /// <summary>
-       ///维修状态
+       /// 维修工作的当前状态 (例如: 待维修, 维修中, 已完成, 无法修复等，具体值需参照业务定义)
        /// </summary>
        [Display(Name ="维修状态")]
        [MaxLength(100)]
@@ -90,7 +90,7 @@ namespace VOL.Entity.DomainModels
        public string RepairStatus { get; set; }
 
        /// <summary>
-       ///维修开始时间
+       /// 维修工作实际开始的时间
        /// </summary>
        [Display(Name ="维修开始时间")]
        [Column(TypeName="datetime")]
@@ -98,7 +98,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? RepairStartTime { get; set; }
 
        /// <summary>
-       ///维修结束时间
+       /// 维修工作实际结束的时间
        /// </summary>
        [Display(Name ="维修结束时间")]
        [Column(TypeName="datetime")]
@@ -106,7 +106,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? RepairEndTime { get; set; }
 
        /// <summary>
-       ///创建人ID
+       /// 创建者ID
        /// </summary>
        [Display(Name ="创建人ID")]
        [Column(TypeName="int")]
@@ -114,7 +114,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(100)]
@@ -123,7 +123,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -131,7 +131,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///修改人ID
+       /// 修改者ID
        /// </summary>
        [Display(Name ="修改人ID")]
        [Column(TypeName="int")]
@@ -139,7 +139,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(100)]
@@ -148,7 +148,7 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]

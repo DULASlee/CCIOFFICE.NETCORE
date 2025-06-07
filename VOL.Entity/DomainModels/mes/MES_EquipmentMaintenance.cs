@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class MES_EquipmentMaintenance:BaseEntity
     {
         /// <summary>
-       ///保养ID
+       /// 保养记录ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="保养ID")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid MaintenanceID { get; set; }
 
        /// <summary>
-       ///设备ID
+       /// 进行保养的设备ID (外键, 关联MES_EquipmentManagement.EquipmentID)
        /// </summary>
        [Display(Name ="设备ID")]
        [MaxLength(36)]
@@ -37,7 +37,7 @@ namespace VOL.Entity.DomainModels
        public Guid? EquipmentID { get; set; }
 
        /// <summary>
-       ///保养日期
+       /// 保养执行的日期
        /// </summary>
        [Display(Name ="保养日期")]
        [Column(TypeName="datetime")]
@@ -45,7 +45,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? MaintenanceDate { get; set; }
 
        /// <summary>
-       ///保养类型
+       /// 保养的类型 (例如: 日常保养, 定期保养, 预防性保养等，具体值需参照业务定义)
        /// </summary>
        [Display(Name ="保养类型")]
        [MaxLength(100)]
@@ -54,7 +54,7 @@ namespace VOL.Entity.DomainModels
        public string MaintenanceType { get; set; }
 
        /// <summary>
-       ///保养内容
+       /// 本次保养的具体工作内容描述
        /// </summary>
        [Display(Name ="保养内容")]
        [MaxLength(100)]
@@ -63,7 +63,7 @@ namespace VOL.Entity.DomainModels
        public string MaintenanceContent { get; set; }
 
        /// <summary>
-       ///保养人员
+       /// 执行保养的人员姓名或ID
        /// </summary>
        [Display(Name ="保养人员")]
        [MaxLength(100)]
@@ -72,7 +72,7 @@ namespace VOL.Entity.DomainModels
        public string MaintenancePerson { get; set; }
 
        /// <summary>
-       ///保养状态
+       /// 保养工作的当前状态 (例如: 计划中, 进行中, 已完成, 已延迟等，具体值需参照业务定义)
        /// </summary>
        [Display(Name ="保养状态")]
        [MaxLength(100)]
@@ -81,7 +81,7 @@ namespace VOL.Entity.DomainModels
        public string MaintenanceStatus { get; set; }
 
        /// <summary>
-       ///下次保养日期
+       /// 计划的下次保养日期
        /// </summary>
        [Display(Name ="下次保养日期")]
        [Column(TypeName="datetime")]
@@ -89,7 +89,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? NextMaintenanceDate { get; set; }
 
        /// <summary>
-       ///保养成本
+       /// 本次保养所花费的成本
        /// </summary>
        [Display(Name ="保养成本")]
        [DisplayFormat(DataFormatString="10,2")]
@@ -98,7 +98,7 @@ namespace VOL.Entity.DomainModels
        public decimal? MaintenanceCost { get; set; }
 
        /// <summary>
-       ///保养备注
+       /// 关于本次保养的其他备注信息
        /// </summary>
        [Display(Name ="保养备注")]
        [MaxLength(100)]
@@ -107,7 +107,7 @@ namespace VOL.Entity.DomainModels
        public string MaintenanceRemarks { get; set; }
 
        /// <summary>
-       ///创建人ID
+       /// 创建者ID
        /// </summary>
        [Display(Name ="创建人ID")]
        [Column(TypeName="int")]
@@ -115,7 +115,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(100)]
@@ -124,7 +124,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -132,7 +132,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///修改人ID
+       /// 修改者ID
        /// </summary>
        [Display(Name ="修改人ID")]
        [Column(TypeName="int")]
@@ -140,7 +140,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(100)]
@@ -149,7 +149,7 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]

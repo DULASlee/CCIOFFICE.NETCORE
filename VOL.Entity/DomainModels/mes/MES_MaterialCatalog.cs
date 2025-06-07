@@ -17,7 +17,7 @@ namespace VOL.Entity.DomainModels
     public partial class MES_MaterialCatalog:BaseEntity
     {
         /// <summary>
-       ///分类ID
+       /// 物料分类ID (主键)
        /// </summary>
        [Key]
        [Display(Name ="分类ID")]
@@ -28,7 +28,7 @@ namespace VOL.Entity.DomainModels
        public Guid CatalogID { get; set; }
 
        /// <summary>
-       ///分类编码
+       /// 物料分类的唯一编码
        /// </summary>
        [Display(Name ="分类编码")]
        [MaxLength(100)]
@@ -38,7 +38,7 @@ namespace VOL.Entity.DomainModels
        public string CatalogCode { get; set; }
 
        /// <summary>
-       ///分类名称
+       /// 物料分类的名称
        /// </summary>
        [Display(Name ="分类名称")]
        [MaxLength(100)]
@@ -48,7 +48,7 @@ namespace VOL.Entity.DomainModels
        public string CatalogName { get; set; }
 
        /// <summary>
-       ///分类类型
+       /// 物料分类的类型 (例如: 原材料类, 半成品类, 成品类等，具体值参照业务定义)
        /// </summary>
        [Display(Name ="分类类型")]
        [MaxLength(100)]
@@ -57,7 +57,7 @@ namespace VOL.Entity.DomainModels
        public string CatalogType { get; set; }
 
        /// <summary>
-       ///上级分类
+       /// 上级物料分类ID (用于构建层级分类，外键，自关联)
        /// </summary>
        [Display(Name ="上级分类")]
        [MaxLength(36)]
@@ -66,7 +66,10 @@ namespace VOL.Entity.DomainModels
        public Guid? ParentId { get; set; }
 
        /// <summary>
-       ///启用状态
+       /// 启用状态
+       /// 可能的值:
+       /// 1: 启用 (Enabled)
+       /// 0: 禁用 (Disabled)
        /// </summary>
        [Display(Name ="启用状态")]
        [Column(TypeName="int")]
@@ -74,7 +77,7 @@ namespace VOL.Entity.DomainModels
        public int? Enable { get; set; }
 
        /// <summary>
-       ///备注信息
+       /// 其他备注信息
        /// </summary>
        [Display(Name ="备注信息")]
        [MaxLength(100)]
@@ -83,7 +86,7 @@ namespace VOL.Entity.DomainModels
        public string Remarks { get; set; }
 
        /// <summary>
-       ///创建人ID
+       /// 创建者ID
        /// </summary>
        [Display(Name ="创建人ID")]
        [Column(TypeName="int")]
@@ -91,7 +94,7 @@ namespace VOL.Entity.DomainModels
        public int? CreateID { get; set; }
 
        /// <summary>
-       ///创建人
+       /// 创建人名称
        /// </summary>
        [Display(Name ="创建人")]
        [MaxLength(100)]
@@ -100,7 +103,7 @@ namespace VOL.Entity.DomainModels
        public string Creator { get; set; }
 
        /// <summary>
-       ///创建时间
+       /// 记录创建时间
        /// </summary>
        [Display(Name ="创建时间")]
        [Column(TypeName="datetime")]
@@ -108,7 +111,7 @@ namespace VOL.Entity.DomainModels
        public DateTime? CreateDate { get; set; }
 
        /// <summary>
-       ///修改人ID
+       /// 修改者ID
        /// </summary>
        [Display(Name ="修改人ID")]
        [Column(TypeName="int")]
@@ -116,7 +119,7 @@ namespace VOL.Entity.DomainModels
        public int? ModifyID { get; set; }
 
        /// <summary>
-       ///修改人
+       /// 修改人名称
        /// </summary>
        [Display(Name ="修改人")]
        [MaxLength(100)]
@@ -125,7 +128,7 @@ namespace VOL.Entity.DomainModels
        public string Modifier { get; set; }
 
        /// <summary>
-       ///修改时间
+       /// 记录修改时间
        /// </summary>
        [Display(Name ="修改时间")]
        [Column(TypeName="datetime")]
