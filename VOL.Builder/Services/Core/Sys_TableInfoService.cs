@@ -6,7 +6,7 @@ using VOL.Entity.DomainModels;
 
 namespace VOL.Builder.Services
 {
-    public partial class Sys_TableInfoService : ServiceBase<Sys_TableInfo, ISys_TableInfoRepository>, ISys_TableInfoService, IDependency
+    public partial class Sys_TableInfoService : ServiceBase<Sys_TableInfo, ISys_TableInfoRepository>, IDependency
     {
         public  Sys_TableInfoService(ISys_TableInfoRepository repository)
              : base(repository) 
