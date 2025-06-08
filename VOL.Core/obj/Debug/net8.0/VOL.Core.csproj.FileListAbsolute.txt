@@ -1,0 +1,15 @@
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Core\bin\Debug\net8.0\VOL.Core.deps.json
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Core\bin\Debug\net8.0\VOL.Core.dll
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Core\bin\Debug\net8.0\VOL.Core.pdb
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Core\bin\Debug\net8.0\VOL.Entity.dll
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Core\bin\Debug\net8.0\VOL.Entity.pdb
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Core\obj\Debug\net8.0\VOL.Core.csproj.AssemblyReference.cache
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Core\obj\Debug\net8.0\VOL.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Core\obj\Debug\net8.0\VOL.Core.AssemblyInfoInputs.cache
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Core\obj\Debug\net8.0\VOL.Core.AssemblyInfo.cs
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Core\obj\Debug\net8.0\VOL.Core.csproj.CoreCompileInputs.cache
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Core\obj\Debug\net8.0\VOL.Core.csproj.Up2Date
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Core\obj\Debug\net8.0\VOL.Core.dll
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Core\obj\Debug\net8.0\refint\VOL.Core.dll
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Core\obj\Debug\net8.0\VOL.Core.pdb
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Core\obj\Debug\net8.0\ref\VOL.Core.dll

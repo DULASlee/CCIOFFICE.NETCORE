@@ -1,0 +1,17 @@
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.MES\bin\Debug\net8.0\VOL.MES.deps.json
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.MES\bin\Debug\net8.0\VOL.MES.dll
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.MES\bin\Debug\net8.0\VOL.MES.pdb
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.MES\bin\Debug\net8.0\VOL.Core.dll
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.MES\bin\Debug\net8.0\VOL.Entity.dll
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.MES\bin\Debug\net8.0\VOL.Core.pdb
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.MES\bin\Debug\net8.0\VOL.Entity.pdb
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.MES\obj\Debug\net8.0\VOL.MES.csproj.AssemblyReference.cache
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.MES\obj\Debug\net8.0\VOL.MES.GeneratedMSBuildEditorConfig.editorconfig
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.MES\obj\Debug\net8.0\VOL.MES.AssemblyInfoInputs.cache
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.MES\obj\Debug\net8.0\VOL.MES.AssemblyInfo.cs
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.MES\obj\Debug\net8.0\VOL.MES.csproj.CoreCompileInputs.cache
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.MES\obj\Debug\net8.0\VOL.MES.csproj.Up2Date
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.MES\obj\Debug\net8.0\VOL.MES.dll
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.MES\obj\Debug\net8.0\refint\VOL.MES.dll
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.MES\obj\Debug\net8.0\VOL.MES.pdb
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.MES\obj\Debug\net8.0\ref\VOL.MES.dll
