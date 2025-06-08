@@ -6,6 +6,7 @@ D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Entity\obj\Debug\net8.0\VOL.Entity
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Entity\obj\Debug\net8.0\VOL.Entity.AssemblyInfoInputs.cache
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Entity\obj\Debug\net8.0\VOL.Entity.AssemblyInfo.cs
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Entity\obj\Debug\net8.0\VOL.Entity.csproj.CoreCompileInputs.cache
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Entity\obj\Debug\net8.0\VOL.Entity.sourcelink.json
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Entity\obj\Debug\net8.0\VOL.Entity.dll
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Entity\obj\Debug\net8.0\refint\VOL.Entity.dll
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Entity\obj\Debug\net8.0\VOL.Entity.pdb

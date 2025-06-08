@@ -15,7 +15,7 @@ using VOL.Core.Utilities;
 using VOL.Entity;
 using VOL.Entity.DomainModels;
 /*
-* jxx 2017-08-09 
+* codesoft 2017-08-09 
 * 通用实体属操作
 */
 

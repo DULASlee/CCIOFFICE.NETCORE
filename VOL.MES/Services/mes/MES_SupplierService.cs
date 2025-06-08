@@ -1,6 +1,6 @@
 /*
- *Author：jxx
- *Contact：283591387@qq.com
+ *Author：codesoft
+ *Contact：971926469@qq.com
  *代码由框架生成,此处任何更改都可能导致被代码生成器覆盖
  *所有业务编写全部应在Partial文件夹下MES_SupplierService与IMES_SupplierService中编写
  */

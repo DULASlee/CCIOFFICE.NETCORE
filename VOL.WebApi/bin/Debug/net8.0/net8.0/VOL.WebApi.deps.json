@@ -2413,6 +2413,7 @@
           "Microsoft.EntityFrameworkCore": "8.0.0",
           "Microsoft.EntityFrameworkCore.SqlServer": "8.0.0",
           "Pomelo.EntityFrameworkCore.MySql": "8.0.0",
+          "Serilog": "4.2.0",
           "VOL.Core": "1.0.0",
           "VOL.Entity": "1.0.0"
         },
@@ -2429,6 +2430,7 @@
           "Autofac": "8.0.0",
           "Microsoft.EntityFrameworkCore": "8.0.0",
           "Microsoft.EntityFrameworkCore.SqlServer": "8.0.0",
+          "Serilog": "4.2.0",
           "VOL.Core": "1.0.0",
           "VOL.Entity": "1.0.0"
         },

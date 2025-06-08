@@ -27,7 +27,7 @@ namespace VOL.Builder.Services
 {
     public partial class Sys_TableInfoService : IDisposable
     {
-        private readonly ILogger _logger;
+       
         private bool _disposed = false;
 
         // 缓存模板文件内容，避免重复读取
@@ -52,7 +52,7 @@ namespace VOL.Builder.Services
 
         public Sys_TableInfoService()
         {
-            _logger = Log.ForContext<Sys_TableInfoService>();
+             Log.ForContext<Sys_TableInfoService>();
         }
 
         private string StratName
@@ -88,13 +88,13 @@ namespace VOL.Builder.Services
                     if (webProject == null)
                     {
                         var errorMsg = $"[{ErrorCodes.InvalidProjectName}] 未找到以.WebApi、Api或.Web结尾的项目名称，无法创建页面。请确保项目命名规范。";
-                        _logger.Error(errorMsg);
+                        Log.Error(errorMsg);
                         throw new InvalidOperationException(errorMsg);
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex, "获取Web项目名称失败");
+                    Log.Error(ex, "获取Web项目名称失败");
                     throw;
                 }
                 return webProject;
@@ -114,13 +114,13 @@ namespace VOL.Builder.Services
                     if (apiNameSpace == null)
                     {
                         var errorMsg = $"[{ErrorCodes.InvalidProjectName}] 未找到以.WebApi结尾的项目，无法创建Api控制器。";
-                        _logger.Error(errorMsg);
+                        Log.Error(errorMsg);
                         throw new InvalidOperationException(errorMsg);
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex, "获取API命名空间失败");
+                    Log.Error(ex, "获取API命名空间失败");
                     throw;
                 }
                 return apiNameSpace;
@@ -165,7 +165,7 @@ namespace VOL.Builder.Services
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "获取表树形结构失败");
+                Log.Error(ex, "获取表树形结构失败");
                 return ("[]", "");
             }
         }
@@ -181,7 +181,7 @@ namespace VOL.Builder.Services
                 string connectionString = DBServerProvider.GetConnectionString();
                 if (string.IsNullOrWhiteSpace(connectionString))
                 {
-                    _logger.Warning("数据库连接字符串为空");
+                    Log.Warning("数据库连接字符串为空");
                     return "";
                 }
 
@@ -204,7 +204,7 @@ namespace VOL.Builder.Services
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "获取MySQL数据库名异常");
+                Log.Error(ex, "获取MySQL数据库名异常");
                 return "";
             }
         }
@@ -220,7 +220,7 @@ namespace VOL.Builder.Services
                 string connectionString = DBServerProvider.GetConnectionString();
                 if (string.IsNullOrWhiteSpace(connectionString))
                 {
-                    _logger.Warning("数据库连接字符串为空");
+                    Log.Warning("数据库连接字符串为空");
                     return "";
                 }
 
@@ -239,7 +239,7 @@ namespace VOL.Builder.Services
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "获取达梦数据库名异常");
+                Log.Error(ex, "获取达梦数据库名异常");
                 return "";
             }
         }
@@ -272,7 +272,7 @@ namespace VOL.Builder.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex, "读取模板文件失败: {Path}", path);
+                    Log.Error(ex, "读取模板文件失败: {Path}", path);
                     throw new InvalidOperationException($"[{ErrorCodes.FileOperationFailed}] 读取模板文件失败: {path}", ex);
                 }
             });
@@ -353,7 +353,7 @@ namespace VOL.Builder.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex, "查询表结构信息失败: {TableName}", tableName);
+                    Log.Error(ex, "查询表结构信息失败: {TableName}", tableName);
                     return $"[{ErrorCodes.DatabaseOperationFailed}] 查询表 {tableName} 结构信息失败: {ex.Message}";
                 }
 
@@ -374,7 +374,7 @@ namespace VOL.Builder.Services
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "创建实体Model失败");
+                Log.Error(ex, "创建实体Model失败");
                 return $"[{ErrorCodes.FileOperationFailed}] 创建Model失败: {ex.Message}";
             }
         }
@@ -1088,7 +1088,7 @@ DISTINCT
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "初始化表{TableName}失败", tableName);
+                Log.Error(ex, "初始化表{TableName}失败", tableName);
                 throw;
             }
         }
@@ -1134,7 +1134,7 @@ DISTINCT
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "加载表配置信息失败");
+                Log.Error(ex, "加载表配置信息失败");
                 return new WebResponseContent().Error($"[{ErrorCodes.DatabaseOperationFailed}] 加载失败: {ex.Message}");
             }
         }
@@ -1177,7 +1177,7 @@ DISTINCT
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "删除树节点失败: {TableId}", table_Id);
+                Log.Error(ex, "删除树节点失败: {TableId}", table_Id);
                 return new WebResponseContent().Error($"[{ErrorCodes.DatabaseOperationFailed}] 删除失败: {ex.Message}");
             }
         }
@@ -1425,7 +1425,7 @@ DISTINCT
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "验证列配置失败");
+                Log.Error(ex, "验证列配置失败");
                 return webResponse.Error($"[{ErrorCodes.InvalidConfiguration}] 验证配置失败: {ex.Message}");
             }
         }
@@ -1482,13 +1482,13 @@ DISTINCT
                     }
                     catch (Exception ex)
                     {
-                        _logger.Warning(ex, "加载程序集 {AssemblyName} 失败", compilation.Name);
+                        Log.Warning(ex, "加载程序集 {AssemblyName} 失败", compilation.Name);
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "检查表是否存在时发生错误");
+                Log.Error(ex, "检查表是否存在时发生错误");
                 // 不阻止流程继续，只记录错误
             }
 
@@ -1556,7 +1556,7 @@ DISTINCT
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "创建实体Model内部实现失败");
+                Log.Error(ex, "创建实体Model内部实现失败");
                 return $"[{ErrorCodes.FileOperationFailed}] 创建Model失败: {ex.Message}";
             }
         }
@@ -1847,7 +1847,7 @@ DISTINCT
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "生成实体文件失败");
+                Log.Error(ex, "生成实体文件失败");
                 return $"[{ErrorCodes.FileOperationFailed}] 生成文件失败: {ex.Message}";
             }
         }
@@ -1943,7 +1943,7 @@ DISTINCT
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "保存配置信息失败");
+                Log.Error(ex, "保存配置信息失败");
                 return WebResponseContent.Instance.Error($"[{ErrorCodes.DatabaseOperationFailed}] 保存失败: {ex.Message}");
             }
         }
@@ -1995,7 +1995,7 @@ DISTINCT
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex, "查询表结构失败: {TableName}", actualTableName);
+                    Log.Error(ex, "查询表结构失败: {TableName}", actualTableName);
                     return webResponse.Error($"[{ErrorCodes.DatabaseOperationFailed}] 查询表结构失败: {ex.Message}");
                 }
 
@@ -2066,14 +2066,14 @@ DISTINCT
                     catch (Exception ex)
                     {
                         await transaction.RollbackAsync();
-                        _logger.Error(ex, "同步表结构失败: {TableName}", actualTableName);
+                        Log.Error(ex, "同步表结构失败: {TableName}", actualTableName);
                         throw;
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "同步表结构失败: {TableName}", tableName);
+                Log.Error(ex, "同步表结构失败: {TableName}", tableName);
                 return webResponse.Error($"[{ErrorCodes.DatabaseOperationFailed}] 同步失败: {ex.Message}");
             }
         }

@@ -1,3 +1,10 @@
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\obj\Debug\net8.0\VOL.WebApi.csproj.AssemblyReference.cache
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\obj\Debug\net8.0\VOL.WebApi.GeneratedMSBuildEditorConfig.editorconfig
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\obj\Debug\net8.0\VOL.WebApi.AssemblyInfoInputs.cache
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\obj\Debug\net8.0\VOL.WebApi.AssemblyInfo.cs
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\obj\Debug\net8.0\VOL.WebApi.csproj.CoreCompileInputs.cache
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\obj\Debug\net8.0\VOL.WebApi.MvcApplicationPartsAssemblyInfo.cache
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\obj\Debug\net8.0\VOL.WebApi.sourcelink.json
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\bin\Debug\net8.0\net8.0\appsettings.Development.json
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\bin\Debug\net8.0\net8.0\appsettings.json
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\bin\Debug\net8.0\net8.0\VOL.WebApi.staticwebassets.runtime.json
@@ -136,13 +143,7 @@ D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\bin\Debug\net8.0\net8.0\VOL
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\bin\Debug\net8.0\net8.0\VOL.Entity.pdb
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\bin\Debug\net8.0\net8.0\VOL.MES.pdb
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\bin\Debug\net8.0\net8.0\VOL.Sys.pdb
-D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\obj\Debug\net8.0\VOL.WebApi.csproj.AssemblyReference.cache
-D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\obj\Debug\net8.0\VOL.WebApi.GeneratedMSBuildEditorConfig.editorconfig
-D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\obj\Debug\net8.0\VOL.WebApi.AssemblyInfoInputs.cache
-D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\obj\Debug\net8.0\VOL.WebApi.AssemblyInfo.cs
-D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\obj\Debug\net8.0\VOL.WebApi.csproj.CoreCompileInputs.cache
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\obj\Debug\net8.0\VOL.WebApi.MvcApplicationPartsAssemblyInfo.cs
-D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\obj\Debug\net8.0\VOL.WebApi.MvcApplicationPartsAssemblyInfo.cache
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\obj\Debug\net8.0\scopedcss\bundle\VOL.WebApi.styles.css
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\obj\Debug\net8.0\staticwebassets.build.json
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.WebApi\obj\Debug\net8.0\staticwebassets.build.json.cache

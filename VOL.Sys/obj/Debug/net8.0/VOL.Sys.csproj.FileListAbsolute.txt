@@ -10,6 +10,7 @@ D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Sys\obj\Debug\net8.0\VOL.Sys.Gener
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Sys\obj\Debug\net8.0\VOL.Sys.AssemblyInfoInputs.cache
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Sys\obj\Debug\net8.0\VOL.Sys.AssemblyInfo.cs
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Sys\obj\Debug\net8.0\VOL.Sys.csproj.CoreCompileInputs.cache
+D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Sys\obj\Debug\net8.0\VOL.Sys.sourcelink.json
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Sys\obj\Debug\net8.0\VOL.Sys.csproj.Up2Date
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Sys\obj\Debug\net8.0\VOL.Sys.dll
 D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\VOL.Sys\obj\Debug\net8.0\refint\VOL.Sys.dll
