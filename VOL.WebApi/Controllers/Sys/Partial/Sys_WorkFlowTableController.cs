@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using VOL.Entity.DomainModels;
 using VOL.Sys.IServices;
 using VOL.Core.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace VOL.Sys.Controllers
 {
@@ -19,16 +20,19 @@ namespace VOL.Sys.Controllers
     {
         private readonly ISys_WorkFlowTableService _service;//访问业务代码
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger<Sys_WorkFlowTableController> _logger;
 
         [ActivatorUtilitiesConstructor]
         public Sys_WorkFlowTableController(
             ISys_WorkFlowTableService service,
-            IHttpContextAccessor httpContextAccessor
+            IHttpContextAccessor httpContextAccessor,
+            ILogger<Sys_WorkFlowTableController> logger
         )
         : base(service)
         {
             _service = service;
             _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
         }
         [ApiActionPermission()]
         public override ActionResult GetPageData([FromBody] PageDataOptions loadData)

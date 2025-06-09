@@ -15,6 +15,7 @@ using VOL.Sys.IRepositories;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using VOL.Sys.Services;
+using Microsoft.Extensions.Logging;
 
 namespace VOL.Sys.Controllers
 {
@@ -24,12 +25,14 @@ namespace VOL.Sys.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IFormCollectionObjectRepository _formCollectionRepository;
         private readonly IFormDesignOptionsRepository _formDesignOptionsRepository;
+        private readonly ILogger<FormDesignOptionsController> _logger;
         [ActivatorUtilitiesConstructor]
         public FormDesignOptionsController(
             IFormDesignOptionsService service,
             IHttpContextAccessor httpContextAccessor,
             IFormCollectionObjectRepository formCollectionRepository,
-            IFormDesignOptionsRepository formDesignOptionsRepository
+            IFormDesignOptionsRepository formDesignOptionsRepository,
+            ILogger<FormDesignOptionsController> logger
         )
         : base(service)
         {
@@ -37,6 +40,7 @@ namespace VOL.Sys.Controllers
             _httpContextAccessor = httpContextAccessor;
             _formCollectionRepository = formCollectionRepository;
             _formDesignOptionsRepository = formDesignOptionsRepository;
+            _logger = logger;
         }
         /// <summary>
         /// 
@@ -46,10 +50,32 @@ namespace VOL.Sys.Controllers
         [Route("getFormOptions"), HttpGet]
         public async Task<IActionResult> GetFormOptions(Guid id)
         {
-            var options = await _formDesignOptionsRepository.FindAsIQueryable(x => x.FormId == id)
-                    .Select(s => new { s.Title, s.FormOptions })  
-                    .FirstOrDefaultAsync();
-            return Json(new { data = options });
+            _logger.LogInformation("GetFormOptions called with ID {FormId}", id);
+
+            if (id == Guid.Empty)
+            {
+                _logger.LogWarning("GetFormOptions called with an empty Guid.");
+                return new BadRequestObjectResult(new { message = "Form ID cannot be empty." });
+            }
+
+            try
+            {
+                var options = await _formDesignOptionsRepository.FindAsIQueryable(x => x.FormId == id)
+                        .Select(s => new { s.Title, s.FormOptions })
+                        .FirstOrDefaultAsync();
+
+                if (options == null)
+                {
+                    _logger.LogInformation("Form options not found for ID {FormId}", id);
+                    return new NotFoundObjectResult(new { message = "Form options not found." });
+                }
+                return Json(new { data = options });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching form options for ID {FormId}", id);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while fetching form options." });
+            }
         }
         /// <summary>
         /// 
@@ -59,8 +85,33 @@ namespace VOL.Sys.Controllers
         [Route("submit"), HttpPost]
         public IActionResult Submit([FromBody] SaveModel saveModel)
         {
-            var result = FormCollectionObjectService.Instance.Add(saveModel);
-            return Json(result);
+            _logger.LogInformation("Submit method called for FormDesignOptions.");
+
+            if (saveModel == null)
+            {
+                _logger.LogWarning("Submit called with null saveModel.");
+                return new BadRequestObjectResult(new { message = "Save data cannot be null." });
+            }
+
+            try
+            {
+                var result = FormCollectionObjectService.Instance.Add(saveModel);
+
+                if (result.Status)
+                {
+                    _logger.LogInformation("Submit successful for FormDesignOptions.");
+                }
+                else
+                {
+                    _logger.LogWarning("Submit for FormDesignOptions failed with service message: {ServiceMessage}", result.Message);
+                }
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception during Submit for FormDesignOptions.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An unexpected error occurred while submitting form data." });
+            }
         }
         /// <summary>
         ///获取有数据的设计器
@@ -69,12 +120,20 @@ namespace VOL.Sys.Controllers
         [Route("getList"), HttpGet]
         public IActionResult GetList()
         {
-            var query = _formCollectionRepository.FindAsIQueryable(x => true);
-            var data = _formDesignOptionsRepository.FindAsIQueryable(x => query.Any(c => c.FormId == x.FormId))
-                  .Select(s => new { s.FormId, s.Title, s.FormOptions })
-                  .ToList();  
-            return Json(data);  
-
+            _logger.LogInformation("GetList called for FormDesignOptions.");
+            try
+            {
+                var query = _formCollectionRepository.FindAsIQueryable(x => true);
+                var data = _formDesignOptionsRepository.FindAsIQueryable(x => query.Any(c => c.FormId == x.FormId))
+                      .Select(s => new { s.FormId, s.Title, s.FormOptions })
+                      .ToList();
+                return Json(data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching form design list.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while fetching the form design list." });
+            }
         }
     }
 }

@@ -6,16 +6,44 @@ using VOL.Core.Controllers.Basic;
 using VOL.Core.Extensions;
 using VOL.Core.Filters;
 using VOL.Sys.IServices;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace VOL.Sys.Controllers
 {
     public partial class Sys_DictionaryController
     {
+        private readonly ILogger<Sys_DictionaryController> _logger;
+
+        [ActivatorUtilitiesConstructor]
+        public Sys_DictionaryController(
+            ISys_DictionaryService service,
+            ILogger<Sys_DictionaryController> logger
+        )
+        : base(service)
+        {
+            _logger = logger;
+        }
+
         [HttpPost, Route("GetVueDictionary"), AllowAnonymous]
         [ApiActionPermission()]
         public IActionResult GetVueDictionary([FromBody] string[] dicNos)
         {
-            return Content(Service.GetVueDictionary(dicNos).Serialize());
+            _logger.LogInformation("GetVueDictionary called with dicNos: {DicNosCount}", dicNos?.Length ?? 0);
+            if (dicNos == null || dicNos.Length == 0)
+            {
+                _logger.LogWarning("GetVueDictionary called with null or empty dicNos.");
+                return new BadRequestObjectResult(new { status = false, message = "Dictionary numbers cannot be empty." });
+            }
+            try
+            {
+                return Content(Service.GetVueDictionary(dicNos).Serialize());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetVueDictionary. dicNos count: {DicNosCount}", dicNos.Length);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "An error occurred while fetching Vue dictionary." });
+            }
         }
         /// <summary>
         /// table加载数据后刷新当前table数据的字典项(适用字典数据量比较大的情况)
@@ -25,7 +53,21 @@ namespace VOL.Sys.Controllers
         [HttpPost, Route("getTableDictionary")]
         public IActionResult GetTableDictionary([FromBody] Dictionary<string, object[]> keyData)
         {
-            return Json(Service.GetTableDictionary(keyData));
+            _logger.LogInformation("GetTableDictionary called with keyData count: {KeyDataCount}", keyData?.Count ?? 0);
+            if (keyData == null || keyData.Count == 0)
+            {
+                _logger.LogWarning("GetTableDictionary called with null or empty keyData.");
+                return new BadRequestObjectResult(new { status = false, message = "Key data cannot be empty." });
+            }
+            try
+            {
+                return Json(Service.GetTableDictionary(keyData));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetTableDictionary. keyData count: {KeyDataCount}", keyData.Count);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "An error occurred while fetching table dictionary." });
+            }
         }
         /// <summary>
         /// 远程搜索
@@ -35,7 +77,21 @@ namespace VOL.Sys.Controllers
         [HttpPost, Route("getSearchDictionary"), AllowAnonymous]
         public IActionResult GetSearchDictionary(string dicNo, string value)
         {
-            return Json(Service.GetSearchDictionary(dicNo, value));
+            _logger.LogInformation("GetSearchDictionary called with dicNo: {DicNo}, value: {Value}", dicNo, value);
+            if (string.IsNullOrEmpty(dicNo))
+            {
+                _logger.LogWarning("GetSearchDictionary called with null or empty dicNo.");
+                return new BadRequestObjectResult(new { status = false, message = "Dictionary number cannot be empty." });
+            }
+            try
+            {
+                return Json(Service.GetSearchDictionary(dicNo, value));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetSearchDictionary. dicNo: {DicNo}, value: {Value}", dicNo, value);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "An error occurred while searching dictionary." });
+            }
         }
 
         /// <summary>
@@ -47,7 +103,21 @@ namespace VOL.Sys.Controllers
         [HttpPost, Route("getRemoteDefaultKeyValue"), AllowAnonymous]
         public async Task<IActionResult> GetRemoteDefaultKeyValue(string dicNo, string key)
         {
-            return Json(await Service.GetRemoteDefaultKeyValue(dicNo, key));
+            _logger.LogInformation("GetRemoteDefaultKeyValue called with dicNo: {DicNo}, key: {Key}", dicNo, key);
+            if (string.IsNullOrEmpty(dicNo) || string.IsNullOrEmpty(key))
+            {
+                _logger.LogWarning("GetRemoteDefaultKeyValue called with null or empty dicNo or key. DicNo: {DicNo}, Key: {Key}", dicNo, key);
+                return new BadRequestObjectResult(new { status = false, message = "Dictionary number and key cannot be empty." });
+            }
+            try
+            {
+                return Json(await Service.GetRemoteDefaultKeyValue(dicNo, key));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetRemoteDefaultKeyValue. dicNo: {DicNo}, key: {Key}", dicNo, key);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "An error occurred while fetching remote default key value." });
+            }
         }
         /// <summary>
         /// 代码生成器获取所有字典项(超级管理权限)
@@ -57,7 +127,16 @@ namespace VOL.Sys.Controllers
         // [ApiActionPermission(ActionRolePermission.SuperAdmin)]
         public async Task<IActionResult> GetBuilderDictionary()
         {
-            return Json(await Service.GetBuilderDictionary());
+            _logger.LogInformation("GetBuilderDictionary called.");
+            try
+            {
+                return Json(await Service.GetBuilderDictionary());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetBuilderDictionary.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "An error occurred while fetching builder dictionary." });
+            }
         }
 
     }

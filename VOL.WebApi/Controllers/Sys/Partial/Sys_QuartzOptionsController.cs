@@ -13,6 +13,7 @@ using VOL.Entity.DomainModels;
 using VOL.Sys.IServices;
 using VOL.Core.Filters;
 using VOL.Core.Enums;
+using Microsoft.Extensions.Logging;
 
 namespace VOL.Sys.Controllers
 {
@@ -20,16 +21,19 @@ namespace VOL.Sys.Controllers
     {
         private readonly ISys_QuartzOptionsService _service;//访问业务代码
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger<Sys_QuartzOptionsController> _logger;
 
         [ActivatorUtilitiesConstructor]
         public Sys_QuartzOptionsController(
             ISys_QuartzOptionsService service,
-            IHttpContextAccessor httpContextAccessor
+            IHttpContextAccessor httpContextAccessor,
+            ILogger<Sys_QuartzOptionsController> logger
         )
         : base(service)
         {
             _service = service;
             _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
         }
 
         /// <summary>
@@ -40,7 +44,16 @@ namespace VOL.Sys.Controllers
         [HttpGet, HttpPost, Route("test2")]
         public IActionResult Test2()
         {
-            return Content(DateTime.Now.ToString("yyyy-MM-dd HH:mm:sss"));
+            _logger.LogInformation("Test2 method called.");
+            try
+            {
+                return Content(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in Test2 method.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "An error occurred in Test2." });
+            }
         }
 
         /// <summary>
@@ -51,7 +64,16 @@ namespace VOL.Sys.Controllers
         [HttpGet, HttpPost, Route("taskTest")]
         public IActionResult TaskTest()
         {
-            return Content(DateTime.Now.ToString("yyyy-MM-dd HH:mm:sss"));
+            _logger.LogInformation("TaskTest method called.");
+            try
+            {
+                return Content(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in TaskTest method.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "An error occurred in TaskTest." });
+            }
         }
 
         /// <summary>
@@ -63,7 +85,21 @@ namespace VOL.Sys.Controllers
         [ActionPermission(ActionPermissionOptions.Update)]
         public async Task<object> Run([FromBody] Sys_QuartzOptions taskOptions)
         {
-            return await Service.Run(taskOptions);
+            _logger.LogInformation("Run called for TaskId: {TaskId}, TaskName: {TaskName}", taskOptions?.Id, taskOptions?.TaskName);
+            if (taskOptions == null)
+            {
+                _logger.LogWarning("Run called with null taskOptions.");
+                return new BadRequestObjectResult(new { status = false, message = "Task options cannot be null." });
+            }
+            try
+            {
+                return await Service.Run(taskOptions);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in Run for TaskId: {TaskId}, TaskName: {TaskName}", taskOptions.Id, taskOptions.TaskName);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "An error occurred while running the task." });
+            }
         }
         /// <summary>
         /// 开启任务
@@ -75,7 +111,21 @@ namespace VOL.Sys.Controllers
         [ActionPermission(ActionPermissionOptions.Update)]
         public async Task<object> Start([FromBody] Sys_QuartzOptions taskOptions)
         {
-            return await Service.Start(taskOptions);
+            _logger.LogInformation("Start called for TaskId: {TaskId}, TaskName: {TaskName}", taskOptions?.Id, taskOptions?.TaskName);
+            if (taskOptions == null)
+            {
+                _logger.LogWarning("Start called with null taskOptions.");
+                return new BadRequestObjectResult(new { status = false, message = "Task options cannot be null." });
+            }
+            try
+            {
+                return await Service.Start(taskOptions);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in Start for TaskId: {TaskId}, TaskName: {TaskName}", taskOptions.Id, taskOptions.TaskName);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "An error occurred while starting the task." });
+            }
         }
 
         /// <summary>
@@ -88,7 +138,21 @@ namespace VOL.Sys.Controllers
         [ActionPermission(ActionPermissionOptions.Update)]
         public async Task<object> Pause([FromBody] Sys_QuartzOptions taskOptions)
         {
-            return await Service.Pause(taskOptions);
+            _logger.LogInformation("Pause called for TaskId: {TaskId}, TaskName: {TaskName}", taskOptions?.Id, taskOptions?.TaskName);
+            if (taskOptions == null)
+            {
+                _logger.LogWarning("Pause called with null taskOptions.");
+                return new BadRequestObjectResult(new { status = false, message = "Task options cannot be null." });
+            }
+            try
+            {
+                return await Service.Pause(taskOptions);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in Pause for TaskId: {TaskId}, TaskName: {TaskName}", taskOptions.Id, taskOptions.TaskName);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "An error occurred while pausing the task." });
+            }
         }
     }
 }

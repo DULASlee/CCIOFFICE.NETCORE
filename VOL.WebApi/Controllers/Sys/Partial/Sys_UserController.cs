@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -36,31 +37,48 @@ namespace VOL.Sys.Controllers
     {
         private ISys_UserRepository _userRepository;
         private ICacheService _cache;
+        private readonly ILogger<Sys_UserController> _logger;
         [ActivatorUtilitiesConstructor]
         public Sys_UserController(
                ISys_UserService userService,
                ISys_UserRepository userRepository,
-               ICacheService cahce
+               ICacheService cahce,
+               ILogger<Sys_UserController> logger
               )
           : base(userService)
         {
             _userRepository = userRepository;
             _cache = cahce;
+            _logger = logger;
         }
 
         [HttpPost, HttpGet, Route("login"), AllowAnonymous]
         [ObjectModelValidatorFilter(ValidatorModel.Login)]
         public async Task<IActionResult> Login([FromBody] LoginInfo loginInfo)
         {
-            return Json(await Service.Login(loginInfo));
+            _logger.LogInformation("Login attempt for User: {UserName}", loginInfo?.UserName);
+            if (loginInfo == null)
+            {
+                _logger.LogWarning("Login called with null loginInfo.");
+                return new BadRequestObjectResult(new { status = false, message = "Login data cannot be null." });
+            }
+            try
+            {
+                return Json(await Service.Login(loginInfo));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during Login for User: {UserName}", loginInfo.UserName);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "An error occurred during login." });
+            }
         }
 
         private readonly ConcurrentDictionary<int, object> _lockCurrent = new ConcurrentDictionary<int, object>();
         [HttpPost, Route("replaceToken")]
         public IActionResult ReplaceToken()
         {
+            _logger.LogInformation("ReplaceToken called for UserId: {UserId}", UserContext.Current.UserId);
             WebResponseContent responseContent = new WebResponseContent();
-            string error = "";
             string key = $"rp:Token:{UserContext.Current.UserId}";
             UserInfo userInfo = null;
             try
@@ -68,6 +86,7 @@ namespace VOL.Sys.Controllers
                 //如果5秒内替换过token,直接使用最新的token(防止一个页面多个并发请求同时替换token导致token错位)
                 if (_cache.Exists(key))
                 {
+                    _logger.LogInformation("ReplaceToken cache hit for UserId: {UserId}", UserContext.Current.UserId);
                     return Json(responseContent.OK(null, _cache.Get(key)));
                 }
                 var _obj = _lockCurrent.GetOrAdd(UserContext.Current.UserId, new object() { });
@@ -75,12 +94,17 @@ namespace VOL.Sys.Controllers
                 {
                     if (_cache.Exists(key))
                     {
+                        _logger.LogInformation("ReplaceToken cache hit (inside lock) for UserId: {UserId}", UserContext.Current.UserId);
                         return Json(responseContent.OK(null, _cache.Get(key)));
                     }
                     string requestToken = HttpContext.Request.Headers[AppSetting.TokenHeaderName];
                     requestToken = requestToken?.Replace("Bearer ", "");
 
-                    if (JwtHelper.IsExp(requestToken)) return Json(responseContent.Error("Token已过期!"));
+                    if (JwtHelper.IsExp(requestToken))
+                    {
+                        _logger.LogWarning("Token expired for UserId: {UserId} during ReplaceToken", UserContext.Current.UserId);
+                        return Json(responseContent.Error("Token已过期!"));
+                    }
 
                     int userId = UserContext.Current.UserId;
 
@@ -94,7 +118,11 @@ namespace VOL.Sys.Controllers
                                  RoleName = s.RoleName
                              }).FirstOrDefault();
 
-                    if (userInfo == null) return Json(responseContent.Error("未查到用户信息!"));
+                    if (userInfo == null)
+                    {
+                        _logger.LogWarning("User info not found for token replacement for UserId: {UserId}", userId);
+                        return Json(responseContent.Error("未查到用户信息!"));
+                    }
 
                     string token = JwtHelper.IssueJwt(userInfo);
                     //移除当前缓存
@@ -108,14 +136,21 @@ namespace VOL.Sys.Controllers
             }
             catch (Exception ex)
             {
-                error = ex.Message + ex.StackTrace;
+                _logger.LogError(ex, "Exception during token replacement for UserId: {UserId}", UserContext.Current.UserId);
                 responseContent.Error("token替换异常");
             }
             finally
             {
                 _lockCurrent.TryRemove(UserContext.Current.UserId, out object val);
-                string _message = $"用户{userInfo?.User_Id}_{userInfo?.UserTrueName},({(responseContent.Status ? "token替换成功": "token替换失败")})";
-                Logger.Info(LoggerType.ReplaceToeken, _message, null, error);
+                string outcomeMessage = $"用户{userInfo?.User_Id}_{userInfo?.UserTrueName} token replacement {(responseContent.Status ? "succeeded" : "failed")}.";
+                if (responseContent.Status)
+                {
+                    _logger.LogInformation(outcomeMessage + " New token present in response data."); // Token itself is not logged for security. responseContent.Data holds it.
+                }
+                else
+                {
+                    _logger.LogWarning(outcomeMessage + (string.IsNullOrEmpty(responseContent.Message) ? "" : " Reason: " + responseContent.Message));
+                }
             }
             return Json(responseContent);
         }
@@ -125,14 +160,37 @@ namespace VOL.Sys.Controllers
         [ApiActionPermission]
         public async Task<IActionResult> ModifyPwd([FromBody] Dictionary<string, string> info)
         {
-            return Json(await Service.ModifyPwd(info?["oldPwd"], info?["newPwd"]));
+            _logger.LogInformation("ModifyPwd called for UserId: {UserId}", UserContext.Current.UserId);
+            if (info == null || !info.ContainsKey("oldPwd") || !info.ContainsKey("newPwd"))
+            {
+                _logger.LogWarning("ModifyPwd called with null info or missing keys for UserId: {UserId}", UserContext.Current.UserId);
+                return new BadRequestObjectResult(new { status = false, message = "Password information is incomplete." });
+            }
+            try
+            {
+                return Json(await Service.ModifyPwd(info["oldPwd"], info["newPwd"]));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in ModifyPwd for UserId: {UserId}", UserContext.Current.UserId);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "An error occurred while modifying password." });
+            }
         }
 
 
         [HttpPost, Route("getCurrentUserInfo")]
         public async Task<IActionResult> GetCurrentUserInfo()
         {
-            return Json(await Service.GetCurrentUserInfo());
+            _logger.LogInformation("GetCurrentUserInfo called for UserId: {UserId}", UserContext.Current.UserId);
+            try
+            {
+                return Json(await Service.GetCurrentUserInfo());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetCurrentUserInfo for UserId: {UserId}", UserContext.Current.UserId);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "An error occurred while fetching current user info." });
+            }
         }
 
         //只能超级管理员才能修改密码
@@ -141,24 +199,48 @@ namespace VOL.Sys.Controllers
         [HttpPost, Route("modifyUserPwd"), ApiActionPermission(ActionPermissionOptions.Add | ActionPermissionOptions.Update)]
         public IActionResult ModifyUserPwd([FromBody] LoginInfo loginInfo)
         {
-            string userName = loginInfo?.UserName;
-            string password = loginInfo?.Password;
+            _logger.LogInformation("ModifyUserPwd attempt for User: {UserName}", loginInfo?.UserName);
             WebResponseContent webResponse = new WebResponseContent();
-            if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(userName))
+
+            if (loginInfo == null)
             {
+                _logger.LogWarning("ModifyUserPwd called with null loginInfo.");
                 return Json(webResponse.Error("参数不完整"));
             }
-            if (password.Length < 6) return Json(webResponse.Error("密码长度不能少于6位"));
-            Sys_User user = _userRepository.FindFirst(x => x.UserName == userName);
-            if (user == null)
+
+            string userName = loginInfo.UserName;
+            string password = loginInfo.Password;
+
+            if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(userName))
             {
-                return Json(webResponse.Error("用户不存在"));
+                _logger.LogWarning("ModifyUserPwd called with incomplete parameters for User: {UserName}", userName);
+                return Json(webResponse.Error("参数不完整"));
             }
-            user.UserPwd = password.EncryptDES(AppSetting.Secret.User);
-            _userRepository.Update(user, x => new { x.UserPwd }, true);
-            //如果用户在线，强制下线
-            UserContext.Current.LogOut(user.User_Id);
-            return Json(webResponse.OK("密码修改成功"));
+            if (password.Length < 6)
+            {
+                _logger.LogWarning("ModifyUserPwd password length too short for User: {UserName}", userName);
+                return Json(webResponse.Error("密码长度不能少于6位"));
+            }
+
+            try
+            {
+                Sys_User user = _userRepository.FindFirst(x => x.UserName == userName);
+                if (user == null)
+                {
+                    _logger.LogWarning("User not found for ModifyUserPwd: {UserName}", userName);
+                    return Json(webResponse.Error("用户不存在"));
+                }
+                user.UserPwd = password.EncryptDES(AppSetting.Secret.User);
+                _userRepository.Update(user, x => new { x.UserPwd }, true);
+                UserContext.Current.LogOut(user.User_Id);
+                _logger.LogInformation("Password successfully modified for User: {UserName}, UserId: {UserId}", userName, user.User_Id);
+                return Json(webResponse.OK("密码修改成功"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in ModifyUserPwd for User: {UserName}", userName);
+                return Json(webResponse.Error("修改密码时发生异常"));
+            }
         }
 
         /// <summary>
@@ -168,28 +250,65 @@ namespace VOL.Sys.Controllers
         [HttpGet, Route("getVierificationCode"), AllowAnonymous]
         public IActionResult GetVierificationCode()
         {
-            string code = VierificationCode.RandomText();
-            var data = new
+            _logger.LogInformation("GetVierificationCode called.");
+            try
             {
-                img = VierificationCode.CreateBase64Imgage(code),
-                uuid = Guid.NewGuid()
-            };
-            HttpContext.GetService<IMemoryCache>().Set(data.uuid.ToString(), code, new TimeSpan(0, 5, 0));
-            return Json(data);
+                string code = VierificationCode.RandomText();
+                var data = new
+                {
+                    img = VierificationCode.CreateBase64Imgage(code),
+                    uuid = Guid.NewGuid()
+                };
+                HttpContext.GetService<IMemoryCache>().Set(data.uuid.ToString(), code, new TimeSpan(0, 5, 0));
+                return Json(data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetVierificationCode.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "An error occurred while generating verification code." });
+            }
         }
 
         [ApiActionPermission()]
         public override IActionResult Upload(IEnumerable<IFormFile> fileInput)
         {
-            return base.Upload(fileInput);
+            _logger.LogInformation("Upload (Sys_UserController) called with {FileCount} files.", fileInput?.Count() ?? 0);
+            if (fileInput == null || !fileInput.Any())
+            {
+                _logger.LogWarning("Upload (Sys_UserController) called with no files.");
+                return new BadRequestObjectResult(new { status = false, message = "No files provided for upload." });
+            }
+            try
+            {
+                return base.Upload(fileInput);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during Upload (Sys_UserController). File count: {FileCount}", fileInput.Count());
+                return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "An error occurred during file upload." });
+            }
         }
         [HttpPost, Route("updateUserInfo")]
         public IActionResult UpdateUserInfo([FromBody] Sys_User user)
         {
-            user.User_Id = UserContext.Current.UserId;
-
-            _userRepository.Update(user, x => new { x.UserTrueName, x.Gender, x.Remark, x.HeadImageUrl }, true);
-            return Content("修改成功");
+            _logger.LogInformation("UpdateUserInfo called for UserId: {UserId}", UserContext.Current.UserId);
+            if (user == null)
+            {
+                _logger.LogWarning("UpdateUserInfo called with null user data for UserId: {UserId}", UserContext.Current.UserId);
+                return new BadRequestObjectResult(new { status = false, message = "User data cannot be null." });
+            }
+            try
+            {
+                user.User_Id = UserContext.Current.UserId;
+                _userRepository.Update(user, x => new { x.UserTrueName, x.Gender, x.Remark, x.HeadImageUrl }, true);
+                _logger.LogInformation("User info updated successfully for UserId: {UserId}", user.User_Id);
+                return Content("修改成功");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in UpdateUserInfo for UserId: {UserId}", UserContext.Current.UserId);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "修改用户信息时发生异常" });
+            }
         }
     }
 }

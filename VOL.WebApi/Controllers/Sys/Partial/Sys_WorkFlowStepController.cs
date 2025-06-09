@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http;
 using VOL.Entity.DomainModels;
 using VOL.Sys.IServices;
+using Microsoft.Extensions.Logging;
 
 namespace VOL.Sys.Controllers
 {
@@ -18,16 +19,19 @@ namespace VOL.Sys.Controllers
     {
         private readonly ISys_WorkFlowStepService _service;//访问业务代码
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger<Sys_WorkFlowStepController> _logger;
 
         [ActivatorUtilitiesConstructor]
         public Sys_WorkFlowStepController(
             ISys_WorkFlowStepService service,
-            IHttpContextAccessor httpContextAccessor
+            IHttpContextAccessor httpContextAccessor,
+            ILogger<Sys_WorkFlowStepController> logger
         )
         : base(service)
         {
             _service = service;
             _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
         }
     }
 }
