@@ -1,0 +1,18 @@
+--------Object reference not set to an instance of an object.   at Microsoft.EntityFrameworkCore.Storage.RelationalTypeMappingSource.FindCollectionMapping(RelationalTypeMappingInfo info, Type modelType, Type providerType, CoreTypeMapping elementMapping)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalTypeMappingSource.<>c.<FindMappingWithConversion>b__8_0(ValueTuple`4 k, RelationalTypeMappingSource self)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalTypeMappingSource.FindMappingWithConversion(RelationalTypeMappingInfo mappingInfo, IReadOnlyList`1 principals)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalTypeMappingSource.FindMapping(MemberInfo member)
+   at Microsoft.EntityFrameworkCore.Metadata.Internal.MemberClassifier.IsCandidatePrimitiveProperty(MemberInfo memberInfo, IConventionModel model, CoreTypeMapping& typeMapping)
+   at Microsoft.EntityFrameworkCore.Metadata.Conventions.PropertyDiscoveryConvention.Process(IConventionEntityTypeBuilder entityTypeBuilder)
+   at Microsoft.EntityFrameworkCore.Metadata.Conventions.PropertyDiscoveryConvention.ProcessEntityTypeAdded(IConventionEntityTypeBuilder entityTypeBuilder, IConventionContext`1 context)
+   at Microsoft.EntityFrameworkCore.Metadata.Conventions.Internal.ConventionDispatcher.ImmediateConventionScope.OnEntityTypeAdded(IConventionEntityTypeBuilder entityTypeBuilder)
+   at Microsoft.EntityFrameworkCore.Metadata.Conventions.Internal.ConventionDispatcher.OnEntityTypeAddedNode.Run(ConventionDispatcher dispatcher)
+   at Microsoft.EntityFrameworkCore.Metadata.Conventions.Internal.ConventionDispatcher.DelayedConventionScope.Run(ConventionDispatcher dispatcher)
+   at Microsoft.EntityFrameworkCore.Metadata.Conventions.Internal.ConventionDispatcher.ConventionBatch.Run()
+   at Microsoft.EntityFrameworkCore.Metadata.Conventions.Internal.ConventionDispatcher.ConventionBatch.Dispose()
+   at Microsoft.EntityFrameworkCore.Metadata.Internal.InternalModelBuilder.Entity(TypeIdentity& type, ConfigurationSource configurationSource, Nullable`1 shouldBeOwned)
+   at Microsoft.EntityFrameworkCore.Metadata.Internal.InternalModelBuilder.Entity(Type type, ConfigurationSource configurationSource, Nullable`1 shouldBeOwned)
+   at Microsoft.EntityFrameworkCore.ModelBuilder.Entity(Type type)
+   at VOL.Core.EFDbContext.VOLContext.<>c__DisplayClass10_0.<OnModelCreating>b__2(Type t) in D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\vol.api\VOL.Core\EFDbContext\VOLContext.cs:line 136
+   at System.Collections.Generic.List`1.ForEach(Action`1 action)
+   at VOL.Core.EFDbContext.VOLContext.OnModelCreating(ModelBuilder modelBuilder) in D:\2025HXSmartConstruct\CCIOFFICE.NETCORE\vol.api\VOL.Core\EFDbContext\VOLContext.cs:line 128Microsoft.EntityFrameworkCore.Relational
